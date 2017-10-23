@@ -4,18 +4,14 @@
     <groupId>io.swagger</groupId>
     <artifactId>swagger-java-client</artifactId>
     <packaging>jar</packaging>
-    <name>swagger-java-client</name>
+    <name>scim2-client</name>
     <version>1.0.0</version>
-    <url>https://github.com/swagger-api/swagger-codegen</url>
-    <description>Swagger Java</description>
+
     <scm>
         <connection>scm:git:git@github.com:swagger-api/swagger-codegen.git</connection>
         <developerConnection>scm:git:git@github.com:swagger-api/swagger-codegen.git</developerConnection>
         <url>https://github.com/swagger-api/swagger-codegen</url>
     </scm>
-    <prerequisites>
-        <maven>2.2.0</maven>
-    </prerequisites>
 
     <licenses>
         <license>
