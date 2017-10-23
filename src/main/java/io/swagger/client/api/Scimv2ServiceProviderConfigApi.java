@@ -96,7 +96,7 @@ public class Scimv2ServiceProviderConfigApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -116,21 +116,24 @@ public class Scimv2ServiceProviderConfigApi {
     /**
      * Return the ServiceProviderConfig schema.
      * Returns HTTP 200 if the schema is found.
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void getServiceProviderConfig() throws ApiException {
-        getServiceProviderConfigWithHttpInfo();
+    public String getServiceProviderConfig() throws ApiException {
+        ApiResponse<String> resp = getServiceProviderConfigWithHttpInfo();
+        return resp.getData();
     }
 
     /**
      * Return the ServiceProviderConfig schema.
      * Returns HTTP 200 if the schema is found.
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> getServiceProviderConfigWithHttpInfo() throws ApiException {
+    public ApiResponse<String> getServiceProviderConfigWithHttpInfo() throws ApiException {
         com.squareup.okhttp.Call call = getServiceProviderConfigValidateBeforeCall(null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -140,7 +143,7 @@ public class Scimv2ServiceProviderConfigApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getServiceProviderConfigAsync(final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call getServiceProviderConfigAsync(final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -162,7 +165,8 @@ public class Scimv2ServiceProviderConfigApi {
         }
 
         com.squareup.okhttp.Call call = getServiceProviderConfigValidateBeforeCall(progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
 }
