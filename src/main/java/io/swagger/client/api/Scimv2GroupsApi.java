@@ -103,7 +103,7 @@ public class Scimv2GroupsApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -126,10 +126,12 @@ public class Scimv2GroupsApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void createGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        createGroupWithHttpInfo(attributes, excludedAttributes, body);
+    public String createGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+        ApiResponse<String> resp = createGroupWithHttpInfo(attributes, excludedAttributes, body);
+        return resp.getData();
     }
 
     /**
@@ -138,12 +140,13 @@ public class Scimv2GroupsApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> createGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> createGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         com.squareup.okhttp.Call call = createGroupValidateBeforeCall(attributes, excludedAttributes, body, null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -156,7 +159,7 @@ public class Scimv2GroupsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call createGroupAsync(List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call createGroupAsync(List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -178,7 +181,8 @@ public class Scimv2GroupsApi {
         }
 
         com.squareup.okhttp.Call call = createGroupValidateBeforeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
     /**
@@ -226,7 +230,7 @@ public class Scimv2GroupsApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -367,7 +371,7 @@ public class Scimv2GroupsApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -394,10 +398,12 @@ public class Scimv2GroupsApi {
      * @param count Specifies the desired maximum number of query results per page. (optional)
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
      * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void getGroup(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
-        getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
+    public String getGroup(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
+        ApiResponse<String> resp = getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
+        return resp.getData();
     }
 
     /**
@@ -410,12 +416,13 @@ public class Scimv2GroupsApi {
      * @param count Specifies the desired maximum number of query results per page. (optional)
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
      * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> getGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
+    public ApiResponse<String> getGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
         com.squareup.okhttp.Call call = getGroupValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -432,7 +439,7 @@ public class Scimv2GroupsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getGroupAsync(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call getGroupAsync(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -454,7 +461,8 @@ public class Scimv2GroupsApi {
         }
 
         com.squareup.okhttp.Call call = getGroupValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
     /**
@@ -508,7 +516,7 @@ public class Scimv2GroupsApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -536,10 +544,12 @@ public class Scimv2GroupsApi {
      * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void getGroupById(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        getGroupByIdWithHttpInfo(id, attributes, excludedAttributes);
+    public String getGroupById(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
+        ApiResponse<String> resp = getGroupByIdWithHttpInfo(id, attributes, excludedAttributes);
+        return resp.getData();
     }
 
     /**
@@ -548,12 +558,13 @@ public class Scimv2GroupsApi {
      * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> getGroupByIdWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
+    public ApiResponse<String> getGroupByIdWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
         com.squareup.okhttp.Call call = getGroupByIdValidateBeforeCall(id, attributes, excludedAttributes, null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -566,7 +577,7 @@ public class Scimv2GroupsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getGroupByIdAsync(String id, List<String> attributes, List<String> excludedAttributes, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call getGroupByIdAsync(String id, List<String> attributes, List<String> excludedAttributes, final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -588,7 +599,8 @@ public class Scimv2GroupsApi {
         }
 
         com.squareup.okhttp.Call call = getGroupByIdValidateBeforeCall(id, attributes, excludedAttributes, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
     /**
@@ -635,7 +647,7 @@ public class Scimv2GroupsApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -656,22 +668,25 @@ public class Scimv2GroupsApi {
      * Return groups according to the filter, sort and pagination parameters
      * Returns HTTP 404 if the groups are not found.
      * @param body  (optional)
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void getGroupsByPost(String body) throws ApiException {
-        getGroupsByPostWithHttpInfo(body);
+    public String getGroupsByPost(String body) throws ApiException {
+        ApiResponse<String> resp = getGroupsByPostWithHttpInfo(body);
+        return resp.getData();
     }
 
     /**
      * Return groups according to the filter, sort and pagination parameters
      * Returns HTTP 404 if the groups are not found.
      * @param body  (optional)
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> getGroupsByPostWithHttpInfo(String body) throws ApiException {
+    public ApiResponse<String> getGroupsByPostWithHttpInfo(String body) throws ApiException {
         com.squareup.okhttp.Call call = getGroupsByPostValidateBeforeCall(body, null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -682,7 +697,7 @@ public class Scimv2GroupsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getGroupsByPostAsync(String body, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call getGroupsByPostAsync(String body, final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -704,7 +719,8 @@ public class Scimv2GroupsApi {
         }
 
         com.squareup.okhttp.Call call = getGroupsByPostValidateBeforeCall(body, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
     /**
@@ -759,7 +775,7 @@ public class Scimv2GroupsApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -788,10 +804,12 @@ public class Scimv2GroupsApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void updateGroup(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        updateGroupWithHttpInfo(id, attributes, excludedAttributes, body);
+    public String updateGroup(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+        ApiResponse<String> resp = updateGroupWithHttpInfo(id, attributes, excludedAttributes, body);
+        return resp.getData();
     }
 
     /**
@@ -801,12 +819,13 @@ public class Scimv2GroupsApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> updateGroupWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> updateGroupWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         com.squareup.okhttp.Call call = updateGroupValidateBeforeCall(id, attributes, excludedAttributes, body, null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -820,7 +839,7 @@ public class Scimv2GroupsApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call updateGroupAsync(String id, List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call updateGroupAsync(String id, List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -842,7 +861,8 @@ public class Scimv2GroupsApi {
         }
 
         com.squareup.okhttp.Call call = updateGroupValidateBeforeCall(id, attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
 }
