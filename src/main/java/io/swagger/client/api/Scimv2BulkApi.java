@@ -103,7 +103,7 @@ public class Scimv2BulkApi {
             });
         }
 
-        String[] localVarAuthNames = new String[] {  };
+        String[] localVarAuthNames = new String[] { "basicAuth" };
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
@@ -126,10 +126,12 @@ public class Scimv2BulkApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
+     * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void createBulk(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        createBulkWithHttpInfo(attributes, excludedAttributes, body);
+    public String createBulk(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+        ApiResponse<String> resp = createBulkWithHttpInfo(attributes, excludedAttributes, body);
+        return resp.getData();
     }
 
     /**
@@ -138,12 +140,13 @@ public class Scimv2BulkApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @return ApiResponse&lt;Void&gt;
+     * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         com.squareup.okhttp.Call call = createBulkValidateBeforeCall(attributes, excludedAttributes, body, null, null);
-        return apiClient.execute(call);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -156,7 +159,7 @@ public class Scimv2BulkApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call createBulkAsync(List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<Void> callback) throws ApiException {
+    public com.squareup.okhttp.Call createBulkAsync(List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<String> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -178,7 +181,8 @@ public class Scimv2BulkApi {
         }
 
         com.squareup.okhttp.Call call = createBulkValidateBeforeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }
 }
