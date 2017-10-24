@@ -107,17 +107,10 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        
-        
+          
         com.squareup.okhttp.Call call = createUserCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        return call;
-
-        
-        
-        
-        
+        return call;    
     }
 
     /**
@@ -197,7 +190,7 @@ public class Scimv2UsersApi {
         Object localVarPostBody = null;
         
         // create path and map variables
-        String localVarPath = "/scim/v2/Users/{id}"
+        String localVarPath = "/wso2/scim/Users/{id}"
             .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -234,22 +227,15 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call deleteUserValidateBeforeCall(String id, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling deleteUser(Async)");
         }
-        
-        
+     
         com.squareup.okhttp.Call call = deleteUserCall(id, progressListener, progressRequestListener);
-        return call;
-
-        
-        
-        
-        
+        return call;    
     }
 
     /**
@@ -269,7 +255,7 @@ public class Scimv2UsersApi {
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> deleteUserWithHttpInfo(String id) throws ApiException {
+    public ApiResponse<String> deleteUserWithHttpInfo(String id) throws ApiException {
         com.squareup.okhttp.Call call = deleteUserValidateBeforeCall(id, null, null);
         return apiClient.execute(call);
     }
@@ -375,7 +361,6 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
     
         com.squareup.okhttp.Call call = getUserCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, progressListener, progressRequestListener);
@@ -514,22 +499,15 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getUserByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling getUserById(Async)");
         }
-        
-        
+         
         com.squareup.okhttp.Call call = getUserByIdCall(id, attributes, excludedAttributes, progressListener, progressRequestListener);
-        return call;
-
-        
-        
-        
-        
+        return call;   
     }
 
     /**
@@ -645,17 +623,10 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call getUsersByPostValidateBeforeCall(String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        
-        
+               
         com.squareup.okhttp.Call call = getUsersByPostCall(body, progressListener, progressRequestListener);
-        return call;
-
-        
-        
-        
-        
+        return call;  
     }
 
     /**
@@ -773,22 +744,15 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
     private com.squareup.okhttp.Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling updateUser(Async)");
         }
-        
-        
+               
         com.squareup.okhttp.Call call = updateUserCall(id, attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        return call;
-
-        
-        
-        
-        
+        return call;  
     }
 
     /**
