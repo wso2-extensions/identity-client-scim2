@@ -21,7 +21,6 @@ public class ProvisioningClient implements Runnable {
 	private static Logger logger = LoggerFactory
 			.getLogger(ProvisioningClient.class.getName());
 
-	private final String GROUP_FILTER = "filter=displayName%20Eq%20";
 	SCIMObject scimObject;
 	SCIMProvider provider;
 	int provisioningMethod;
@@ -60,6 +59,20 @@ public class ProvisioningClient implements Runnable {
 		UserOperation operation = new UserOperation(provider, scimObject,
 				provisioningMethod, additionalProvisioningInformation);
 		operation.provisionCreateUser();
+	}
+	
+	public void provisionDeleteUser() throws IdentitySCIMException {
+
+		UserOperation operation = new UserOperation(provider, scimObject,
+				provisioningMethod, additionalProvisioningInformation);
+		operation.provisionDeleteUser();
+	}
+	
+	public void provisionDeleteUser(String id) throws IdentitySCIMException {
+
+		UserOperation operation = new UserOperation(provider, scimObject,
+				provisioningMethod, additionalProvisioningInformation);
+		operation.provisionDeleteUserById(id);
 	}
 
 	/**
