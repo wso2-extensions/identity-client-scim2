@@ -67,7 +67,7 @@ public class Scimv2UsersApi {
         Object localVarPostBody = body;
         
         // create path and map variables
-        String localVarPath = "/wso2/scim/Users";
+        String localVarPath = "/scim/v2/Users";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -190,7 +190,7 @@ public class Scimv2UsersApi {
         Object localVarPostBody = null;
         
         // create path and map variables
-        String localVarPath = "/wso2/scim/Users/{id}"
+        String localVarPath = "/scim/v2/Users/{id}"
             .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
