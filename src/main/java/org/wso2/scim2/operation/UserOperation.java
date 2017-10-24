@@ -30,13 +30,14 @@ public class UserOperation {
 	private static Logger logger = LoggerFactory.getLogger(UserOperation.class
 			.getName());
 
-	public static final String USER_FILTER = "filter=userName%20Eq%20";
 	public static final String USER_ENDPOINT = "user-endpoint";
+	public static final String ATTRIBUTES = "attributes";
+	public static final String EXCLUDE_ATTRIBUTES = "excludedAttributes";
 
 	SCIMObject scimObject;
 	SCIMProvider provider;
 	int provisioningMethod;
-	private Map<String, Object> additionalProvisioningInformation;
+	private Map<String, Object> additionalInformation;
 
 	String userEPURL;
 	String userName;
@@ -49,7 +50,7 @@ public class UserOperation {
 		provider = scimProvider;
 		scimObject = object;
 		provisioningMethod = httpMethod;
-		additionalProvisioningInformation = additionalInformation;
+		this.additionalInformation = additionalInformation;
 
 		userEPURL = provider.getProperty(USER_ENDPOINT);
 		userName = provider.getProperty(UserSchemaConstants.USER_NAME);
@@ -110,5 +111,33 @@ public class UserOperation {
 		}
 
 		return user;
+	}
+	
+	public void provisionDeleteUser() throws IdentitySCIMException {
+		
+		if(this.scimObject != null && scimObject.getClass().isInstance(User.class)) {
+			User user = (User)scimObject;
+			try {
+				provisionDeleteUserById(user.getId());
+			} catch (CharonException e) {			
+				throw new IdentitySCIMException("Error in encoding the object", e);
+			}
+		}
+	}
+	
+	public void provisionDeleteUserById(String id) throws IdentitySCIMException {
+		
+		Scimv2UsersApi api = new Scimv2UsersApi(client);
+		
+		try {
+			api.deleteUser(id);
+		} catch (ApiException e) {
+			System.out.println(e.getMessage());
+			Gson gson = new Gson();
+			Errors errors = gson.fromJson(e.getResponseBody(), Errors.class);
+			throw new IdentitySCIMException(errors.getErrors().get(0)
+					.getDescription(), e);
+		
+		}
 	}
 }
