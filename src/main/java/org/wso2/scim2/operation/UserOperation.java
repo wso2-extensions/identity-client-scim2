@@ -115,7 +115,7 @@ public class UserOperation {
 	
 	public void provisionDeleteUser() throws IdentitySCIMException {
 		
-		if(this.scimObject != null && scimObject.getClass().isInstance(User.class)) {
+		if(this.scimObject != null) {
 			User user = (User)scimObject;
 			try {
 				provisionDeleteUserById(user.getId());
