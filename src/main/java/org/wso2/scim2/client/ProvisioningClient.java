@@ -20,10 +20,10 @@ public class ProvisioningClient implements Runnable {
 
 	private static Logger logger = LoggerFactory
 			.getLogger(ProvisioningClient.class.getName());
+	
 
 	SCIMObject scimObject;
 	SCIMProvider provider;
-	int provisioningMethod;
 	private String objectType;
 	private Map<String, Object> additionalProvisioningInformation;
 
@@ -33,10 +33,10 @@ public class ProvisioningClient implements Runnable {
 	 *
 	 * @param scimProvider
 	 * @param object
-	 * @param httpMethod
+	 * @param additionalInformation
 	 */
 	public ProvisioningClient(SCIMProvider scimProvider, SCIMObject object,
-			int httpMethod, Map<String, Object> additionalInformation) {
+			Map<String, Object> additionalInformation) {
 
 		if (SCIMObject.class.isAssignableFrom(User.class)) {
 			this.objectType = SCIMConstants.USER;
@@ -46,7 +46,6 @@ public class ProvisioningClient implements Runnable {
 
 		provider = scimProvider;
 		scimObject = object;
-		provisioningMethod = httpMethod;
 		additionalProvisioningInformation = additionalInformation;
 	}
 	
@@ -54,26 +53,28 @@ public class ProvisioningClient implements Runnable {
      * Provision the SCIM User Object passed to the provisioning client in the constructor, to the
      * SCIM Provider whose details are also sent at the initialization.
      */
-	public void provisionCreateUser() throws IdentitySCIMException {
+	public User provisionCreateUser() throws IdentitySCIMException {
 
 		UserOperation operation = new UserOperation(provider, scimObject,
-				provisioningMethod, additionalProvisioningInformation);
-		operation.provisionCreateUser();
+				additionalProvisioningInformation);
+		User user = operation.provisionCreateUser();
+		
+		return user;
 	}
 	
 	public void provisionDeleteUser() throws IdentitySCIMException {
 
 		UserOperation operation = new UserOperation(provider, scimObject,
-				provisioningMethod, additionalProvisioningInformation);
+				additionalProvisioningInformation);
 		operation.provisionDeleteUser();
 	}
-	
-	public void provisionDeleteUser(String id) throws IdentitySCIMException {
 
-		UserOperation operation = new UserOperation(provider, scimObject,
-				provisioningMethod, additionalProvisioningInformation);
-		operation.provisionDeleteUserById(id);
-	}
+	public void provisionUpdateUser() throws IdentitySCIMException {
+
+	    UserOperation operation = new UserOperation(provider, scimObject,
+                additionalProvisioningInformation);
+        operation.provisionUpdateUser();
+    }
 
 	/**
 	 * When an object implementing interface <code>Runnable</code> is used to
@@ -90,8 +91,7 @@ public class ProvisioningClient implements Runnable {
 		try {
 			if (SCIMConstants.USER.equals(objectType)) {
 				UserOperation operation = new UserOperation(provider,
-						scimObject, provisioningMethod,
-						additionalProvisioningInformation);
+						scimObject, additionalProvisioningInformation);
 				operation.provisionCreateUser();
 			} else if (SCIMConstants.GROUP.equals(objectType)) {
 
