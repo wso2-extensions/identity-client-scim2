@@ -86,7 +86,7 @@ public class Scimv2UsersApi {
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
-            "application/json"
+            "application/scim+json"
         };
         final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
@@ -301,13 +301,13 @@ public class Scimv2UsersApi {
      * @param startIndex The 1-based index of the first query result (optional)
      * @param count Specifies the desired maximum number of query results per page. (optional)
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
-     * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
+     * @param sortOrder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -326,8 +326,8 @@ public class Scimv2UsersApi {
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "count", count));
         if (sortBy != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "sortBy", sortBy));
-        if (sortOder != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "sortOder", sortOder));
+        if (sortOrder != null)
+        localVarQueryParams.addAll(apiClient.parameterToPairs("", "sortOrder", sortOrder));
 
         Map<String, String> localVarHeaderParams = new HashMap<String, String>();
 
@@ -376,12 +376,12 @@ public class Scimv2UsersApi {
      * @param startIndex The 1-based index of the first query result (optional)
      * @param count Specifies the desired maximum number of query results per page. (optional)
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
-     * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
+     * @param sortOrder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getUser(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
-        ApiResponse<String> resp = getUserWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
+    public ApiResponse<String> getUser(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder) throws ApiException {
+        ApiResponse<String> resp = getUserWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOrder);
         return resp;
     }
 
@@ -394,12 +394,12 @@ public class Scimv2UsersApi {
      * @param startIndex The 1-based index of the first query result (optional)
      * @param count Specifies the desired maximum number of query results per page. (optional)
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
-     * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
+     * @param sortOrder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
      * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
-        com.squareup.okhttp.Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, null, null);
+    public ApiResponse<String> getUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder) throws ApiException {
+        com.squareup.okhttp.Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOrder, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -765,9 +765,9 @@ public class Scimv2UsersApi {
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String updateUser(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> updateUser(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         ApiResponse<String> resp = updateUserWithHttpInfo(id, attributes, excludedAttributes, body);
-        return resp.getData();
+        return resp;
     }
 
     /**
