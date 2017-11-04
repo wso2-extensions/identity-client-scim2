@@ -85,7 +85,7 @@ public class ApiClient {
      */
     public static final String LENIENT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private String basePath = "https://localhost:9443";
+    private String basePath = "https://localhost:9292";
     private boolean lenientOnJson = false;
     private boolean debugging = false;
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
@@ -721,7 +721,7 @@ public class ApiClient {
      * @return True if the given MIME is JSON, false otherwise.
      */
     public boolean isJsonMime(String mime) {
-      String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
+      String jsonMime = "(?i)^(application/scim+json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
       return mime != null && (mime.matches(jsonMime) || mime.equalsIgnoreCase("application/json-patch+json"));
     }
 
