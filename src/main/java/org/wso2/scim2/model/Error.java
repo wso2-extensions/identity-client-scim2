@@ -5,28 +5,41 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Error {
-
-    @SerializedName("code")
+	
+	@SerializedName("schemas")
     @Expose
-    private String code;
-    @SerializedName("description")
+    private String schemas;
+    
+	@SerializedName("detail")
     @Expose
-    private String description;
+    private String detail;
+    
+	@SerializedName("status")
+    @Expose
+    private String status;
 
-    public String getCode() {
-        return code;
+    public String getSchemas() {
+        return schemas;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setSchemas(String schemas) {
+        this.schemas = schemas;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDetail() {
+        return detail;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+    
+    public String getStatus() {
+    	return status;
+    }
+    
+    public void setStatus(String status) {
+    	this.status = status;
     }
 
 }
