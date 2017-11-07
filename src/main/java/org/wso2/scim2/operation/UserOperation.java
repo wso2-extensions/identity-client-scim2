@@ -77,7 +77,7 @@ public class UserOperation {
         client.setPassword(provider.getProperty(UserSchemaConstants.PASSWORD));
     }
 
-    public User provisionCreateUser() throws IdentitySCIMException {
+    public User createUser() throws IdentitySCIMException {
 
         Gson gson;
         User user = null;
@@ -128,37 +128,44 @@ public class UserOperation {
         return user;
     }
 
-    /*
-     * To delete the user by giving user object
-     */
-    public void provisionDeleteUser() throws IdentitySCIMException {
+    public void deleteUser() throws IdentitySCIMException {
 
         if (this.scimObject != null) {
-            User user = (User) scimObject;
+            Gson gson = new Gson();
+            String userId = null;
             try {
-                provisionDeleteUserById(user.getId());
+                String filter = USER_FILTER + ((User) scimObject).getUserName();
+                List<User> users = listWithGet(null, null, filter, 1, 1, null, null);
+                User user = users.get(0);
+
+                userId = user.getId();
+                if (userId == null) {
+                    logger.error("Trying to delete a user entry which doesn't support SCIM. " +
+                            "Usually internal carbon User entries such as admin role doesn't support SCIM 2.0 attributes.");
+                    return;
+                }
+
+                Scimv2UsersApi api = new Scimv2UsersApi(client);
+                api.deleteUser(userId);
+
             } catch (CharonException e) {
                 throw new IdentitySCIMException("Error in encoding the object", e);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InternalErrorException e) {
+                throw new IdentitySCIMException(
+                        "Error in invoking provisioning operation for the use with id: "
+                                + userId, e);
+            } catch (BadRequestException e) {
+                throw new IdentitySCIMException(
+                        "Error in invoking provisioning operation for the user with id: "
+                                + userId, e);
+            } catch (ApiException e) {
+                Error err = gson.fromJson(e.getResponseBody(), Error.class);
+                throw new IdentitySCIMException(err.getDetail(), e);
+            } catch (NotFoundException e) {
+                throw new IdentitySCIMException("No resulted users found in the user store.", e);
             }
-        }
-    }
-
-    /*
-     * To delete the user by giving user Id
-     *
-     * @param Id
-     */
-    public void provisionDeleteUserById(String id) throws IdentitySCIMException {
-
-        Scimv2UsersApi api = new Scimv2UsersApi(client);
-
-        try {
-            api.deleteUser(id);
-        } catch (ApiException e) {
-            Gson gson = new Gson();
-            Error err = gson.fromJson(e.getResponseBody(), Error.class);
-            throw new IdentitySCIMException(err.getDetail(), e);
-
         }
     }
 
@@ -231,16 +238,12 @@ public class UserOperation {
                 String error = "No resulted users found in the user store.";
                 throw new NotFoundException(error);
             }
-
-        } else {
-
         }
 
         return returnedUsers;
-
     }
 
-    public User provisionUpdateUser() throws IdentitySCIMException {
+    public User updateUser() throws IdentitySCIMException {
 
         Scimv2UsersApi api;
         User updatedUser = null;
@@ -273,7 +276,7 @@ public class UserOperation {
 
         } catch (CharonException e) {
             throw new IdentitySCIMException(
-                    "Error in encoding the object to be provisioned for user with id: "
+                    "Error in encoding the object to be provisioned for user : "
                             + userName, e);
         } catch (BadRequestException e) {
             throw new IdentitySCIMException(
@@ -285,7 +288,7 @@ public class UserOperation {
             throw new IdentitySCIMException(err.getDetail(), e);
         } catch (InternalErrorException e) {
             throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: "
+                    "Error in invoking provisioning operation for the user : "
                             + userName, e);
         } catch (NotFoundException e) {
             throw new IdentitySCIMException("No resulted users found in the user store.", e);
