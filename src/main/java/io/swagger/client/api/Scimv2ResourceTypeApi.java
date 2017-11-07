@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.squareup.okhttp.Call;
+
 public class Scimv2ResourceTypeApi {
     private ApiClient apiClient;
 
@@ -49,7 +51,8 @@ public class Scimv2ResourceTypeApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getResourceTypeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call getResourceTypeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -89,9 +92,9 @@ public class Scimv2ResourceTypeApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getResourceTypeValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call getResourceTypeValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
-        com.squareup.okhttp.Call call = getResourceTypeCall(progressListener, progressRequestListener);
+        Call call = getResourceTypeCall(progressListener, progressRequestListener);
         return call;
     }
 
@@ -102,6 +105,7 @@ public class Scimv2ResourceTypeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String getResourceType() throws ApiException {
+
         ApiResponse<String> resp = getResourceTypeWithHttpInfo();
         return resp.getData();
     }
@@ -113,7 +117,8 @@ public class Scimv2ResourceTypeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> getResourceTypeWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = getResourceTypeValidateBeforeCall(null, null);
+
+        Call call = getResourceTypeValidateBeforeCall(null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }

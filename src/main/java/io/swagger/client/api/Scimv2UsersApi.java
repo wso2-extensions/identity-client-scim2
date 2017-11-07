@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.squareup.okhttp.Call;
+
 public class Scimv2UsersApi {
     private ApiClient apiClient;
 
@@ -52,7 +54,8 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call createUserCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call createUserCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = body;
         
         // create path and map variables
@@ -96,9 +99,9 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
           
-        com.squareup.okhttp.Call call = createUserCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
+        Call call = createUserCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
         return call;    
     }
 
@@ -112,6 +115,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> createUser(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+
         ApiResponse<String> resp = createUserWithHttpInfo(attributes, excludedAttributes, body);
         return resp;
     }
@@ -126,7 +130,8 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> createUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        com.squareup.okhttp.Call call = createUserValidateBeforeCall(attributes, excludedAttributes, body, null, null);
+
+        Call call = createUserValidateBeforeCall(attributes, excludedAttributes, body, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -139,7 +144,8 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call deleteUserCall(String id, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call deleteUserCall(String id, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -180,14 +186,14 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call deleteUserValidateBeforeCall(String id, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call deleteUserValidateBeforeCall(String id, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling deleteUser(Async)");
         }
      
-        com.squareup.okhttp.Call call = deleteUserCall(id, progressListener, progressRequestListener);
+        Call call = deleteUserCall(id, progressListener, progressRequestListener);
         return call;    
     }
 
@@ -198,6 +204,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public void deleteUser(String id) throws ApiException {
+
         deleteUserWithHttpInfo(id);
     }
 
@@ -209,7 +216,8 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> deleteUserWithHttpInfo(String id) throws ApiException {
-        com.squareup.okhttp.Call call = deleteUserValidateBeforeCall(id, null, null);
+
+        Call call = deleteUserValidateBeforeCall(id, null, null);
         return apiClient.execute(call);
     }
 
@@ -227,7 +235,8 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -281,9 +290,9 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
     
-        com.squareup.okhttp.Call call = getUserCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, progressListener, progressRequestListener);
+        Call call = getUserCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, progressListener, progressRequestListener);
         return call;      
     }
 
@@ -319,7 +328,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> getUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder) throws ApiException {
-        com.squareup.okhttp.Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOrder, null, null);
+        Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOrder, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -334,7 +343,8 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getUserByIdCall(String id, List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call getUserByIdCall(String id, List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -379,14 +389,14 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getUserByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call getUserByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling getUserById(Async)");
         }
          
-        com.squareup.okhttp.Call call = getUserByIdCall(id, attributes, excludedAttributes, progressListener, progressRequestListener);
+        Call call = getUserByIdCall(id, attributes, excludedAttributes, progressListener, progressRequestListener);
         return call;   
     }
 
@@ -400,6 +410,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String getUserById(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
+
         ApiResponse<String> resp = getUserByIdWithHttpInfo(id, attributes, excludedAttributes);
         return resp.getData();
     }
@@ -414,7 +425,8 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> getUserByIdWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        com.squareup.okhttp.Call call = getUserByIdValidateBeforeCall(id, attributes, excludedAttributes, null, null);
+
+        Call call = getUserByIdValidateBeforeCall(id, attributes, excludedAttributes, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -427,7 +439,8 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getUsersByPostCall(String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call getUsersByPostCall(String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = body;
         
         // create path and map variables
@@ -467,9 +480,9 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getUsersByPostValidateBeforeCall(String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call getUsersByPostValidateBeforeCall(String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
                
-        com.squareup.okhttp.Call call = getUsersByPostCall(body, progressListener, progressRequestListener);
+        Call call = getUsersByPostCall(body, progressListener, progressRequestListener);
         return call;  
     }
 
@@ -481,6 +494,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String getUsersByPost(String body) throws ApiException {
+
         ApiResponse<String> resp = getUsersByPostWithHttpInfo(body);
         return resp.getData();
     }
@@ -493,7 +507,8 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> getUsersByPostWithHttpInfo(String body) throws ApiException {
-        com.squareup.okhttp.Call call = getUsersByPostValidateBeforeCall(body, null, null);
+
+        Call call = getUsersByPostValidateBeforeCall(body, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -509,7 +524,8 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call updateUserCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call updateUserCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = body;
         
         // create path and map variables
@@ -554,14 +570,14 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling updateUser(Async)");
         }
                
-        com.squareup.okhttp.Call call = updateUserCall(id, attributes, excludedAttributes, body, progressListener, progressRequestListener);
+        Call call = updateUserCall(id, attributes, excludedAttributes, body, progressListener, progressRequestListener);
         return call;  
     }
 
@@ -576,6 +592,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> updateUser(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+
         ApiResponse<String> resp = updateUserWithHttpInfo(id, attributes, excludedAttributes, body);
         return resp;
     }
@@ -591,7 +608,7 @@ public class Scimv2UsersApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> updateUserWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        com.squareup.okhttp.Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body, null, null);
+        Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }

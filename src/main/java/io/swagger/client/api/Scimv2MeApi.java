@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.squareup.okhttp.Call;
+
 public class Scimv2MeApi {
     private ApiClient apiClient;
 
@@ -52,7 +54,8 @@ public class Scimv2MeApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call createMeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call createMeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = body;
         
         // create path and map variables
@@ -96,10 +99,9 @@ public class Scimv2MeApi {
         return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = createMeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
+        Call call = createMeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
         return call;
     }
 
@@ -113,6 +115,7 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String createMe(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+
         ApiResponse<String> resp = createMeWithHttpInfo(attributes, excludedAttributes, body);
         return resp.getData();
     }
@@ -127,7 +130,8 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> createMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        com.squareup.okhttp.Call call = createMeValidateBeforeCall(attributes, excludedAttributes, body, null, null);
+
+        Call call = createMeValidateBeforeCall(attributes, excludedAttributes, body, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -139,7 +143,8 @@ public class Scimv2MeApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call deleteMeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call deleteMeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -179,9 +184,9 @@ public class Scimv2MeApi {
         return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call deleteMeValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call deleteMeValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = deleteMeCall(progressListener, progressRequestListener);
+        Call call = deleteMeCall(progressListener, progressRequestListener);
         return call;
     }
 
@@ -191,6 +196,7 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public void deleteMe() throws ApiException {
+
         deleteMeWithHttpInfo();
     }
 
@@ -201,7 +207,8 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<Void> deleteMeWithHttpInfo() throws ApiException {
-        com.squareup.okhttp.Call call = deleteMeValidateBeforeCall(null, null);
+
+        Call call = deleteMeValidateBeforeCall(null, null);
         return apiClient.execute(call);
     }
 
@@ -214,7 +221,8 @@ public class Scimv2MeApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getMeCall(List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call getMeCall(List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = null;
         
         // create path and map variables
@@ -258,9 +266,9 @@ public class Scimv2MeApi {
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
-        com.squareup.okhttp.Call call = getMeCall(attributes, excludedAttributes, progressListener, progressRequestListener);
+        Call call = getMeCall(attributes, excludedAttributes, progressListener, progressRequestListener);
         return call;
     }
 
@@ -273,6 +281,7 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String getMe(List<String> attributes, List<String> excludedAttributes) throws ApiException {
+
         ApiResponse<String> resp = getMeWithHttpInfo(attributes, excludedAttributes);
         return resp.getData();
     }
@@ -286,7 +295,8 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> getMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        com.squareup.okhttp.Call call = getMeValidateBeforeCall(attributes, excludedAttributes, null, null);
+
+        Call call = getMeValidateBeforeCall(attributes, excludedAttributes, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -301,7 +311,8 @@ public class Scimv2MeApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call updateMeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call updateMeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = body;
         
         // create path and map variables
@@ -345,9 +356,9 @@ public class Scimv2MeApi {
         return apiClient.buildCall(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
     
-    private com.squareup.okhttp.Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
 
-        com.squareup.okhttp.Call call = updateMeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
+        Call call = updateMeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
         return call;
     }
 
@@ -361,6 +372,7 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String updateMe(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+
         ApiResponse<String> resp = updateMeWithHttpInfo(attributes, excludedAttributes, body);
         return resp.getData();
     }
@@ -375,7 +387,8 @@ public class Scimv2MeApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> updateMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        com.squareup.okhttp.Call call = updateMeValidateBeforeCall(attributes, excludedAttributes, body, null, null);
+
+        Call call = updateMeValidateBeforeCall(attributes, excludedAttributes, body, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
