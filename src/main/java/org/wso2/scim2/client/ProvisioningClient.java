@@ -73,7 +73,7 @@ public class ProvisioningClient implements Runnable {
 
 		UserOperation operation = new UserOperation(provider, scimObject,
 				additionalProvisioningInformation);
-		User user = operation.provisionCreateUser();
+		User user = operation.createUser();
 		
 		return user;
 	}
@@ -82,14 +82,14 @@ public class ProvisioningClient implements Runnable {
 
 		UserOperation operation = new UserOperation(provider, scimObject,
 				additionalProvisioningInformation);
-		operation.provisionDeleteUser();
+		operation.deleteUser();
 	}
 
 	public void provisionUpdateUser() throws IdentitySCIMException {
 
 	    UserOperation operation = new UserOperation(provider, scimObject,
                 additionalProvisioningInformation);
-        operation.provisionUpdateUser();
+        operation.updateUser();
     }
 
 	/**
@@ -108,7 +108,7 @@ public class ProvisioningClient implements Runnable {
 			if (SCIMConstants.USER.equals(objectType)) {
 				UserOperation operation = new UserOperation(provider,
 						scimObject, additionalProvisioningInformation);
-				operation.provisionCreateUser();
+				operation.createUser();
 			} else if (SCIMConstants.GROUP.equals(objectType)) {
 
 			}
