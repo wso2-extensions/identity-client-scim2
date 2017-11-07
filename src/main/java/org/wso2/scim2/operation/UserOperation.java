@@ -41,6 +41,7 @@ import org.wso2.charon3.core.schema.SCIMConstants.UserSchemaConstants;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 import org.wso2.charon3.core.utils.codeutils.FilterTreeManager;
+import org.wso2.charon3.core.utils.codeutils.PatchOperation;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.model.Error;
@@ -74,6 +75,7 @@ public class UserOperation {
 
         client = new ApiClient();
         client.setUsername(userName);
+        //client.setURL(provider.getProperty("userEndpoint"));
         client.setPassword(provider.getProperty(UserSchemaConstants.PASSWORD));
     }
 
@@ -297,5 +299,41 @@ public class UserOperation {
         }
 
         return updatedUser;
+    }
+
+    public void patchUser() throws IdentitySCIMException {
+
+        Scimv2UsersApi api;
+
+        try {
+            String filter = USER_FILTER + ((User) scimObject).getUserName();
+            List<User> users = null;
+            users = listWithGet(null, null, filter, 1, 1, null, null);
+            User user = users.get(0);
+
+            String userId = user.getId();
+            if (userId == null) {
+                logger.error("Trying to update a user entry which doesn't support SCIM. " +
+                        "Usually internal carbon User entries such as admin role doesn't support SCIM 2.0 attributes.");
+                return;
+            }
+
+            String patchOperations = provider.getProperty("PatchOperation");
+
+            api = new Scimv2UsersApi(client);
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+        } catch (ApiException e) {
+            e.printStackTrace();
+        } catch (InternalErrorException e) {
+            e.printStackTrace();
+        } catch (CharonException e) {
+            e.printStackTrace();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

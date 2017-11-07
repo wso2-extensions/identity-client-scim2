@@ -109,6 +109,7 @@ public class ApiClient {
     private JSON json;
 
     private HttpLoggingInterceptor loggingInterceptor;
+    private String url;
 
     /*
      * Constructor for ApiClient
@@ -1062,14 +1063,18 @@ public class ApiClient {
      * @param headerParams The header parameters
      * @param formParams The form parameters
      * @param authNames The authentications to apply
-     * @param progressRequestListener Progress request listener
      * @return The HTTP call
      * @throws ApiException If fail to serialize the request body object
      */
-    public Call buildCall(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames, ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        Request request = buildRequest(path, method, queryParams, body, headerParams, formParams, authNames, progressRequestListener);
+    public Call buildCall(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
+        Request request = buildRequest(path, method, queryParams, body, headerParams, formParams, authNames);
 
         return httpClient.newCall(request);
+    }
+
+    public void setURL(String url) {
+
+        this.url = url;
     }
 
     /**
@@ -1078,23 +1083,28 @@ public class ApiClient {
      * @param path The sub-path of the HTTP URL
      * @param method The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
      * @param queryParams The query parameters
-     * @param body The request body object
+9     * @param body The request body object
      * @param headerParams The header parameters
      * @param formParams The form parameters
      * @param authNames The authentications to apply
-     * @param progressRequestListener Progress request listener
-     * @return The HTTP request 
+     * @return The HTTP request
      * @throws ApiException If fail to serialize the request body object
      */
-    public Request buildRequest(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames, ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Request buildRequest(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
         updateParamsForAuth(authNames, queryParams, headerParams);
 
-        final String url = buildUrl(path, queryParams);
+        final String url;
+
+        if(this.url != null) {
+            url = this.url;
+        } else {
+            url = buildUrl(path, queryParams);
+        }
         
         final Request.Builder reqBuilder = new Request.Builder().url(url);
         processHeaderParams(headerParams, reqBuilder);
 
-        String contentType = (String) headerParams.get("Content-Type");
+        String contentType = headerParams.get("Content-Type");
         // ensuring a default content type
         if (contentType == null) {
             contentType = "application/json";
@@ -1119,14 +1129,7 @@ public class ApiClient {
             reqBody = serialize(body, contentType);
         }
 
-        Request request = null;
-
-        if(progressRequestListener != null && reqBody != null) {
-            ProgressRequestBody progressRequestBody = new ProgressRequestBody(reqBody, progressRequestListener);
-            request = reqBuilder.method(method, progressRequestBody).build();
-        } else {
-            request = reqBuilder.method(method, reqBody).build();
-        }
+        Request request = reqBuilder.method(method, reqBody).build();
 
         return request;
     }
