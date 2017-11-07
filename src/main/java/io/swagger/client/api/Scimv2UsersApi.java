@@ -13,21 +13,10 @@
 
 package io.swagger.client.api;
 
-import io.swagger.client.ApiCallback;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.ApiResponse;
-import io.swagger.client.Configuration;
-import io.swagger.client.Pair;
-import io.swagger.client.ProgressRequestBody;
-import io.swagger.client.ProgressResponseBody;
-
 import com.google.gson.reflect.TypeToken;
+import io.swagger.client.*;
 
 import java.io.IOException;
-
-
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -143,42 +132,6 @@ public class Scimv2UsersApi {
     }
 
     /**
-     * Return the user which was created (asynchronously)
-     * Returns HTTP 201 if the user is successfully created.
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @param callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     */
-    public com.squareup.okhttp.Call createUserAsync(List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<String> callback) throws ApiException {
-
-        ProgressResponseBody.ProgressListener progressListener = null;
-        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
-
-        if (callback != null) {
-            progressListener = new ProgressResponseBody.ProgressListener() {
-                @Override
-                public void update(long bytesRead, long contentLength, boolean done) {
-                    callback.onDownloadProgress(bytesRead, contentLength, done);
-                }
-            };
-
-            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
-                @Override
-                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
-                    callback.onUploadProgress(bytesWritten, contentLength, done);
-                }
-            };
-        }
-
-        com.squareup.okhttp.Call call = createUserValidateBeforeCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
-        apiClient.executeAsync(call, localVarReturnType, callback);
-        return call;
-    }
-    /**
      * Build call for deleteUser
      * @param id Unique id of the resource type. (required)
      * @param progressListener Progress listener
@@ -260,39 +213,6 @@ public class Scimv2UsersApi {
         return apiClient.execute(call);
     }
 
-    /**
-     * Delete the user with the given id (asynchronously)
-     * Returns HTTP 204 if the user is successfully deleted.
-     * @param id Unique id of the resource type. (required)
-     * @param callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     */
-    public com.squareup.okhttp.Call deleteUserAsync(String id, final ApiCallback<Void> callback) throws ApiException {
-
-        ProgressResponseBody.ProgressListener progressListener = null;
-        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
-
-        if (callback != null) {
-            progressListener = new ProgressResponseBody.ProgressListener() {
-                @Override
-                public void update(long bytesRead, long contentLength, boolean done) {
-                    callback.onDownloadProgress(bytesRead, contentLength, done);
-                }
-            };
-
-            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
-                @Override
-                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
-                    callback.onUploadProgress(bytesWritten, contentLength, done);
-                }
-            };
-        }
-
-        com.squareup.okhttp.Call call = deleteUserValidateBeforeCall(id, progressListener, progressRequestListener);
-        apiClient.executeAsync(call, callback);
-        return call;
-    }
     /**
      * Build call for getUser
      * @param attributes SCIM defined attributes parameter. (optional)
@@ -405,46 +325,6 @@ public class Scimv2UsersApi {
     }
 
     /**
-     * Return users according to the filter, sort and pagination parameters (asynchronously)
-     * Returns HTTP 404 if the users are not found.
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param filter Filter expression for filtering (optional)
-     * @param startIndex The 1-based index of the first query result (optional)
-     * @param count Specifies the desired maximum number of query results per page. (optional)
-     * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
-     * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
-     * @param callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     */
-    public com.squareup.okhttp.Call getUserAsync(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder, final ApiCallback<String> callback) throws ApiException {
-
-        ProgressResponseBody.ProgressListener progressListener = null;
-        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
-
-        if (callback != null) {
-            progressListener = new ProgressResponseBody.ProgressListener() {
-                @Override
-                public void update(long bytesRead, long contentLength, boolean done) {
-                    callback.onDownloadProgress(bytesRead, contentLength, done);
-                }
-            };
-
-            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
-                @Override
-                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
-                    callback.onUploadProgress(bytesWritten, contentLength, done);
-                }
-            };
-        }
-
-        com.squareup.okhttp.Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
-        apiClient.executeAsync(call, localVarReturnType, callback);
-        return call;
-    }
-    /**
      * Build call for getUserById
      * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
@@ -540,42 +420,6 @@ public class Scimv2UsersApi {
     }
 
     /**
-     * Return the user with the given id (asynchronously)
-     * Returns HTTP 200 if the user is found.
-     * @param id Unique id of the resource type. (required)
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     */
-    public com.squareup.okhttp.Call getUserByIdAsync(String id, List<String> attributes, List<String> excludedAttributes, final ApiCallback<String> callback) throws ApiException {
-
-        ProgressResponseBody.ProgressListener progressListener = null;
-        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
-
-        if (callback != null) {
-            progressListener = new ProgressResponseBody.ProgressListener() {
-                @Override
-                public void update(long bytesRead, long contentLength, boolean done) {
-                    callback.onDownloadProgress(bytesRead, contentLength, done);
-                }
-            };
-
-            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
-                @Override
-                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
-                    callback.onUploadProgress(bytesWritten, contentLength, done);
-                }
-            };
-        }
-
-        com.squareup.okhttp.Call call = getUserByIdValidateBeforeCall(id, attributes, excludedAttributes, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
-        apiClient.executeAsync(call, localVarReturnType, callback);
-        return call;
-    }
-    /**
      * Build call for getUsersByPost
      * @param body  (optional)
      * @param progressListener Progress listener
@@ -654,40 +498,6 @@ public class Scimv2UsersApi {
         return apiClient.execute(call, localVarReturnType);
     }
 
-    /**
-     * Return users according to the filter, sort and pagination parameters (asynchronously)
-     * Returns HTTP 404 if the users are not found.
-     * @param body  (optional)
-     * @param callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     */
-    public com.squareup.okhttp.Call getUsersByPostAsync(String body, final ApiCallback<String> callback) throws ApiException {
-
-        ProgressResponseBody.ProgressListener progressListener = null;
-        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
-
-        if (callback != null) {
-            progressListener = new ProgressResponseBody.ProgressListener() {
-                @Override
-                public void update(long bytesRead, long contentLength, boolean done) {
-                    callback.onDownloadProgress(bytesRead, contentLength, done);
-                }
-            };
-
-            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
-                @Override
-                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
-                    callback.onUploadProgress(bytesWritten, contentLength, done);
-                }
-            };
-        }
-
-        com.squareup.okhttp.Call call = getUsersByPostValidateBeforeCall(body, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
-        apiClient.executeAsync(call, localVarReturnType, callback);
-        return call;
-    }
     /**
      * Build call for updateUser
      * @param id Unique id of the resource type. (required)
@@ -784,43 +594,5 @@ public class Scimv2UsersApi {
         com.squareup.okhttp.Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body, null, null);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
-    }
-
-    /**
-     * Return the updated user (asynchronously)
-     * Returns HTTP 404 if the user is not found.
-     * @param id Unique id of the resource type. (required)
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @param callback The callback to be executed when the API call finishes
-     * @return The request call
-     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
-     */
-    public com.squareup.okhttp.Call updateUserAsync(String id, List<String> attributes, List<String> excludedAttributes, String body, final ApiCallback<String> callback) throws ApiException {
-
-        ProgressResponseBody.ProgressListener progressListener = null;
-        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
-
-        if (callback != null) {
-            progressListener = new ProgressResponseBody.ProgressListener() {
-                @Override
-                public void update(long bytesRead, long contentLength, boolean done) {
-                    callback.onDownloadProgress(bytesRead, contentLength, done);
-                }
-            };
-
-            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
-                @Override
-                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
-                    callback.onUploadProgress(bytesWritten, contentLength, done);
-                }
-            };
-        }
-
-        com.squareup.okhttp.Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
-        apiClient.executeAsync(call, localVarReturnType, callback);
-        return call;
     }
 }

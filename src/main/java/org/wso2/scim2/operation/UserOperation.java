@@ -35,8 +35,6 @@ import com.google.gson.Gson;
 public class UserOperation {
 
     public static final String USER_ENDPOINT = "user-endpoint";
-    public static final String ATTRIBUTES = "attributes";
-    public static final String EXCLUDE_ATTRIBUTES = "excludedAttributes";
     private static Logger logger = LoggerFactory.getLogger(UserOperation.class
             .getName());
     private final String USER_FILTER = "userName%20Eq%20";
