@@ -92,6 +92,13 @@ public class ProvisioningClient implements Runnable {
         operation.updateUser();
     }
 
+	public void provisionPatchUser() throws IdentitySCIMException {
+
+		UserOperation operation = new UserOperation(provider, scimObject,
+				additionalProvisioningInformation);
+		operation.patchUser();
+	}
+
 	/**
 	 * When an object implementing interface <code>Runnable</code> is used to
 	 * create a thread, starting the thread causes the object's <code>run</code>

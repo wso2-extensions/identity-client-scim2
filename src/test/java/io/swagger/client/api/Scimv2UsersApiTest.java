@@ -138,7 +138,7 @@ public class Scimv2UsersApiTest {
         List<String> attributes = null;
         List<String> excludedAttributes = null;
         String body = null;
-        api.updateUser(id, attributes, excludedAttributes, body);
+        api.updateUser(id, attributes, excludedAttributes, body, "PUT");
 
         // TODO: test validations
     }

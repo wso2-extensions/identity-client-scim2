@@ -453,7 +453,7 @@ public class Scimv2UsersApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public Call updateUserCall(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public Call updateUserCall(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
 
         Object localVarPostBody = body;
         
@@ -484,17 +484,17 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall(localVarPath, httpMethod, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
-    private Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    private Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
         
         // verify the required parameter 'id' is set
         if (id == null) {
             throw new ApiException("Missing the required parameter 'id' when calling updateUser(Async)");
         }
                
-        Call call = updateUserCall(id, attributes, excludedAttributes, body);
+        Call call = updateUserCall(id, attributes, excludedAttributes, body, httpMethod);
         return call;  
     }
 
@@ -508,9 +508,9 @@ public class Scimv2UsersApi {
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateUser(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> updateUser(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
 
-        ApiResponse<String> resp = updateUserWithHttpInfo(id, attributes, excludedAttributes, body);
+        ApiResponse<String> resp = updateUserWithHttpInfo(id, attributes, excludedAttributes, body, httpMethod);
         return resp;
     }
 
@@ -524,8 +524,8 @@ public class Scimv2UsersApi {
      * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateUserWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body);
+    public ApiResponse<String> updateUserWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
+        Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body, httpMethod);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }

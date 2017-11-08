@@ -105,7 +105,6 @@ public class UserOperation {
                         .getInstance().getUserResourceSchema();
                 user = (User) jsonDecoder.decodeResource(response.getData(),
                         schema, new User());
-
             }
 
         } catch (CharonException e) {
@@ -245,7 +244,7 @@ public class UserOperation {
         return returnedUsers;
     }
 
-    public User updateUser() throws IdentitySCIMException {
+    public User updateUser(String httpMethod) throws IdentitySCIMException {
 
         Scimv2UsersApi api;
         User updatedUser = null;
@@ -262,10 +261,19 @@ public class UserOperation {
                 return updatedUser;
             }
 
-            String encodedUser = new JSONEncoder().encodeSCIMObject(scimObject);
+            String encodedObject = null;
+
+            if(httpMethod.equals("PUT")) {
+                encodedObject = new JSONEncoder().encodeSCIMObject(scimObject);
+            } else if(httpMethod.equals("PATCH")) {
+                List<PatchOperation> patchOperations = provider.getPatchOperationList();
+            } else {
+                logger.error("Not supported update operation type: " + httpMethod);
+            }
+
 
             api = new Scimv2UsersApi(client);
-            ApiResponse<String> response = api.updateUser(userId, null, null, encodedUser);
+            ApiResponse<String> response = api.updateUser(userId, null, null, encodedObject, httpMethod);
 
             if (response.getStatusCode() == 201) {
                 JSONDecoder jsonDecoder = new JSONDecoder();
@@ -301,39 +309,13 @@ public class UserOperation {
         return updatedUser;
     }
 
-    public void patchUser() throws IdentitySCIMException {
+    public User updateUser() throws IdentitySCIMException {
 
-        Scimv2UsersApi api;
+        return updateUser("PUT");
+    }
 
-        try {
-            String filter = USER_FILTER + ((User) scimObject).getUserName();
-            List<User> users = null;
-            users = listWithGet(null, null, filter, 1, 1, null, null);
-            User user = users.get(0);
+    public User patchUser() throws IdentitySCIMException {
 
-            String userId = user.getId();
-            if (userId == null) {
-                logger.error("Trying to update a user entry which doesn't support SCIM. " +
-                        "Usually internal carbon User entries such as admin role doesn't support SCIM 2.0 attributes.");
-                return;
-            }
-
-            String patchOperations = provider.getProperty("PatchOperation");
-
-            api = new Scimv2UsersApi(client);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-        } catch (ApiException e) {
-            e.printStackTrace();
-        } catch (InternalErrorException e) {
-            e.printStackTrace();
-        } catch (CharonException e) {
-            e.printStackTrace();
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        return updateUser("PATCH");
     }
 }

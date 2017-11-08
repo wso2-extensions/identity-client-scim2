@@ -37,7 +37,7 @@ import java.util.List;
 
 public class Worker {
 
-    public static String DEFINED_USER = "{\"userName\":\"black_thunder3\",\"name\":{\"givenName\":\"Andy\",\"familyName\":\"Gonja\"},\"emails\":[{\"type\":\"work\",\"value\":\"abergin@example.com\"}]}";
+    public static String DEFINED_USER = "{\"userName\":\"black_thunder3rd\",\"name\":{\"givenName\":\"Andy\",\"familyName\":\"DOS\"},\"emails\":[{\"type\":\"work\",\"value\":\"abergin@example.com\"}]}";
 
     public static void main(String[] args) throws InternalErrorException, BadRequestException, CharonException, IdentitySCIMException, ApiException, NotFoundException, IOException {
         Logger.getRootLogger().setLevel(Level.INFO);
@@ -58,7 +58,7 @@ public class Worker {
 
         ProvisioningClient client = new ProvisioningClient(scim, user, null);
 
-        //user = client.provisionCreateUser();
+        user = client.provisionCreateUser();
 
         UserOperation o = new UserOperation(scim, user,null);
         //o.provisionCreateUser();
