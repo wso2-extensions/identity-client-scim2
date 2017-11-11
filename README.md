@@ -26,19 +26,11 @@ Add this dependency to your project's POM:
 
 ```xml
 <dependency>
-    <groupId>io.swagger</groupId>
-    <artifactId>swagger-java-client</artifactId>
+    <groupId>org.wso2.scim2.client</groupId>
+    <artifactId>org.wso2.scim2.client</artifactId>
     <version>1.0.0</version>
     <scope>compile</scope>
 </dependency>
-```
-
-### Gradle users
-
-Add this dependency to your project's build file:
-
-```groovy
-compile "io.swagger:swagger-java-client:1.0.0"
 ```
 
 ### Others
@@ -91,25 +83,25 @@ All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*Scimv2BulkApi* | [**createBulk**](docs/Scimv2BulkApi.md#createBulk) | **POST** /scim/v2/Bulk | Return the bulk which was created.
-*Scimv2GroupsApi* | [**createGroup**](docs/Scimv2GroupsApi.md#createGroup) | **POST** /scim/v2/Groups | Return the group which was created
-*Scimv2GroupsApi* | [**deleteGroup**](docs/Scimv2GroupsApi.md#deleteGroup) | **DELETE** /scim/v2/Groups/{id} | Delete the group with the given id
-*Scimv2GroupsApi* | [**getGroup**](docs/Scimv2GroupsApi.md#getGroup) | **GET** /scim/v2/Groups | Return groups according to the filter, sort and pagination parameters
-*Scimv2GroupsApi* | [**getGroupById**](docs/Scimv2GroupsApi.md#getGroupById) | **GET** /scim/v2/Groups/{id} | Return the group with the given id
-*Scimv2GroupsApi* | [**getGroupsByPost**](docs/Scimv2GroupsApi.md#getGroupsByPost) | **POST** /scim/v2/Groups/.search | Return groups according to the filter, sort and pagination parameters
-*Scimv2GroupsApi* | [**updateGroup**](docs/Scimv2GroupsApi.md#updateGroup) | **PUT** /scim/v2/Groups/{id} | Return the updated group
-*Scimv2MeApi* | [**createMe**](docs/Scimv2MeApi.md#createMe) | **POST** /scim/v2/Me | Return the user which was anonymously created
-*Scimv2MeApi* | [**deleteMe**](docs/Scimv2MeApi.md#deleteMe) | **DELETE** /scim/v2/Me | Delete the authenticated user.
-*Scimv2MeApi* | [**getMe**](docs/Scimv2MeApi.md#getMe) | **GET** /scim/v2/Me | Return the authenticated user.
-*Scimv2MeApi* | [**updateMe**](docs/Scimv2MeApi.md#updateMe) | **PUT** /scim/v2/Me | Return the updated user
-*Scimv2ResourceTypeApi* | [**getResourceType**](docs/Scimv2ResourceTypeApi.md#getResourceType) | **GET** /scim/v2/ResourceType | Return the ResourceType schema.
-*Scimv2ServiceProviderConfigApi* | [**getServiceProviderConfig**](docs/Scimv2ServiceProviderConfigApi.md#getServiceProviderConfig) | **GET** /scim/v2/ServiceProviderConfig | Return the ServiceProviderConfig schema.
-*Scimv2UsersApi* | [**createUser**](docs/Scimv2UsersApi.md#createUser) | **POST** /scim/v2/Users | Return the user which was created
-*Scimv2UsersApi* | [**deleteUser**](docs/Scimv2UsersApi.md#deleteUser) | **DELETE** /scim/v2/Users/{id} | Delete the user with the given id
-*Scimv2UsersApi* | [**getUser**](docs/Scimv2UsersApi.md#getUser) | **GET** /scim/v2/Users | Return users according to the filter, sort and pagination parameters
-*Scimv2UsersApi* | [**getUserById**](docs/Scimv2UsersApi.md#getUserById) | **GET** /scim/v2/Users/{id} | Return the user with the given id
-*Scimv2UsersApi* | [**getUsersByPost**](docs/Scimv2UsersApi.md#getUsersByPost) | **POST** /scim/v2/Users/.search | Return users according to the filter, sort and pagination parameters
-*Scimv2UsersApi* | [**updateUser**](docs/Scimv2UsersApi.md#updateUser) | **PUT** /scim/v2/Users/{id} | Return the updated user
+*Scimv2BulkApi* | [**createBulk**](docs/Scimv2BulkApi.md#createBulk) | **POST** | Return the bulk which was created.
+*Scimv2GroupsApi* | [**createGroup**](docs/Scimv2GroupsApi.md#createGroup) | **POST** | Return the group which was created
+*Scimv2GroupsApi* | [**deleteGroup**](docs/Scimv2GroupsApi.md#deleteGroup) | **DELETE** | Delete the group with the given id
+*Scimv2GroupsApi* | [**getGroup**](docs/Scimv2GroupsApi.md#getGroup) | **GET** | Return groups according to the filter, sort and pagination parameters
+*Scimv2GroupsApi* | [**getGroupById**](docs/Scimv2GroupsApi.md#getGroupById) | **GET** | Return the group with the given id
+*Scimv2GroupsApi* | [**getGroupsByPost**](docs/Scimv2GroupsApi.md#getGroupsByPost) | **POST** | Return groups according to the filter, sort and pagination parameters
+*Scimv2GroupsApi* | [**updateGroup**](docs/Scimv2GroupsApi.md#updateGroup) | **PUT** | Return the updated group
+*Scimv2MeApi* | [**createMe**](docs/Scimv2MeApi.md#createMe) | **POST** | Return the user which was anonymously created
+*Scimv2MeApi* | [**deleteMe**](docs/Scimv2MeApi.md#deleteMe) | **DELETE** | Delete the authenticated user.
+*Scimv2MeApi* | [**getMe**](docs/Scimv2MeApi.md#getMe) | **GET** | Return the authenticated user.
+*Scimv2MeApi* | [**updateMe**](docs/Scimv2MeApi.md#updateMe) | **PUT** | Return the updated user
+*Scimv2ResourceTypeApi* | [**getResourceType**](docs/Scimv2ResourceTypeApi.md#getResourceType) | **GET** | Return the ResourceType schema.
+*Scimv2ServiceProviderConfigApi* | [**getServiceProviderConfig**](docs/Scimv2ServiceProviderConfigApi.md#getServiceProviderConfig) | **GET** | Return the ServiceProviderConfig schema.
+*Scimv2UsersApi* | [**createUser**](docs/Scimv2UsersApi.md#createUser) | **POST** | Return the user which was created
+*Scimv2UsersApi* | [**deleteUser**](docs/Scimv2UsersApi.md#deleteUser) | **DELETE** | Delete the user with the given id
+*Scimv2UsersApi* | [**getUser**](docs/Scimv2UsersApi.md#getUser) | **GET** | Return users according to the filter, sort and pagination parameters
+*Scimv2UsersApi* | [**getUserById**](docs/Scimv2UsersApi.md#getUserById) | **GET** | Return the user with the given id
+*Scimv2UsersApi* | [**getUsersByPost**](docs/Scimv2UsersApi.md#getUsersByPost) | **POST** | Return users according to the filter, sort and pagination parameters
+*Scimv2UsersApi* | [**updateUser**](docs/Scimv2UsersApi.md#updateUser) | **PUT** | Return the updated user
 
 
 ## Documentation for Models
