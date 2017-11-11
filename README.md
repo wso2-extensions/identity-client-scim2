@@ -79,7 +79,6 @@ public class Scimv2BulkApiExample {
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
