@@ -116,9 +116,9 @@ public class Scimv2GroupsApi {
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String createGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> createGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         ApiResponse<String> resp = createGroupWithHttpInfo(attributes, excludedAttributes, body);
-        return resp.getData();
+        return resp;
     }
 
     /**
@@ -187,8 +187,10 @@ public class Scimv2GroupsApi {
      * @param id Unique id of the resource type. (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void deleteGroup(String id) throws ApiException {
-        deleteGroupWithHttpInfo(id);
+    public ApiResponse<String> deleteGroup(String id) throws ApiException {
+
+        ApiResponse<String> resp = deleteGroupWithHttpInfo(id);
+        return resp;
     }
 
     /**
@@ -198,7 +200,8 @@ public class Scimv2GroupsApi {
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Void> deleteGroupWithHttpInfo(String id) throws ApiException {
+    public ApiResponse<String> deleteGroupWithHttpInfo(String id) throws ApiException {
+
         Call call = deleteGroupValidateBeforeCall(id);
         return apiClient.execute(call);
     }
@@ -276,9 +279,9 @@ public class Scimv2GroupsApi {
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String getGroup(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
+    public ApiResponse<String> getGroup(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
         ApiResponse<String> resp = getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
-        return resp.getData();
+        return resp;
     }
 
     /**
@@ -509,9 +512,9 @@ public class Scimv2GroupsApi {
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String updateGroup(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ApiResponse<String> updateGroup(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         ApiResponse<String> resp = updateGroupWithHttpInfo(id, attributes, excludedAttributes, body);
-        return resp.getData();
+        return resp;
     }
 
     /**

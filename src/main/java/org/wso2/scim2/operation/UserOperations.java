@@ -50,6 +50,7 @@ import org.wso2.scim2.model.UserList;
 
 import com.google.gson.Gson;
 import org.wso2.scim2.util.PatchOperationEncoder;
+import org.wso2.scim2.util.SCIMClient;
 
 public class UserOperation {
 
@@ -178,9 +179,9 @@ public class UserOperation {
 
         FilterTreeManager filterTreeManager;
         Scimv2UsersApi api;
-        JSONDecoder jsonDecoder;
-        Gson gson;
-        List<User> returnedUsers = new ArrayList<>();
+        List<SCIMObject> returnedUsers = new ArrayList<>();
+
+        SCIMClient scimClient = new SCIMClient();
 
         if (startIndex < 1) {
             startIndex = 1;
@@ -222,20 +223,14 @@ public class UserOperation {
         if (logger.isDebugEnabled()) {
             logger.debug("SCIM - filter operation inside 'delete user' provisioning " +
                     "returned with response code: " + response.getStatusCode());
-            logger.debug("Filter User Response: " + response.getData());
+            if(logger.isDebugEnabled()) {
+                logger.debug("Filter User Response: " + response.getData());
+            }
         }
 
-        if (response.getStatusCode() == 200 && response.getData() != null) {
-            gson = new Gson();
-            jsonDecoder = new JSONDecoder();
+        if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
 
-            UserList userList = gson.fromJson(response.getData(),
-                    UserList.class);
-            Iterator<Object> iterator = userList.getResources().iterator();
-            while (iterator.hasNext()) {
-                returnedUsers.add((User) jsonDecoder.decodeResource(
-                        gson.toJson(iterator.next()), schema, new User()));
-            }
+            returnedUsers = scimClient.decodeSCIMResponseWithListedResource(response.getData(), SCIMConstants.JSON, SCIMClient.USER);
 
             if (returnedUsers.isEmpty()) {
                 String error = "No resulted users found in the user store.";
@@ -243,7 +238,7 @@ public class UserOperation {
             }
         }
 
-        return returnedUsers;
+        return (List<User>)(List<?>)returnedUsers;
     }
 
     public User updateUser(String httpMethod) throws IdentitySCIMException {
