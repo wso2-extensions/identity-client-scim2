@@ -25,7 +25,8 @@ import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMConstants;
 import org.wso2.scim2.exception.IdentitySCIMException;
-import org.wso2.scim2.operation.UserOperation;
+import org.wso2.scim2.operation.GroupOperations;
+import org.wso2.scim2.operation.UserOperations;
 
 /**
  * This class implements logic to initiate SCIM 2.0 provisioning operations to
@@ -71,7 +72,7 @@ public class ProvisioningClient implements Runnable {
      */
 	public User provisionCreateUser() throws IdentitySCIMException {
 
-		UserOperation operation = new UserOperation(provider, scimObject,
+		UserOperations operation = new UserOperations(provider, scimObject,
 				additionalProvisioningInformation);
 		User user = operation.createUser();
 		
@@ -80,24 +81,38 @@ public class ProvisioningClient implements Runnable {
 	
 	public void provisionDeleteUser() throws IdentitySCIMException {
 
-		UserOperation operation = new UserOperation(provider, scimObject,
+		UserOperations operation = new UserOperations(provider, scimObject,
 				additionalProvisioningInformation);
 		operation.deleteUser();
 	}
 
 	public void provisionUpdateUser() throws IdentitySCIMException {
 
-	    UserOperation operation = new UserOperation(provider, scimObject,
+	    UserOperations operation = new UserOperations(provider, scimObject,
                 additionalProvisioningInformation);
         operation.updateUser();
     }
 
 	public void provisionPatchUser() throws IdentitySCIMException {
 
-		UserOperation operation = new UserOperation(provider, scimObject,
+		UserOperations operation = new UserOperations(provider, scimObject,
 				additionalProvisioningInformation);
 		operation.patchUser();
 	}
+
+	public void provisionCreateGroup() throws IdentitySCIMException {
+
+		GroupOperations operation = new GroupOperations(provider, scimObject,
+				additionalProvisioningInformation);
+		operation.createGroup();
+	}
+
+    public void provisionDeleteGroup() throws IdentitySCIMException {
+
+        GroupOperations operation = new GroupOperations(provider, scimObject,
+                additionalProvisioningInformation);
+        operation.deleteGroup();
+    }
 
 	/**
 	 * When an object implementing interface <code>Runnable</code> is used to
@@ -113,7 +128,7 @@ public class ProvisioningClient implements Runnable {
 	public void run() {
 		try {
 			if (SCIMConstants.USER.equals(objectType)) {
-				UserOperation operation = new UserOperation(provider,
+				UserOperations operation = new UserOperations(provider,
 						scimObject, additionalProvisioningInformation);
 				operation.createUser();
 			} else if (SCIMConstants.GROUP.equals(objectType)) {
