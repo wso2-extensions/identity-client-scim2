@@ -16,70 +16,43 @@
 
 package org.wso2.scim2.operation;
 
-import io.swagger.client.ApiClient;
+import com.google.gson.Gson;
 import io.swagger.client.ApiException;
 import io.swagger.client.ApiResponse;
 import io.swagger.client.api.Scimv2UsersApi;
-
-import java.io.IOException;
-import java.util.*;
-
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.charon3.core.config.CharonConfiguration;
 import org.wso2.charon3.core.encoder.JSONDecoder;
 import org.wso2.charon3.core.encoder.JSONEncoder;
+import org.wso2.charon3.core.exceptions.AbstractCharonException;
 import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.InternalErrorException;
-import org.wso2.charon3.core.exceptions.NotFoundException;
 import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.objects.User;
-import org.wso2.charon3.core.protocol.ResponseCodeConstants;
-import org.wso2.charon3.core.schema.SCIMConstants;
-import org.wso2.charon3.core.schema.SCIMConstants.UserSchemaConstants;
 import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
 import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
-import org.wso2.charon3.core.utils.codeutils.FilterTreeManager;
 import org.wso2.charon3.core.utils.codeutils.PatchOperation;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.model.Error;
-import org.wso2.scim2.model.UserList;
-
-import com.google.gson.Gson;
 import org.wso2.scim2.util.PatchOperationEncoder;
 import org.wso2.scim2.util.SCIMClient;
 
-public class UserOperation {
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
-    public static final String USER_ENDPOINT = "user-endpoint";
-    private static Logger logger = LoggerFactory.getLogger(UserOperation.class
+public class UserOperations extends AbstractOperations {
+
+    private static Logger logger = LoggerFactory.getLogger(UserOperations.class
             .getName());
-    private final String USER_FILTER = "userName%20Eq%20";
 
-    SCIMObject scimObject;
-    SCIMProvider provider;
-    String userEPURL;
-    String userName;
-    private Map<String, Object> additionalInformation;
-    private ApiClient client;
+    public UserOperations(SCIMProvider scimProvider, SCIMObject object,
+                          Map<String, Object> additionalInformation) {
 
-    public UserOperation(SCIMProvider scimProvider, SCIMObject object,
-                         Map<String, Object> additionalInformation) {
-
-        provider = scimProvider;
-        scimObject = object;
-        this.additionalInformation = additionalInformation;
-
-        userEPURL = provider.getProperty(USER_ENDPOINT);
-        userName = provider.getProperty(UserSchemaConstants.USER_NAME);
-
-        client = new ApiClient();
-        client.setUsername(userName);
-        //client.setURL(provider.getProperty("userEndpoint"));
-        client.setPassword(provider.getProperty(UserSchemaConstants.PASSWORD));
+       super(scimProvider, object, additionalInformation);
     }
 
     public User createUser() throws IdentitySCIMException {
@@ -139,7 +112,7 @@ public class UserOperation {
             String userId = null;
             try {
                 String filter = USER_FILTER + ((User) scimObject).getUserName();
-                List<User> users = listWithGet(null, null, filter, 1, 1, null, null);
+                List<User> users = (List<User>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
                 User user = users.get(0);
 
                 userId = user.getId();
@@ -152,103 +125,24 @@ public class UserOperation {
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
                 api.deleteUser(userId);
 
-            } catch (CharonException e) {
+            } catch (AbstractCharonException e) {
                 throw new IdentitySCIMException("Error in encoding the object", e);
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (InternalErrorException e) {
-                throw new IdentitySCIMException(
-                        "Error in invoking provisioning operation for the use with id: "
-                                + userId, e);
-            } catch (BadRequestException e) {
-                throw new IdentitySCIMException(
-                        "Error in invoking provisioning operation for the user with id: "
-                                + userId, e);
             } catch (ApiException e) {
                 Error err = gson.fromJson(e.getResponseBody(), Error.class);
                 throw new IdentitySCIMException(err.getDetail(), e);
-            } catch (NotFoundException e) {
-                throw new IdentitySCIMException("No resulted users found in the user store.", e);
             }
         }
-    }
-
-    public List<User> listWithGet(List<String> attributes,
-                                  List<String> excludedAttributes, String filter, int startIndex,
-                                  int count, String sortBy, String sortOrder) throws BadRequestException, ApiException, InternalErrorException, CharonException, NotFoundException, IOException {
-
-        FilterTreeManager filterTreeManager;
-        Scimv2UsersApi api;
-        List<SCIMObject> returnedUsers = new ArrayList<>();
-
-        SCIMClient scimClient = new SCIMClient();
-
-        if (startIndex < 1) {
-            startIndex = 1;
-        }
-
-        if (count == 0) {
-            count = CharonConfiguration.getInstance()
-                    .getCountValueForPagination();
-        }
-
-        if (sortOrder != null) {
-            if (!(sortOrder
-                    .equalsIgnoreCase(SCIMConstants.OperationalConstants.ASCENDING) || sortOrder
-                    .equalsIgnoreCase(SCIMConstants.OperationalConstants.DESCENDING))) {
-                String error = " Invalid sortOrder value is specified";
-                throw new BadRequestException(error,
-                        ResponseCodeConstants.INVALID_VALUE);
-            }
-        }
-
-        if (sortOrder == null && sortBy != null) {
-            sortOrder = SCIMConstants.OperationalConstants.ASCENDING;
-        }
-
-        SCIMResourceTypeSchema schema = SCIMResourceSchemaManager
-                .getInstance().getUserResourceSchema();
-
-        if (filter != null) {
-            filterTreeManager = new FilterTreeManager(filter, schema);
-            filterTreeManager.buildTree();
-        }
-
-        new JSONEncoder();
-
-        api = new Scimv2UsersApi(client);
-        ApiResponse<String> response = api.getUser(attributes,
-                excludedAttributes, filter, startIndex, count, sortBy,
-                sortOrder);
-        if (logger.isDebugEnabled()) {
-            logger.debug("SCIM - filter operation inside 'delete user' provisioning " +
-                    "returned with response code: " + response.getStatusCode());
-            if(logger.isDebugEnabled()) {
-                logger.debug("Filter User Response: " + response.getData());
-            }
-        }
-
-        if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
-
-            returnedUsers = scimClient.decodeSCIMResponseWithListedResource(response.getData(), SCIMConstants.JSON, SCIMClient.USER);
-
-            if (returnedUsers.isEmpty()) {
-                String error = "No resulted users found in the user store.";
-                throw new NotFoundException(error);
-            }
-        }
-
-        return (List<User>)(List<?>)returnedUsers;
     }
 
     public User updateUser(String httpMethod) throws IdentitySCIMException {
 
-        Scimv2UsersApi api;
         User updatedUser = null;
         Gson gson;
         try {
             String filter = USER_FILTER + ((User) scimObject).getUserName();
-            List<User> users = listWithGet(null, null, filter, 1, 1, null, null);
+            List<User> users = (List<User>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
             User user = users.get(0);
 
             String userId = user.getId();
@@ -270,7 +164,7 @@ public class UserOperation {
             }
 
 
-            api = new Scimv2UsersApi(client);
+            Scimv2UsersApi api = new Scimv2UsersApi(client);
             ApiResponse<String> response = api.updateUser(userId, null, null, encodedObject, httpMethod);
 
             if (response.getStatusCode() == 201) {
@@ -282,24 +176,14 @@ public class UserOperation {
 
             }
 
-        } catch (CharonException e) {
+        } catch (AbstractCharonException e) {
             throw new IdentitySCIMException(
                     "Error in encoding the object to be provisioned for user : "
-                            + userName, e);
-        } catch (BadRequestException e) {
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: "
                             + userName, e);
         } catch (ApiException e) {
             gson = new Gson();
             Error err = gson.fromJson(e.getResponseBody(), Error.class);
             throw new IdentitySCIMException(err.getDetail(), e);
-        } catch (InternalErrorException e) {
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user : "
-                            + userName, e);
-        } catch (NotFoundException e) {
-            throw new IdentitySCIMException("No resulted users found in the user store.", e);
         } catch (IOException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (JSONException e) {
