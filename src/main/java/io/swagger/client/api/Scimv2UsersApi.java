@@ -1,18 +1,18 @@
 /*
-* Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package io.swagger.client.api;
 
@@ -56,9 +56,7 @@ public class Scimv2UsersApi {
     public Call createUserCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
 
         Object localVarPostBody = body;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Users";
+
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -83,7 +81,7 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
@@ -132,10 +130,6 @@ public class Scimv2UsersApi {
     public Call deleteUserCall(String id) throws ApiException {
 
         Object localVarPostBody = null;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Users/{id}"
-            .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
 
@@ -156,7 +150,7 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call deleteUserValidateBeforeCall(String id) throws ApiException {
@@ -176,9 +170,10 @@ public class Scimv2UsersApi {
      * @param id Unique id of the resource type. (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public void deleteUser(String id) throws ApiException {
+    public ApiResponse<String> deleteUser(String id) throws ApiException {
 
-        deleteUserWithHttpInfo(id);
+        ApiResponse<String> resp = deleteUserWithHttpInfo(id);
+        return resp;
     }
 
     /**
@@ -209,9 +204,6 @@ public class Scimv2UsersApi {
     public Call getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder) throws ApiException {
 
         Object localVarPostBody = null;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Users";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -229,15 +221,15 @@ public class Scimv2UsersApi {
         if (sortOrder != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("", "sortOrder", sortOrder));
 
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarHeaderParams = new HashMap<>();
 
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+        Map<String, Object> localVarFormParams = new HashMap<>();
 
-        final String[] localVarAccepts = {
+        /*final String[] localVarAccepts = {
             "application/json", "application/scim+json"
         };
         final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);*/
 
         final String[] localVarContentTypes = {
             
@@ -246,7 +238,7 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
@@ -303,10 +295,6 @@ public class Scimv2UsersApi {
     public Call getUserByIdCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
 
         Object localVarPostBody = null;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Users/{id}"
-            .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -331,7 +319,7 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getUserByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
@@ -385,9 +373,6 @@ public class Scimv2UsersApi {
     public Call getUsersByPostCall(String body) throws ApiException {
 
         Object localVarPostBody = body;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Users/.search";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
 
@@ -408,7 +393,7 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getUsersByPostValidateBeforeCall(String body) throws ApiException {
@@ -456,10 +441,6 @@ public class Scimv2UsersApi {
     public Call updateUserCall(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
 
         Object localVarPostBody = body;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Users/{id}"
-            .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -484,7 +465,7 @@ public class Scimv2UsersApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, httpMethod, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall(httpMethod, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {

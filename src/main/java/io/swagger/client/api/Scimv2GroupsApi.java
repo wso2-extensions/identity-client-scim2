@@ -1,18 +1,18 @@
 /*
-* Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package io.swagger.client.api;
 
@@ -52,16 +52,11 @@ public class Scimv2GroupsApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @param progressListener Progress listener
-     * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public Call createGroupCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public Call createGroupCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
         Object localVarPostBody = body;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Groups";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -73,37 +68,25 @@ public class Scimv2GroupsApi {
 
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
 
-        final String[] localVarAccepts = {
+        /*final String[] localVarAccepts = {
             "application/json", "application/scim+json"
         };
         final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);*/
 
         final String[] localVarContentTypes = {
-            "application/scim+json"
+            "application/json"
         };
         final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        if(progressListener != null) {
-            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
-                @Override
-                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
-                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
-                    return originalResponse.newBuilder()
-                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
-                    .build();
-                }
-            });
-        }
-
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
-    private Call createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private Call createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
 
-        Call call = createGroupCall(attributes, excludedAttributes, body, progressListener, progressRequestListener);
+        Call call = createGroupCall(attributes, excludedAttributes, body);
         return call;
     }
 
@@ -131,7 +114,7 @@ public class Scimv2GroupsApi {
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ApiResponse<String> createGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        Call call = createGroupValidateBeforeCall(attributes, excludedAttributes, body, null, null);
+        Call call = createGroupValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -144,10 +127,6 @@ public class Scimv2GroupsApi {
      */
     public Call deleteGroupCall(String id) throws ApiException {
         Object localVarPostBody = null;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Groups/{id}"
-            .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
 
@@ -168,7 +147,7 @@ public class Scimv2GroupsApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call deleteGroupValidateBeforeCall(String id) throws ApiException {
@@ -220,9 +199,6 @@ public class Scimv2GroupsApi {
      */
     public Call getGroupCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
         Object localVarPostBody = null;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Groups";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -257,7 +233,7 @@ public class Scimv2GroupsApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
@@ -313,10 +289,6 @@ public class Scimv2GroupsApi {
      */
     public Call getGroupByIdCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
         Object localVarPostBody = null;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Groups/{id}"
-            .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -341,7 +313,7 @@ public class Scimv2GroupsApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getGroupByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
@@ -391,9 +363,6 @@ public class Scimv2GroupsApi {
      */
     public Call getGroupsByPostCall(String body) throws ApiException {
         Object localVarPostBody = body;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Groups/.search";
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
 
@@ -414,7 +383,7 @@ public class Scimv2GroupsApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getGroupsByPostValidateBeforeCall(String body) throws ApiException {
@@ -460,11 +429,8 @@ public class Scimv2GroupsApi {
      * @throws ApiException If fail to serialize the request body object
      */
     public Call updateGroupCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+
         Object localVarPostBody = body;
-        
-        // create path and map variables
-        String localVarPath = "/scim/v2/Groups/{id}"
-            .replaceAll("\\{" + "id" + "\\}", apiClient.escapeString(id.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -489,7 +455,7 @@ public class Scimv2GroupsApi {
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return apiClient.buildCall("PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call updateGroupValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
