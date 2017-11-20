@@ -1,18 +1,18 @@
 /*
-* Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package io.swagger.client;
 
@@ -63,7 +63,6 @@ public class ApiClient {
      */
     public static final String LENIENT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private String basePath = "https://localhost:9292";
     private boolean lenientOnJson = false;
     private boolean debugging = false;
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
@@ -118,26 +117,6 @@ public class ApiClient {
         authentications.put("basicAuth", new HttpBasicAuth());
         // Prevent the authentications from being modified.
         authentications = Collections.unmodifiableMap(authentications);
-    }
-
-    /**
-     * Get base path
-     *
-     * @return Baes path
-     */
-    public String getBasePath() {
-        return basePath;
-    }
-
-    /**
-     * Set base path
-     *
-     * @param basePath Base path of the URL (e.g https://localhost
-     * @return An instance of OkHttpClient
-     */
-    public ApiClient setBasePath(String basePath) {
-        this.basePath = basePath;
-        return this;
     }
 
     /**
@@ -700,7 +679,7 @@ public class ApiClient {
      * @return True if the given MIME is JSON, false otherwise.
      */
     public boolean isJsonMime(String mime) {
-      String jsonMime = "(?i)^(application/scim+json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
+      String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
       return mime != null && (mime.matches(jsonMime) || mime.equalsIgnoreCase("application/json-patch+json"));
     }
 
@@ -714,7 +693,7 @@ public class ApiClient {
      *   null will be returned (not to set the Accept header explicitly).
      */
     public String selectHeaderAccept(String[] accepts) {
-        if (accepts.length == 0) {
+        /*if (accepts.length == 0) {
             return null;
         }
         for (String accept : accepts) {
@@ -722,7 +701,8 @@ public class ApiClient {
                 return accept;
             }
         }
-        return StringUtil.join(accepts, ",");
+        return StringUtil.join(accepts, ",");*/
+        return "*/*";
     }
 
     /**
@@ -845,10 +825,16 @@ public class ApiClient {
             } else {
                 content = null;
             }
-            return RequestBody.create(MediaType.parse(contentType), content);
+            try {
+                MediaType mediaType = MediaType.parse("application/json");
+                return RequestBody.create(mediaType, content.getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+            }
         } else {
             throw new ApiException("Content type \"" + contentType + "\" is not supported");
         }
+
+        return null;
     }
 
     /**
@@ -989,7 +975,6 @@ public class ApiClient {
     /**
      * Build HTTP call with the given options.
      *
-     * @param path The sub-path of the HTTP URL
      * @param method The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
      * @param queryParams The query parameters
      * @param body The request body object
@@ -999,8 +984,8 @@ public class ApiClient {
      * @return The HTTP call
      * @throws ApiException If fail to serialize the request body object
      */
-    public Call buildCall(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
-        Request request = buildRequest(path, method, queryParams, body, headerParams, formParams, authNames);
+    public Call buildCall(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
+        Request request = buildRequest(method, queryParams, body, headerParams, formParams, authNames);
 
         return httpClient.newCall(request);
     }
@@ -1013,7 +998,6 @@ public class ApiClient {
     /**
      * Build an HTTP request with the given options.
      *
-     * @param path The sub-path of the HTTP URL
      * @param method The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
      * @param queryParams The query parameters
 9     * @param body The request body object
@@ -1023,11 +1007,12 @@ public class ApiClient {
      * @return The HTTP request
      * @throws ApiException If fail to serialize the request body object
      */
-    public Request buildRequest(String path, String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
+    public Request buildRequest(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
 
         updateParamsForAuth(authNames, queryParams, headerParams);
 
-        final String url = (this.url != null)? this.url : buildUrl(path, queryParams);
+        String path = this.url;
+        final String url = buildUrl(path, queryParams);
         
         final Request.Builder reqBuilder = new Request.Builder().url(url);
         processHeaderParams(headerParams, reqBuilder);
@@ -1072,7 +1057,7 @@ public class ApiClient {
     public String buildUrl(String path, List<Pair> queryParams) {
 
         final StringBuilder url = new StringBuilder();
-        url.append(basePath).append(path);
+        url.append(path);
 
         if (queryParams != null && !queryParams.isEmpty()) {
             // support (constant) query string in `path`, e.g. "/posts?draft=1"
