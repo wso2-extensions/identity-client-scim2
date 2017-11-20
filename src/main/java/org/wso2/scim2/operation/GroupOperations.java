@@ -49,8 +49,7 @@ public class GroupOperations extends AbstractOperations {
     }
 
     public void createGroup() throws IdentitySCIMException {
-        String userName = null;
-        UserOperations userOperations = new UserOperations(provider, scimObject, null);
+
         try {
             SCIMClient scimClient = new SCIMClient();
             //get list of users in the group, if any, by userNames
@@ -67,7 +66,7 @@ public class GroupOperations extends AbstractOperations {
                 //get corresponding userIds
                 for (String user : users) {
                     String filter = USER_FILTER + user;
-                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.GROUP);
+                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
 
                     String userId = null;
                     for (SCIMObject filteredUser : filteredUsers) {
@@ -86,6 +85,7 @@ public class GroupOperations extends AbstractOperations {
                         SCIMConstants.JSON);
             }
 
+            client.setURL(groupEPURL);
             Scimv2GroupsApi api = new Scimv2GroupsApi(client);
 
             ApiResponse<String> response = api.createGroup(null, null, encodedGroup);
@@ -105,90 +105,80 @@ public class GroupOperations extends AbstractOperations {
                 logger.error(exception.getMessage());
             }
         } catch (IOException | AbstractCharonException e) {
-            throw new IdentitySCIMException("Error in provisioning 'create group' operation for user :" + userName, e);
+            throw new IdentitySCIMException("Error in provisioning 'create group' operation for user : " + userName, e);
         } catch (ApiException e) {
-            e.printStackTrace();
+            throw new IdentitySCIMException(e.getMessage(), e);
         }
     }
 
     public void deleteGroup() throws IdentitySCIMException {
 
-        String userName = null;
-        SCIMClient scimClient = new SCIMClient();
-
         try {
             String filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
 
             List<Group> groups = (List<Group>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.GROUP);
-            String groupId = groups.get(0).getId();
+            if(groups != null && groups.size() > 0) {
+                String groupId = groups.get(0).getId();
 
-            if (groupId == null) {
-                return;
-            }
+                if (groupId == null) {
+                    return;
+                }
 
-            Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-            ApiResponse<String> response = api.deleteGroup(groupId);
+                client.setURL(groupEPURL);
+                Scimv2GroupsApi api = new Scimv2GroupsApi(client);
+                ApiResponse<String> response = api.deleteGroup(groupId);
 
-            logger.info("SCIM - delete group operation returned with response code: " +
-                    response.getStatusCode());
-            if (!scimClient.evaluateResponseStatus(response.getStatusCode())) {
-                //decode scim exception and extract the specific error message.
-                AbstractCharonException exception =
-                        scimClient.decodeSCIMException(
-                                response.getData(), SCIMConstants.JSON);
-                logger.error(exception.getMessage());
-            } else {
-                AbstractCharonException exception =
-                        scimClient.decodeSCIMException(
-                                response.getData(), SCIMConstants.JSON);
-                logger.error(exception.getMessage());
+                logger.info("SCIM - delete group operation returned with response code: " +
+                        response.getStatusCode());
+                handleSCIMErrorResponse(response);
             }
         } catch (AbstractCharonException | IOException e) {
-            throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user :" + userName, e);
+            throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user : " + userName, e);
         } catch (ApiException e) {
-
+            throw new IdentitySCIMException(e.getMessage(), e);
         }
     }
 
     public void updateGroup() throws IdentitySCIMException {
 
-        String userName = null;
-        SCIMClient scimClient = new SCIMClient();
-
         try {
             String filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
 
             List<Group> groups = (List<Group>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.GROUP);
-            String groupId = groups.get(0).getId();
+            if(groups != null && groups.size() > 0) {
+                SCIMClient scimClient = new SCIMClient();
+                String groupId = groups.get(0).getId();
 
-            if (groupId == null) {
-                return;
-            }
+                if (groupId == null) {
+                    return;
+                }
 
-            String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
-                    SCIMConstants.JSON);
+                String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
+                        SCIMConstants.JSON);
 
-            Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-            ApiResponse<String> response = api.updateGroup(groupId, null, null, encodedGroup);
+                client.setURL(groupEPURL);
+                Scimv2GroupsApi api = new Scimv2GroupsApi(client);
+                ApiResponse<String> response = api.updateGroup(groupId, null, null, encodedGroup);
 
-            logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
+                logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Update Group Response: " + response.getData());
-            }
-            if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
-                //try to decode the scim object to verify that it gets decoded without issue.
-                scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.GROUP);
-            } else {
-                //decode scim exception and extract the specific error message.
-                AbstractCharonException exception =
-                        scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
-                logger.error(exception.getMessage());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Update Group Response: " + response.getData());
+                }
+                if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
+                    //try to decode the scim object to verify that it gets decoded without issue.
+                    scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.GROUP);
+                } else {
+                    //decode scim exception and extract the specific error message.
+                    AbstractCharonException exception =
+                            scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
+                    logger.error(exception.getMessage());
+                }
             }
         } catch (AbstractCharonException | IOException e) {
-            throw new IdentitySCIMException("Error in provisioning 'update group' operation for user :" + userName, e);
+            throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         } catch (ApiException e) {
-
+            throw new IdentitySCIMException(e.getMessage(), e);
         }
     }
 

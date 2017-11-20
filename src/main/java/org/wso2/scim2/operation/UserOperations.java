@@ -16,28 +16,19 @@
 
 package org.wso2.scim2.operation;
 
-import com.google.gson.Gson;
 import io.swagger.client.ApiException;
 import io.swagger.client.ApiResponse;
 import io.swagger.client.api.Scimv2UsersApi;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.charon3.core.encoder.JSONDecoder;
-import org.wso2.charon3.core.encoder.JSONEncoder;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
-import org.wso2.charon3.core.exceptions.BadRequestException;
 import org.wso2.charon3.core.exceptions.CharonException;
-import org.wso2.charon3.core.exceptions.InternalErrorException;
+import org.wso2.charon3.core.objects.AbstractSCIMObject;
 import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.objects.User;
-import org.wso2.charon3.core.schema.SCIMResourceSchemaManager;
-import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
-import org.wso2.charon3.core.utils.codeutils.PatchOperation;
+import org.wso2.charon3.core.schema.SCIMConstants;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
-import org.wso2.scim2.model.Error;
-import org.wso2.scim2.util.PatchOperationEncoder;
 import org.wso2.scim2.util.SCIMClient;
 
 import java.io.IOException;
@@ -52,154 +43,139 @@ public class UserOperations extends AbstractOperations {
     public UserOperations(SCIMProvider scimProvider, SCIMObject object,
                           Map<String, Object> additionalInformation) {
 
-       super(scimProvider, object, additionalInformation);
+        super(scimProvider, object, additionalInformation);
     }
 
-    public User createUser() throws IdentitySCIMException {
-
-        Gson gson;
-        User user = null;
+    public void createUser() throws IdentitySCIMException {
 
         try {
-
-            String encodedUser = new JSONEncoder().encodeSCIMObject(scimObject);
+            SCIMClient scimClient = new SCIMClient();
+            String encodedUser = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
+                    SCIMConstants.JSON);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("User to provision : useName" + userName);
             }
 
+            client.setURL(userEPURL);
             Scimv2UsersApi api = new Scimv2UsersApi(client);
             ApiResponse<String> response = api.createUser(null, null,
                     encodedUser);
+            logger.info("SCIM - create user operation returned with response code: " + response.getStatusCode());
             if (logger.isDebugEnabled()) {
-                logger.debug("Create User Response: " + response);
+                logger.debug("Create User Response: " + response.getData());
             }
 
-            if (response.getStatusCode() == 201) {
-                JSONDecoder jsonDecoder = new JSONDecoder();
-                SCIMResourceTypeSchema schema = SCIMResourceSchemaManager
-                        .getInstance().getUserResourceSchema();
-                user = (User) jsonDecoder.decodeResource(response.getData(),
-                        schema, new User());
+            if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
+                //try to decode the scim object to verify that it gets decoded without issue.
+                scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.USER);
+            } else {
+                //decode scim exception and extract the specific error message.
+                AbstractCharonException exception =
+                        scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
+                logger.error(exception.getMessage());
             }
 
         } catch (CharonException e) {
             throw new IdentitySCIMException(
-                    "Error in encoding the object to be provisioned for user with id: "
+                    "Error in encoding the object to be provisioned for user with userName: "
                             + userName, e);
         } catch (ApiException e) {
-            gson = new Gson();
-            Error err = gson.fromJson(e.getResponseBody(), Error.class);
-            throw new IdentitySCIMException(err.getDetail(), e);
-
-        } catch (BadRequestException e) {
+            throw new IdentitySCIMException(e.getMessage(), e);
+        } catch (AbstractCharonException e) {
             throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: "
-                            + userName, e);
-        } catch (InternalErrorException e) {
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: "
+                    "Error in invoking provisioning operation for the user with userName: "
                             + userName, e);
         }
-
-        return user;
     }
 
     public void deleteUser() throws IdentitySCIMException {
 
-        if (this.scimObject != null) {
-            Gson gson = new Gson();
-            String userId = null;
-            try {
-                String filter = USER_FILTER + ((User) scimObject).getUserName();
-                List<User> users = (List<User>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
-                User user = users.get(0);
+        try {
+            String filter = USER_FILTER + ((User) scimObject).getUserName();
+            List<User> users = (List<User>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
+            User user;
 
-                userId = user.getId();
+            if (users != null && users.size() > 0) {
+                user = users.get(0);
+                String userId = user.getId();
                 if (userId == null) {
                     logger.error("Trying to delete a user entry which doesn't support SCIM. " +
                             "Usually internal carbon User entries such as admin role doesn't support SCIM 2.0 attributes.");
                     return;
                 }
 
+                client.setURL(userEPURL+"/"+userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
-                api.deleteUser(userId);
+                ApiResponse response = api.deleteUser(userId);
 
-            } catch (AbstractCharonException e) {
-                throw new IdentitySCIMException("Error in encoding the object", e);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ApiException e) {
-                Error err = gson.fromJson(e.getResponseBody(), Error.class);
-                throw new IdentitySCIMException(err.getDetail(), e);
+                handleSCIMErrorResponse(response);
+            } else {
+                logger.error("No Users found with userName: " + ((User) scimObject).getUserName());
             }
+        } catch (ApiException e) {
+            throw new IdentitySCIMException(e.getMessage(), e);
+        } catch (IOException | AbstractCharonException e) {
+            throw new IdentitySCIMException(
+                    "Error in invoking provisioning operation for the user with id: " + userName, e);
         }
     }
 
-    public User updateUser(String httpMethod) throws IdentitySCIMException {
+    public void updateUser(String httpMethod) throws IdentitySCIMException {
 
-        User updatedUser = null;
-        Gson gson;
         try {
             String filter = USER_FILTER + ((User) scimObject).getUserName();
-            List<User> users = (List<User>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
-            User user = users.get(0);
+            List<User> users = (List<User>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
+            User user;
 
-            String userId = user.getId();
-            if (userId == null) {
-                logger.error("Trying to update a user entry which doesn't support SCIM. " +
-                        "Usually internal carbon User entries such as admin role doesn't support SCIM 2.0 attributes.");
-                return updatedUser;
-            }
+            SCIMClient scimClient = new SCIMClient();
+            if (users != null && users.size() > 0) {
+                user = users.get(0);
+                String userId = user.getId();
+                if (userId == null) {
+                    logger.error("Trying to update a user entry which doesn't support SCIM. " +
+                            "Usually internal carbon User entries such as admin role doesn't support SCIM 2.0 attributes.");
+                    return;
+                }
 
-            String encodedObject = null;
+                String encodedObject;
 
-            if(httpMethod.equals("PUT")) {
-                encodedObject = new JSONEncoder().encodeSCIMObject(scimObject);
-            } else if(httpMethod.equals("PATCH")) {
-                List<PatchOperation> patchOperations = provider.getPatchOperationList();
-                encodedObject = new PatchOperationEncoder().encodeRequest(patchOperations);
+                if (httpMethod.equals("PUT")) {
+                    encodedObject = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                } else {
+                    logger.error("Not supported update operation type: " + httpMethod);
+                    return;
+                }
+
+                client.setURL(userEPURL+"/"+userId);
+                Scimv2UsersApi api = new Scimv2UsersApi(client);
+                ApiResponse<String> response = api.updateUser(userId, null, null, encodedObject, httpMethod);
+
+                if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
+                    scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.USER);
+                } else {
+                    AbstractCharonException exception =
+                            scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
+                    logger.error(exception.getMessage());
+                }
             } else {
-                logger.error("Not supported update operation type: " + httpMethod);
+                logger.error("No Users found with userName: " + ((User) scimObject).getUserName());
             }
 
-
-            Scimv2UsersApi api = new Scimv2UsersApi(client);
-            ApiResponse<String> response = api.updateUser(userId, null, null, encodedObject, httpMethod);
-
-            if (response.getStatusCode() == 201) {
-                JSONDecoder jsonDecoder = new JSONDecoder();
-                SCIMResourceTypeSchema schema = SCIMResourceSchemaManager
-                        .getInstance().getUserResourceSchema();
-                updatedUser = (User) jsonDecoder.decodeResource(response.getData(),
-                        schema, new User());
-
-            }
-
-        } catch (AbstractCharonException e) {
+        } catch (CharonException e) {
             throw new IdentitySCIMException(
                     "Error in encoding the object to be provisioned for user : "
                             + userName, e);
         } catch (ApiException e) {
-            gson = new Gson();
-            Error err = gson.fromJson(e.getResponseBody(), Error.class);
-            throw new IdentitySCIMException(err.getDetail(), e);
-        } catch (IOException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
-        } catch (JSONException e) {
-            throw new IdentitySCIMException("Error while encoding patch operations");
+        } catch (IOException | AbstractCharonException e) {
+            throw new IdentitySCIMException(
+                    "Error in invoking provisioning operation for the user with id: " + userName, e);
         }
-
-        return updatedUser;
     }
 
-    public User updateUser() throws IdentitySCIMException {
+    public void updateUser() throws IdentitySCIMException {
 
-        return updateUser("PUT");
-    }
-
-    public User patchUser() throws IdentitySCIMException {
-
-        return updateUser("PATCH");
+        this.updateUser("PUT");
     }
 }

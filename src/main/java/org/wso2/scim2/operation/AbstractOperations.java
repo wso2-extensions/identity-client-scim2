@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.wso2.charon3.core.config.CharonConfiguration;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
 import org.wso2.charon3.core.exceptions.BadRequestException;
+import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.NotFoundException;
 import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.protocol.ResponseCodeConstants;
@@ -51,6 +52,7 @@ public abstract class AbstractOperations {
     protected SCIMObject scimObject;
     protected SCIMProvider provider;
     protected String userEPURL;
+    protected String groupEPURL;
     protected String userName;
     protected Map<String, Object> additionalInformation;
     protected ApiClient client;
@@ -62,7 +64,8 @@ public abstract class AbstractOperations {
         scimObject = object;
         this.additionalInformation = additionalInformation;
 
-        userEPURL = provider.getProperty(GROUP_ENDPOINT);
+        userEPURL = provider.getProperty(USER_ENDPOINT);
+        groupEPURL = provider.getProperty(GROUP_ENDPOINT);
         userName = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
 
         client = new ApiClient();
@@ -105,10 +108,12 @@ public abstract class AbstractOperations {
 
         ApiResponse<String> response;
         if(resourceType == SCIMClient.USER) {
+            client.setURL(userEPURL);
             response = new Scimv2UsersApi(client).getUser(attributes,
                     excludedAttributes, filter, startIndex, count, sortBy,
                     sortOrder);
         } else {
+            client.setURL(groupEPURL);
             response = new Scimv2GroupsApi(client).getGroup(attributes,
                     excludedAttributes, filter, startIndex, count, sortBy,
                     sortOrder);
@@ -128,8 +133,26 @@ public abstract class AbstractOperations {
                 String error = "No results found.";
                 throw new NotFoundException(error);
             }
+        } else {
+            //decode scim exception and extract the specific error message.
+            AbstractCharonException exception =
+                    scimClient.decodeSCIMException(
+                            response.getData(), SCIMConstants.JSON);
+            logger.error(exception.getMessage());
         }
 
         return returnedSCIMObject;
+    }
+
+    public void handleSCIMErrorResponse(ApiResponse<String> response) throws CharonException {
+
+        SCIMClient scimClient = new SCIMClient();
+        if (!scimClient.evaluateResponseStatus(response.getStatusCode())) {
+            //decode scim exception and extract the specific error message.
+            AbstractCharonException exception =
+                    scimClient.decodeSCIMException(
+                            response.getData(), SCIMConstants.JSON);
+            logger.error(exception.getMessage());
+        }
     }
 }
