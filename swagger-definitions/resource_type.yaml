@@ -1,0 +1,31 @@
+swagger: '2.0'
+info:
+  description: SCIM 2.0 /ResourceType endpoint
+  version: '1.0'
+  title: /ResourceType Endpoint Swagger Definition
+  contact:
+    name: WSO2 Identity Server Team
+    url: 'http://wso2.com'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+basePath: /scim/v2/ResourceType
+tags:
+  - name: scimv2ResourceType
+paths:
+  /scim/v2/ResourceType:
+    get:
+      tags:
+        - scimv2ResourceType
+      summary: Return the ResourceType schema.
+      description: Returns HTTP 200 if the schema is found.
+      operationId: getResourceType
+      produces:
+        - application/json
+        - application/scim+json
+      parameters: []
+      responses:
+        '200':
+          description: Schema is found
+        '404':
+          description: Schema is not found

@@ -1,0 +1,144 @@
+swagger: '2.0'
+info:
+  description: SCIM 2.0 /Me endpoint
+  version: '1.0'
+  title: /Me Endpoint Swagger Definition
+  contact:
+    name: WSO2 Identity Server Team
+    url: 'http://wso2.com'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+basePath: /scim/v2/Me
+tags:
+  - name: scimv2Me
+paths:
+  /scim/v2/Me:
+    get:
+      tags:
+        - scimv2Me
+      summary: Return the authenticated user.
+      description: Returns HTTP 200 if the user is found.
+      operationId: getMe
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+      responses:
+        '200':
+          description: Valid user is found
+        '404':
+          description: Valid user is not found
+    post:
+      tags:
+        - scimv2Me
+      summary: Return the user which was anonymously created
+      description: Returns HTTP 201 if the user is successfully created.
+      operationId: createMe
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Valid user is created
+        '404':
+          description: User is not found
+    put:
+      tags:
+        - scimv2Me
+      summary: Return the updated user
+      description: Returns HTTP 404 if the user is not found.
+      operationId: updateMe
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User is updated
+        '404':
+          description: Valid user is not found
+    delete:
+      tags:
+        - scimv2Me
+      summary: Delete the authenticated user.
+      description: Returns HTTP 204 if the user is successfully deleted.
+      operationId: deleteMe
+      produces:
+        - application/json
+        - application/scim+json
+      parameters: []
+      responses:
+        '204':
+          description: User is deleted
+        '404':
+          description: Valid user is not found
