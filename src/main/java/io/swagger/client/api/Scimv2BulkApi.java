@@ -18,73 +18,29 @@ package io.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
-import io.swagger.client.*;
+import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.ApiResponse;
+import io.swagger.client.Configuration;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Scimv2BulkApi {
-    private ApiClient apiClient;
+public class Scimv2BulkApi extends Scimv2BaseApi {
 
     public Scimv2BulkApi() {
+
         this(Configuration.getDefaultApiClient());
     }
 
     public Scimv2BulkApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
 
-    public ApiClient getApiClient() {
-        return apiClient;
-    }
-
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
-
-    /**
-     * Build call for createBulk
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call createBulkCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        Object localVarPostBody = body;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        super(apiClient);
     }
     
     private Call createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
 
-        Call call = createBulkCall(attributes, excludedAttributes, body);
+        Call call = createResourceCall(attributes, excludedAttributes, body);
         return call;
     }
 

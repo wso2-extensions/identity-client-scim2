@@ -70,7 +70,6 @@ public abstract class AbstractOperations {
 
         client = new ApiClient();
         client.setUsername(userName);
-        //client.setURL(provider.getProperty("groupEndpoint"));
         client.setPassword(provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD));
     }
 

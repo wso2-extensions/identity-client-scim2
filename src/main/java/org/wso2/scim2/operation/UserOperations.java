@@ -107,7 +107,7 @@ public class UserOperations extends AbstractOperations {
 
                 client.setURL(userEPURL+"/"+userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
-                ApiResponse response = api.deleteUser(userId);
+                ApiResponse response = api.deleteUser();
 
                 handleSCIMErrorResponse(response);
             } else {
@@ -149,7 +149,7 @@ public class UserOperations extends AbstractOperations {
 
                 client.setURL(userEPURL+"/"+userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
-                ApiResponse<String> response = api.updateUser(userId, null, null, encodedObject, httpMethod);
+                ApiResponse<String> response = api.updateUser(null, null, encodedObject, httpMethod);
 
                 if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                     scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.USER);

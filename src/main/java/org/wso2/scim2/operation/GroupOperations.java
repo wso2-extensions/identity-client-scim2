@@ -124,9 +124,9 @@ public class GroupOperations extends AbstractOperations {
                     return;
                 }
 
-                client.setURL(groupEPURL);
+                client.setURL(groupEPURL+"/"+groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-                ApiResponse<String> response = api.deleteGroup(groupId);
+                ApiResponse<String> response = api.deleteGroup();
 
                 logger.info("SCIM - delete group operation returned with response code: " +
                         response.getStatusCode());
@@ -156,9 +156,9 @@ public class GroupOperations extends AbstractOperations {
                 String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
                         SCIMConstants.JSON);
 
-                client.setURL(groupEPURL);
+                client.setURL(groupEPURL+"/"+groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-                ApiResponse<String> response = api.updateGroup(groupId, null, null, encodedGroup);
+                ApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
 
                 logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
 

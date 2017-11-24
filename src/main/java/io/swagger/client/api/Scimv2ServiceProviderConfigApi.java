@@ -18,67 +18,28 @@ package io.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
-import io.swagger.client.*;
+import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.ApiResponse;
+import io.swagger.client.Configuration;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class Scimv2ServiceProviderConfigApi {
-    private ApiClient apiClient;
+public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
 
     public Scimv2ServiceProviderConfigApi() {
+
         this(Configuration.getDefaultApiClient());
     }
 
     public Scimv2ServiceProviderConfigApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
 
-    public ApiClient getApiClient() {
-        return apiClient;
-    }
-
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
-
-    /**
-     * Build call for getServiceProviderConfig
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call getServiceProviderConfigCall() throws ApiException {
-
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        super(apiClient);
     }
     
     private Call getServiceProviderConfigValidateBeforeCall() throws ApiException {
 
-        Call call = getServiceProviderConfigCall();
+        Call call = getResourceTypeCall();
         return call;
     }
 

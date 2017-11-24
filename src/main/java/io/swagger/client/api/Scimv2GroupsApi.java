@@ -17,34 +17,25 @@
 package io.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Call;
 import io.swagger.client.*;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.squareup.okhttp.Call;
-
-public class Scimv2GroupsApi {
-    private ApiClient apiClient;
+public class Scimv2GroupsApi extends Scimv2BaseApi {
 
     public Scimv2GroupsApi() {
+
         this(Configuration.getDefaultApiClient());
     }
 
     public Scimv2GroupsApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
 
-    public ApiClient getApiClient() {
-        return apiClient;
-    }
-
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
+        super(apiClient);
     }
 
     /**
@@ -118,70 +109,33 @@ public class Scimv2GroupsApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for deleteGroup
-     * @param id Unique id of the resource type. (required)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call deleteGroupCall(String id) throws ApiException {
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
-    private Call deleteGroupValidateBeforeCall(String id) throws ApiException {
-        
-        if (id == null) {
-            throw new ApiException("Missing the required parameter 'id' when calling deleteGroup(Async)");
-        }
+    private Call deleteGroupValidateBeforeCall() throws ApiException {
 
-        Call call = deleteGroupCall(id);
+        Call call = deleteResourceCall();
         return call;
     }
 
     /**
      * Delete the group with the given id
      * Returns HTTP 204 if the group is successfully deleted.
-     * @param id Unique id of the resource type. (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> deleteGroup(String id) throws ApiException {
+    public ApiResponse<String> deleteGroup() throws ApiException {
 
-        ApiResponse<String> resp = deleteGroupWithHttpInfo(id);
+        ApiResponse<String> resp = deleteGroupWithHttpInfo();
         return resp;
     }
 
     /**
      * Delete the group with the given id
      * Returns HTTP 204 if the group is successfully deleted.
-     * @param id Unique id of the resource type. (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> deleteGroupWithHttpInfo(String id) throws ApiException {
+    public ApiResponse<String> deleteGroupWithHttpInfo() throws ApiException {
 
-        Call call = deleteGroupValidateBeforeCall(id);
+        Call call = deleteGroupValidateBeforeCall();
         return apiClient.execute(call);
     }
 
@@ -278,117 +232,43 @@ public class Scimv2GroupsApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for getGroupById
-     * @param id Unique id of the resource type. (required)
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call getGroupByIdCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
-    private Call getGroupByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        
-        if (id == null) {
-            throw new ApiException("Missing the required parameter 'id' when calling getGroupById(Async)");
-        }
+    private Call getGroupByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
 
-        Call call = getGroupByIdCall(id, attributes, excludedAttributes);
+        Call call = getResourceCall(attributes, excludedAttributes);
         return call;
     }
 
     /**
      * Return the group with the given id
      * Returns HTTP 200 if the group is found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String getGroupById(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        ApiResponse<String> resp = getGroupByIdWithHttpInfo(id, attributes, excludedAttributes);
+    public String getGroupById(List<String> attributes, List<String> excludedAttributes) throws ApiException {
+        ApiResponse<String> resp = getGroupByIdWithHttpInfo(attributes, excludedAttributes);
         return resp.getData();
     }
 
     /**
      * Return the group with the given id
      * Returns HTTP 200 if the group is found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getGroupByIdWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        Call call = getGroupByIdValidateBeforeCall(id, attributes, excludedAttributes);
+    public ApiResponse<String> getGroupByIdWithHttpInfo(List<String> attributes, List<String> excludedAttributes) throws ApiException {
+        Call call = getGroupByIdValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
-    }
-
-    /**
-     * Build call for getGroupsByPost
-     * @param body  (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call getGroupsByPostCall(String body) throws ApiException {
-        Object localVarPostBody = body;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getGroupsByPostValidateBeforeCall(String body) throws ApiException {
 
-        Call call = getGroupsByPostCall(body);
+        Call call = getResourcesByPostCall(body);
         return call;
     }
 
@@ -416,85 +296,38 @@ public class Scimv2GroupsApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for updateGroup
-     * @param id Unique id of the resource type. (required)
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @param progressListener Progress listener
-     * @param progressRequestListener Progress request listener
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call updateGroupCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-
-        Object localVarPostBody = body;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
-    private Call updateGroupValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        
-        if (id == null) {
-            throw new ApiException("Missing the required parameter 'id' when calling updateGroup(Async)");
-        }
+    private Call updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
 
-        Call call = updateGroupCall(id, attributes, excludedAttributes, body, progressListener, progressRequestListener);
+        Call call = updateResourceCall(attributes, excludedAttributes, body);
         return call;
     }
 
     /**
      * Return the updated group
      * Returns HTTP 404 if the group is not found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateGroup(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        ApiResponse<String> resp = updateGroupWithHttpInfo(id, attributes, excludedAttributes, body);
+    public ApiResponse<String> updateGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+        ApiResponse<String> resp = updateGroupWithHttpInfo(attributes, excludedAttributes, body);
         return resp;
     }
 
     /**
      * Return the updated group
      * Returns HTTP 404 if the group is not found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateGroupWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        Call call = updateGroupValidateBeforeCall(id, attributes, excludedAttributes, body, null, null);
+    public ApiResponse<String> updateGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+        Call call = updateGroupValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }

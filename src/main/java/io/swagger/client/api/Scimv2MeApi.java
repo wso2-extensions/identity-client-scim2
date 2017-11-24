@@ -18,74 +18,29 @@ package io.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
-import io.swagger.client.*;
+import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.ApiResponse;
+import io.swagger.client.Configuration;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class Scimv2MeApi {
-    private ApiClient apiClient;
+public class Scimv2MeApi extends Scimv2BaseApi {
 
     public Scimv2MeApi() {
+
         this(Configuration.getDefaultApiClient());
     }
 
     public Scimv2MeApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
+
+        super(apiClient);
     }
 
-    public ApiClient getApiClient() {
-        return apiClient;
-    }
-
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
-
-    /**
-     * Build call for createMe
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call createMeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-
-        Object localVarPostBody = body;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
-    
     private Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
 
-        Call call = createMeCall(attributes, excludedAttributes, body);
+        Call call = createResourceCall(attributes, excludedAttributes, body);
         return call;
     }
 
@@ -119,41 +74,10 @@ public class Scimv2MeApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for deleteMe
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call deleteMeCall() throws ApiException {
-
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
     private Call deleteMeValidateBeforeCall() throws ApiException {
 
-        Call call = deleteMeCall();
+        Call call = deleteResourceCall();
         return call;
     }
 
@@ -178,47 +102,10 @@ public class Scimv2MeApi {
         Call call = deleteMeValidateBeforeCall();
         return apiClient.execute(call);
     }
-
-    /**
-     * Build call for getMe
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call getMeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
-
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
     private Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
         
-        Call call = getMeCall(attributes, excludedAttributes);
+        Call call = getResourceCall(attributes, excludedAttributes);
         return call;
     }
 
@@ -250,48 +137,10 @@ public class Scimv2MeApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for updateMe
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call updateMeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-
-        Object localVarPostBody = body;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
     private Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
 
-        Call call = updateMeCall(attributes, excludedAttributes, body);
+        Call call = updateResourceCall(attributes, excludedAttributes, body);
         return call;
     }
 

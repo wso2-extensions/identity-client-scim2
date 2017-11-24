@@ -26,67 +26,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Scimv2UsersApi {
-    private ApiClient apiClient;
+public class Scimv2UsersApi extends Scimv2BaseApi{
 
     public Scimv2UsersApi() {
         this(Configuration.getDefaultApiClient());
     }
 
     public Scimv2UsersApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
-
-    public ApiClient getApiClient() {
-        return apiClient;
-    }
-
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
-    }
-
-    /**
-     * Build call for createUser
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call createUserCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-
-        Object localVarPostBody = body;
-
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        super(apiClient);
     }
     
     private Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
           
-        Call call = createUserCall(attributes, excludedAttributes, body);
+        Call call = createResourceCall(attributes, excludedAttributes, body);
         return call;    
     }
 
@@ -120,72 +72,33 @@ public class Scimv2UsersApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for deleteUser
-     * @param id Unique id of the resource type. (required)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call deleteUserCall(String id) throws ApiException {
-
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
-    private Call deleteUserValidateBeforeCall(String id) throws ApiException {
-        
-        // verify the required parameter 'id' is set
-        if (id == null) {
-            throw new ApiException("Missing the required parameter 'id' when calling deleteUser(Async)");
-        }
-     
-        Call call = deleteUserCall(id);
+    private Call deleteUserValidateBeforeCall() throws ApiException {
+
+        Call call = deleteResourceCall();
         return call;    
     }
 
     /**
      * Delete the user with the given id
      * Returns HTTP 204 if the user is successfully deleted.
-     * @param id Unique id of the resource type. (required)
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> deleteUser(String id) throws ApiException {
+    public ApiResponse<String> deleteUser() throws ApiException {
 
-        ApiResponse<String> resp = deleteUserWithHttpInfo(id);
+        ApiResponse<String> resp = deleteUserWithHttpInfo();
         return resp;
     }
 
     /**
      * Delete the user with the given id
      * Returns HTTP 204 if the user is successfully deleted.
-     * @param id Unique id of the resource type. (required)
      * @return ApiResponse&lt;Void&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> deleteUserWithHttpInfo(String id) throws ApiException {
+    public ApiResponse<String> deleteUserWithHttpInfo() throws ApiException {
 
-        Call call = deleteUserValidateBeforeCall(id);
+        Call call = deleteUserValidateBeforeCall();
         return apiClient.execute(call);
     }
 
@@ -205,7 +118,7 @@ public class Scimv2UsersApi {
 
         Object localVarPostBody = null;
 
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarQueryParams = new ArrayList<>();
         if (attributes != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
@@ -283,122 +196,45 @@ public class Scimv2UsersApi {
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
-
-    /**
-     * Build call for getUserById
-     * @param id Unique id of the resource type. (required)
-     * @param attributes SCIM defined attributes parameter. (optional)
-     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call getUserByIdCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-
-        Object localVarPostBody = null;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-        if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
-        if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
-    }
     
-    private Call getUserByIdValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        
-        // verify the required parameter 'id' is set
-        if (id == null) {
-            throw new ApiException("Missing the required parameter 'id' when calling getUserById(Async)");
-        }
+    private Call getUserByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
          
-        Call call = getUserByIdCall(id, attributes, excludedAttributes);
+        Call call = getResourceCall(attributes, excludedAttributes);
         return call;   
     }
 
     /**
      * Return the user with the given id
      * Returns HTTP 200 if the user is found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String getUserById(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
+    public String getUserById(List<String> attributes, List<String> excludedAttributes) throws ApiException {
 
-        ApiResponse<String> resp = getUserByIdWithHttpInfo(id, attributes, excludedAttributes);
+        ApiResponse<String> resp = getUserByIdWithHttpInfo(attributes, excludedAttributes);
         return resp.getData();
     }
 
     /**
      * Return the user with the given id
      * Returns HTTP 200 if the user is found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getUserByIdWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes) throws ApiException {
+    public ApiResponse<String> getUserByIdWithHttpInfo(List<String> attributes, List<String> excludedAttributes) throws ApiException {
 
-        Call call = getUserByIdValidateBeforeCall(id, attributes, excludedAttributes);
+        Call call = getUserByIdValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
-    }
-
-    /**
-     * Build call for getUsersByPost
-     * @param body  (optional)
-     * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
-     */
-    public Call getUsersByPostCall(String body) throws ApiException {
-
-        Object localVarPostBody = body;
-
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
-
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-        final String[] localVarAccepts = {
-            "application/json", "application/scim+json"
-        };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
-
-        final String[] localVarContentTypes = {
-            "application/scim+json"
-        };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-        localVarHeaderParams.put("Content-Type", localVarContentType);
-
-        String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getUsersByPostValidateBeforeCall(String body) throws ApiException {
                
-        Call call = getUsersByPostCall(body);
+        Call call = getResourcesByPostCall(body);
         return call;  
     }
 
@@ -431,26 +267,25 @@ public class Scimv2UsersApi {
 
     /**
      * Build call for updateUser
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public Call updateUserCall(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
+    public Call updateUserCall(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
 
         Object localVarPostBody = body;
 
-        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarQueryParams = new ArrayList<>();
         if (attributes != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
         localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
 
-        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarHeaderParams = new HashMap<>();
 
-        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+        Map<String, Object> localVarFormParams = new HashMap<>();
 
         final String[] localVarAccepts = {
             "application/json", "application/scim+json"
@@ -468,45 +303,38 @@ public class Scimv2UsersApi {
         return apiClient.buildCall(httpMethod, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
-    private Call updateUserValidateBeforeCall(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
-        
-        // verify the required parameter 'id' is set
-        if (id == null) {
-            throw new ApiException("Missing the required parameter 'id' when calling updateUser(Async)");
-        }
+    private Call updateUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
                
-        Call call = updateUserCall(id, attributes, excludedAttributes, body, httpMethod);
+        Call call = updateUserCall(attributes, excludedAttributes, body, httpMethod);
         return call;  
     }
 
     /**
      * Return the updated user
      * Returns HTTP 404 if the user is not found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return String
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateUser(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
+    public ApiResponse<String> updateUser(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
 
-        ApiResponse<String> resp = updateUserWithHttpInfo(id, attributes, excludedAttributes, body, httpMethod);
+        ApiResponse<String> resp = updateUserWithHttpInfo(attributes, excludedAttributes, body, httpMethod);
         return resp;
     }
 
     /**
      * Return the updated user
      * Returns HTTP 404 if the user is not found.
-     * @param id Unique id of the resource type. (required)
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return ApiResponse&lt;String&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateUserWithHttpInfo(String id, List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
-        Call call = updateUserValidateBeforeCall(id, attributes, excludedAttributes, body, httpMethod);
+    public ApiResponse<String> updateUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
+        Call call = updateUserValidateBeforeCall(attributes, excludedAttributes, body, httpMethod);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
