@@ -1,4 +1,4 @@
-# swagger-java-client
+# identity-client-scim2
 
 ## Requirements
 

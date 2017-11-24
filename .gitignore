@@ -11,6 +11,10 @@
 .mtj.tmp/
 
 # Package Files #
+<<<<<<< HEAD
+=======
+*.jar
+>>>>>>> 9b5bce0e97a63a3085ab4bea120f645e4ecc3d54
 *.war
 *.ear
 *.zip
@@ -25,4 +29,3 @@ hs_err_pid*
 .classpath
 .project
 .settings/
-
