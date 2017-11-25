@@ -17,10 +17,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.scim2.client</groupId>
-    <artifactId>org.wso2.scim2.client</artifactId>
+    <groupId>org.wso2.identity.client</groupId>
+    <artifactId>org.wso2.identity.client.scim2</artifactId>
     <packaging>jar</packaging>
-    <name>scim2-client</name>
+    <name>identity-client-scim2</name>
     <version>1.0.0</version>
 
     <licenses>
