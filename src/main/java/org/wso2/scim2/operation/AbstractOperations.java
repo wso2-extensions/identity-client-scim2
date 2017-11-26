@@ -32,6 +32,7 @@ import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.protocol.ResponseCodeConstants;
 import org.wso2.charon3.core.schema.SCIMConstants;
 import org.wso2.scim2.client.SCIMProvider;
+import org.wso2.scim2.util.SCIM2CommonConstants;
 import org.wso2.scim2.util.SCIMClient;
 
 import java.io.IOException;
@@ -43,8 +44,6 @@ public abstract class AbstractOperations {
 
     public static final String USER_FILTER = "userName%20Eq%20";
     public static final String GROUP_FILTER = "displayName%20Eq%20";
-    public static final String GROUP_ENDPOINT = "group-endpoint";
-    public static final String USER_ENDPOINT = "user-endpoint";
 
     private static Logger logger = LoggerFactory.getLogger(AbstractOperations.class
             .getName());
@@ -64,8 +63,8 @@ public abstract class AbstractOperations {
         scimObject = object;
         this.additionalInformation = additionalInformation;
 
-        userEPURL = provider.getProperty(USER_ENDPOINT);
-        groupEPURL = provider.getProperty(GROUP_ENDPOINT);
+        userEPURL = provider.getProperty(SCIM2CommonConstants.ELEMENT_NAME_USER_ENDPOINT);
+        groupEPURL = provider.getProperty(SCIM2CommonConstants.ELEMENT_NAME_GROUP_ENDPOINT);
         userName = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
 
         client = new ApiClient();
@@ -106,7 +105,7 @@ public abstract class AbstractOperations {
         }
 
         ApiResponse<String> response;
-        if(resourceType == SCIMClient.USER) {
+        if(resourceType == SCIM2CommonConstants.USER) {
             client.setURL(userEPURL);
             response = new Scimv2UsersApi(client).getUser(attributes,
                     excludedAttributes, filter, startIndex, count, sortBy,

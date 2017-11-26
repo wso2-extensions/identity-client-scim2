@@ -31,6 +31,7 @@ import org.wso2.charon3.core.utils.CopyUtil;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.util.CollectionUtils;
+import org.wso2.scim2.util.SCIM2CommonConstants;
 import org.wso2.scim2.util.SCIMClient;
 
 import java.io.IOException;
@@ -66,7 +67,7 @@ public class GroupOperations extends AbstractOperations {
                 //get corresponding userIds
                 for (String user : users) {
                     String filter = USER_FILTER + user;
-                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
+                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.USER);
 
                     String userId = null;
                     for (SCIMObject filteredUser : filteredUsers) {
@@ -97,7 +98,7 @@ public class GroupOperations extends AbstractOperations {
             }
             if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                 //try to decode the scim object to verify that it gets decoded without issue.
-                scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.GROUP);
+                scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.GROUP);
             } else {
                 //decode scim exception and extract the specific error message.
                 AbstractCharonException exception =
@@ -116,7 +117,7 @@ public class GroupOperations extends AbstractOperations {
         try {
             String filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
 
-            List<Group> groups = (List<Group>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.GROUP);
+            List<Group> groups = (List<Group>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.GROUP);
             if(groups != null && groups.size() > 0) {
                 String groupId = groups.get(0).getId();
 
@@ -141,10 +142,18 @@ public class GroupOperations extends AbstractOperations {
 
     public void updateGroup() throws IdentitySCIMException {
 
-        try {
-            String filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
+        String filter;
 
-            List<Group> groups = (List<Group>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.GROUP);
+        try {
+            //check if role name is updated
+            if (additionalInformation != null && (Boolean) additionalInformation.get(
+                    SCIM2CommonConstants.IS_ROLE_NAME_CHANGED_ON_UPDATE)) {
+                filter = GROUP_FILTER + additionalInformation.get(SCIM2CommonConstants.OLD_GROUP_NAME);
+            } else {
+                filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
+            }
+
+            List<Group> groups = (List<Group>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.GROUP);
             if(groups != null && groups.size() > 0) {
                 SCIMClient scimClient = new SCIMClient();
                 String groupId = groups.get(0).getId();
@@ -167,7 +176,7 @@ public class GroupOperations extends AbstractOperations {
                 }
                 if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                     //try to decode the scim object to verify that it gets decoded without issue.
-                    scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.GROUP);
+                    scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.GROUP);
                 } else {
                     //decode scim exception and extract the specific error message.
                     AbstractCharonException exception =

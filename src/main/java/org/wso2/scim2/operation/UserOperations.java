@@ -29,6 +29,7 @@ import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMConstants;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
+import org.wso2.scim2.util.SCIM2CommonConstants;
 import org.wso2.scim2.util.SCIMClient;
 
 import java.io.IOException;
@@ -68,7 +69,7 @@ public class UserOperations extends AbstractOperations {
 
             if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                 //try to decode the scim object to verify that it gets decoded without issue.
-                scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.USER);
+                scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.USER);
             } else {
                 //decode scim exception and extract the specific error message.
                 AbstractCharonException exception =
@@ -93,7 +94,7 @@ public class UserOperations extends AbstractOperations {
 
         try {
             String filter = USER_FILTER + ((User) scimObject).getUserName();
-            List<User> users = (List<User>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
+            List<User> users = (List<User>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.USER);
             User user;
 
             if (users != null && users.size() > 0) {
@@ -125,7 +126,7 @@ public class UserOperations extends AbstractOperations {
 
         try {
             String filter = USER_FILTER + ((User) scimObject).getUserName();
-            List<User> users = (List<User>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIMClient.USER);
+            List<User> users = (List<User>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.USER);
             User user;
 
             SCIMClient scimClient = new SCIMClient();
@@ -152,7 +153,7 @@ public class UserOperations extends AbstractOperations {
                 ApiResponse<String> response = api.updateUser(null, null, encodedObject, httpMethod);
 
                 if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
-                    scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIMClient.USER);
+                    scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.USER);
                 } else {
                     AbstractCharonException exception =
                             scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);

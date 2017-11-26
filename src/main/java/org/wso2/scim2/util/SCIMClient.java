@@ -47,9 +47,6 @@ public class SCIMClient {
     private JSONEncoder jsonEncoder;
     private JSONDecoder jsonDecoder;
 
-    public static final int USER = 1;
-    public static final int GROUP = 2;
-
     public SCIMClient() {
         jsonEncoder = new JSONEncoder();
         jsonDecoder = new JSONDecoder();
