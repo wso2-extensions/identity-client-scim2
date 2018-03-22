@@ -101,23 +101,6 @@
                 </executions>
             </plugin>
 
-            <!--&lt;!&ndash; attach test jar &ndash;&gt;-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-jar-plugin</artifactId>-->
-                <!--<version>2.2</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals>-->
-                            <!--<goal>jar</goal>-->
-                            <!--<goal>test-jar</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <!--<configuration>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
