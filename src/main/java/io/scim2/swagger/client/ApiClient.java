@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package io.swagger.client;
+package io.scim2.swagger.client;
 
 import com.squareup.okhttp.*;
 import com.squareup.okhttp.internal.http.HttpMethod;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
-import io.swagger.client.auth.ApiKeyAuth;
-import io.swagger.client.auth.Authentication;
-import io.swagger.client.auth.HttpBasicAuth;
-import io.swagger.client.auth.OAuth;
+import io.scim2.swagger.client.auth.Authentication;
+import io.scim2.swagger.client.auth.ApiKeyAuth;
+import io.scim2.swagger.client.auth.HttpBasicAuth;
+import io.scim2.swagger.client.auth.OAuth;
 import okio.BufferedSink;
 import okio.Okio;
 

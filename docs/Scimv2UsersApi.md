@@ -23,8 +23,8 @@ Returns HTTP 201 if the user is successfully created.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2UsersApi;
+//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
 Scimv2UsersApi apiInstance = new Scimv2UsersApi();
@@ -219,8 +219,8 @@ Returns HTTP 404 if the users are not found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2UsersApi;
+//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
 Scimv2UsersApi apiInstance = new Scimv2UsersApi();

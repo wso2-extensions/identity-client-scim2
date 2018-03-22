@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.swagger.client.api;
+package io.scim2.swagger.client.api;
 
 import com.squareup.okhttp.Call;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.Configuration;
-import io.swagger.client.Pair;
+import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.ApiException;
+import io.scim2.swagger.client.Configuration;
+import io.scim2.swagger.client.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -109,8 +109,8 @@ Returns HTTP 200 if the user is found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2MeApi;
+//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.api.Scimv2MeApi;
 
 
 Scimv2MeApi apiInstance = new Scimv2MeApi();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package io.swagger.client.api;
+package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
-import io.swagger.client.*;
+import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.Configuration;
+import io.scim2.swagger.client.Pair;
+import io.scim2.swagger.client.ApiResponse;
+import io.scim2.swagger.client.ApiException;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

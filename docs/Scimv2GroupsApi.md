@@ -71,8 +71,8 @@ Returns HTTP 204 if the group is successfully deleted.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2GroupsApi;
+//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
