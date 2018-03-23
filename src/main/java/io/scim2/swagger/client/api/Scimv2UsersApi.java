@@ -18,7 +18,7 @@ package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
-import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
 import io.scim2.swagger.client.ApiResponse;
@@ -33,11 +33,11 @@ import java.util.Map;
 public class Scimv2UsersApi extends Scimv2BaseApi{
 
     public Scimv2UsersApi() {
-        this(Configuration.getDefaultApiClient());
+        this(Configuration.getDefaultScimApiClient());
     }
 
-    public Scimv2UsersApi(ApiClient apiClient) {
-        super(apiClient);
+    public Scimv2UsersApi(ScimApiClient scimApiClient) {
+        super(scimApiClient);
     }
     
     private Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
@@ -74,7 +74,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
 
         Call call = createUserValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
     
     private Call deleteUserValidateBeforeCall() throws ApiException {
@@ -103,7 +103,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
     public ApiResponse<String> deleteUserWithHttpInfo() throws ApiException {
 
         Call call = deleteUserValidateBeforeCall();
-        return apiClient.execute(call);
+        return scimApiClient.execute(call);
     }
 
     /**
@@ -124,19 +124,19 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
 
         List<Pair> localVarQueryParams = new ArrayList<>();
         if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
         if (filter != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "filter", filter));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("", "filter", filter));
         if (startIndex != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "startIndex", startIndex));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("", "startIndex", startIndex));
         if (count != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "count", count));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("", "count", count));
         if (sortBy != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "sortBy", sortBy));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("", "sortBy", sortBy));
         if (sortOrder != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("", "sortOrder", sortOrder));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("", "sortOrder", sortOrder));
 
         Map<String, String> localVarHeaderParams = new HashMap<>();
 
@@ -145,17 +145,17 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
         /*final String[] localVarAccepts = {
             "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);*/
 
         final String[] localVarContentTypes = {
             
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
@@ -198,7 +198,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
     public ApiResponse<String> getUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOrder) throws ApiException {
         Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOrder);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
     
     private Call getUserByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
@@ -233,7 +233,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
 
         Call call = getUserByIdValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
     
     private Call getUsersByPostValidateBeforeCall(String body) throws ApiException {
@@ -266,7 +266,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
 
         Call call = getUsersByPostValidateBeforeCall(body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
 
     /**
@@ -283,9 +283,9 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
 
         List<Pair> localVarQueryParams = new ArrayList<>();
         if (attributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
-        localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
+        localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
 
         Map<String, String> localVarHeaderParams = new HashMap<>();
 
@@ -294,17 +294,17 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
         final String[] localVarAccepts = {
             "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
             "application/scim+json"
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall(httpMethod, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall(httpMethod, localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
     private Call updateUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
@@ -340,7 +340,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi{
     public ApiResponse<String> updateUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod) throws ApiException {
         Call call = updateUserValidateBeforeCall(attributes, excludedAttributes, body, httpMethod);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
 
 }

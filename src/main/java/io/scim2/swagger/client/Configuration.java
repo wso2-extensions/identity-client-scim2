@@ -17,7 +17,7 @@
 package io.scim2.swagger.client;
 
 public class Configuration {
-    private static ApiClient defaultApiClient = new ApiClient();
+    private static ScimApiClient defaultScimApiClient = new ScimApiClient();
 
     /**
      * Get the default API client, which would be used when creating API
@@ -25,17 +25,17 @@ public class Configuration {
      *
      * @return Default API client
      */
-    public static ApiClient getDefaultApiClient() {
-        return defaultApiClient;
+    public static ScimApiClient getDefaultScimApiClient() {
+        return defaultScimApiClient;
     }
 
     /**
      * Set the default API client, which would be used when creating API
      * instances without providing an API client.
      *
-     * @param apiClient API client
+     * @param scimApiClient API client
      */
-    public static void setDefaultApiClient(ApiClient apiClient) {
-        defaultApiClient = apiClient;
+    public static void setDefaultScimApiClient(ScimApiClient scimApiClient) {
+        defaultScimApiClient = scimApiClient;
     }
 }

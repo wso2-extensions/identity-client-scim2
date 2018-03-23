@@ -18,7 +18,7 @@ package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
-import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ApiException;
 import io.scim2.swagger.client.ApiResponse;
 import io.scim2.swagger.client.Configuration;
@@ -30,12 +30,12 @@ public class Scimv2MeApi extends Scimv2BaseApi {
 
     public Scimv2MeApi() {
 
-        this(Configuration.getDefaultApiClient());
+        this(Configuration.getDefaultScimApiClient());
     }
 
-    public Scimv2MeApi(ApiClient apiClient) {
+    public Scimv2MeApi(ScimApiClient scimApiClient) {
 
-        super(apiClient);
+        super(scimApiClient);
     }
 
     private Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
@@ -72,7 +72,7 @@ public class Scimv2MeApi extends Scimv2BaseApi {
 
         Call call = createMeValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
     
     private Call deleteMeValidateBeforeCall() throws ApiException {
@@ -100,7 +100,7 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     public ApiResponse<Void> deleteMeWithHttpInfo() throws ApiException {
 
         Call call = deleteMeValidateBeforeCall();
-        return apiClient.execute(call);
+        return scimApiClient.execute(call);
     }
     
     private Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
@@ -135,7 +135,7 @@ public class Scimv2MeApi extends Scimv2BaseApi {
 
         Call call = getMeValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
     
     private Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
@@ -172,6 +172,6 @@ public class Scimv2MeApi extends Scimv2BaseApi {
 
         Call call = updateMeValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
 }

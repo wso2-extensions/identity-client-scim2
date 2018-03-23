@@ -41,18 +41,18 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 public class JSON {
-    private ApiClient apiClient;
+    private ScimApiClient scimApiClient;
     private Gson gson;
 
     /**
      * JSON constructor.
      *
-     * @param apiClient An instance of ApiClient
+     * @param scimApiClient An instance of ScimApiClient
      */
-    public JSON(ApiClient apiClient) {
-        this.apiClient = apiClient;
+    public JSON(ScimApiClient scimApiClient) {
+        this.scimApiClient = scimApiClient;
         gson = new GsonBuilder()
-            .registerTypeAdapter(Date.class, new DateAdapter(apiClient))
+            .registerTypeAdapter(Date.class, new DateAdapter(scimApiClient))
             .registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter())
             .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
             .create();
@@ -95,9 +95,9 @@ public class JSON {
      * @return The deserialized Java object
      */
     @SuppressWarnings("unchecked")
-    public <T> T deserialize(String body, Type returnType) {
+    public <T> T deserialize(String body, Type returnType) throws ApiException {
         try {
-            if (apiClient.isLenientOnJson()) {
+            if (scimApiClient.isLenientOnJson()) {
                 JsonReader jsonReader = new JsonReader(new StringReader(body));
                 // see https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/stream/JsonReader.html#setLenient(boolean)
                 jsonReader.setLenient(true);
@@ -112,23 +112,23 @@ public class JSON {
             if (returnType.equals(String.class))
                 return (T) body;
             else if (returnType.equals(Date.class))
-                return (T) apiClient.parseDateOrDatetime(body);
+                return (T) scimApiClient.parseDateOrDatetime(body);
             else throw(e);
         }
     }
 }
 
 class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
-    private final ApiClient apiClient;
+    private final ScimApiClient scimApiClient;
 
     /**
      * Constructor for DateAdapter
      *
-     * @param apiClient Api client
+     * @param scimApiClient Api client
      */
-    public DateAdapter(ApiClient apiClient) {
+    public DateAdapter(ScimApiClient scimApiClient) {
         super();
-        this.apiClient = apiClient;
+        this.scimApiClient = scimApiClient;
     }
 
     /**
@@ -144,7 +144,7 @@ class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
         if (src == null) {
             return JsonNull.INSTANCE;
         } else {
-            return new JsonPrimitive(apiClient.formatDatetime(src));
+            return new JsonPrimitive(scimApiClient.formatDatetime(src));
         }
     }
 
@@ -161,8 +161,8 @@ class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
     public Date deserialize(JsonElement json, Type date, JsonDeserializationContext context) throws JsonParseException {
         String str = json.getAsJsonPrimitive().getAsString();
         try {
-            return apiClient.parseDateOrDatetime(str);
-        } catch (RuntimeException e) {
+            return scimApiClient.parseDateOrDatetime(str);
+        } catch (ApiException e) {
             throw new JsonParseException(e);
         }
     }

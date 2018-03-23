@@ -19,7 +19,7 @@ package io.scim2.swagger.client.api;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.Configuration;
-import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ApiException;
 import io.scim2.swagger.client.ApiResponse;
 
@@ -29,12 +29,12 @@ public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
 
     public Scimv2ServiceProviderConfigApi() {
 
-        this(Configuration.getDefaultApiClient());
+        this(Configuration.getDefaultScimApiClient());
     }
 
-    public Scimv2ServiceProviderConfigApi(ApiClient apiClient) {
+    public Scimv2ServiceProviderConfigApi(ScimApiClient scimApiClient) {
 
-        super(apiClient);
+        super(scimApiClient);
     }
     
     private Call getServiceProviderConfigValidateBeforeCall() throws ApiException {
@@ -63,6 +63,6 @@ public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
     public ApiResponse<String> getServiceProviderConfigWithHttpInfo() throws ApiException {
         Call call = getServiceProviderConfigValidateBeforeCall();
         Type localVarReturnType = new TypeToken<String>(){}.getType();
-        return apiClient.execute(call, localVarReturnType);
+        return scimApiClient.execute(call, localVarReturnType);
     }
 }

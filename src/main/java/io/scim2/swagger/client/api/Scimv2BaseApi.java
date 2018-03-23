@@ -17,7 +17,7 @@
 package io.scim2.swagger.client.api;
 
 import com.squareup.okhttp.Call;
-import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ApiException;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
@@ -29,22 +29,22 @@ import java.util.Map;
 
 public class Scimv2BaseApi {
 
-    protected ApiClient apiClient;
+    protected ScimApiClient scimApiClient;
 
     public Scimv2BaseApi() {
-        this(Configuration.getDefaultApiClient());
+        this(Configuration.getDefaultScimApiClient());
     }
 
-    public Scimv2BaseApi(ApiClient apiClient) {
-        this.apiClient = apiClient;
+    public Scimv2BaseApi(ScimApiClient scimApiClient) {
+        this.scimApiClient = scimApiClient;
     }
 
-    public ApiClient getApiClient() {
-        return apiClient;
+    public ScimApiClient getScimApiClient() {
+        return scimApiClient;
     }
 
-    public void setApiClient(ApiClient apiClient) {
-        this.apiClient = apiClient;
+    public void setScimApiClient(ScimApiClient scimApiClient) {
+        this.scimApiClient = scimApiClient;
     }
 
     /**
@@ -62,9 +62,9 @@ public class Scimv2BaseApi {
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
-            localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
+            localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
-            localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
+            localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
 
         Map<String, String> localVarHeaderParams = new HashMap<>();
 
@@ -73,17 +73,17 @@ public class Scimv2BaseApi {
         final String[] localVarAccepts = {
                 "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
                 "application/scim+json"
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
 
     /**
@@ -104,17 +104,17 @@ public class Scimv2BaseApi {
         final String[] localVarAccepts = {
                 "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
 
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
 
     /**
@@ -130,9 +130,9 @@ public class Scimv2BaseApi {
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
-            localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
+            localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
-            localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
+            localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
 
         Map<String, String> localVarHeaderParams = new HashMap<>();
 
@@ -141,17 +141,17 @@ public class Scimv2BaseApi {
         final String[] localVarAccepts = {
                 "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
 
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
 
     /**
@@ -173,17 +173,17 @@ public class Scimv2BaseApi {
         final String[] localVarAccepts = {
                 "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
                 "application/scim+json"
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
 
     /**
@@ -200,9 +200,9 @@ public class Scimv2BaseApi {
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
-            localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "attributes", attributes));
+            localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes", attributes));
         if (excludedAttributes != null)
-            localVarQueryParams.addAll(apiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
+            localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "excludedAttributes", excludedAttributes));
 
         Map<String, String> localVarHeaderParams = new HashMap<String, String>();
 
@@ -211,17 +211,17 @@ public class Scimv2BaseApi {
         final String[] localVarAccepts = {
                 "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
                 "application/scim+json"
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
 
     /**
@@ -242,16 +242,16 @@ public class Scimv2BaseApi {
         final String[] localVarAccepts = {
                 "application/json", "application/scim+json"
         };
-        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
 
         };
-        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
         String[] localVarAuthNames = new String[] { "basicAuth" };
-        return apiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
+        return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
 }

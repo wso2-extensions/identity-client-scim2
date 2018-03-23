@@ -16,7 +16,7 @@
 
 package org.wso2.scim2.operation;
 
-import io.scim2.swagger.client.ApiClient;
+import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ApiException;
 import io.scim2.swagger.client.ApiResponse;
 import io.scim2.swagger.client.api.Scimv2GroupsApi;
@@ -54,7 +54,7 @@ public abstract class AbstractOperations {
     protected String groupEPURL;
     protected String userName;
     protected Map<String, Object> additionalInformation;
-    protected ApiClient client;
+    protected ScimApiClient client;
 
     public AbstractOperations(SCIMProvider scimProvider, SCIMObject object,
                            Map<String, Object> additionalInformation) {
@@ -67,7 +67,7 @@ public abstract class AbstractOperations {
         groupEPURL = provider.getProperty(SCIM2CommonConstants.ELEMENT_NAME_GROUP_ENDPOINT);
         userName = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
 
-        client = new ApiClient();
+        client = new ScimApiClient();
         client.setUsername(userName);
         client.setPassword(provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD));
     }

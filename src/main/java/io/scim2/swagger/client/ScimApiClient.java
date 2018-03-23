@@ -16,7 +16,15 @@
 
 package io.scim2.swagger.client;
 
-import com.squareup.okhttp.*;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.MultipartBuilder;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.Call;
 import com.squareup.okhttp.internal.http.HttpMethod;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
@@ -27,7 +35,13 @@ import io.scim2.swagger.client.auth.OAuth;
 import okio.BufferedSink;
 import okio.Okio;
 
-import javax.net.ssl.*;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,13 +59,20 @@ import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ApiClient {
+public class ScimApiClient {
     public static final double JAVA_VERSION;
 
     static {
@@ -63,6 +84,10 @@ public class ApiClient {
      */
     public static final String LENIENT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
+    private final String urlEncodedContentType = "application/x-www-form-urlencoded";
+    private final String multiparFormDataContentType = "multipart/form-data";
+    private final String octetStreamContentType = "application/octet-stream";
+    private final String jsonContentType = "application/json";
     private boolean lenientOnJson = false;
     private boolean debugging = false;
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
@@ -86,9 +111,9 @@ public class ApiClient {
     private String url;
 
     /*
-     * Constructor for ApiClient
+     * Constructor for ScimApiClient
      */
-    public ApiClient() {
+    public ScimApiClient() {
         httpClient = new OkHttpClient();
 
 
@@ -134,7 +159,7 @@ public class ApiClient {
      * @param httpClient An instance of OkHttpClient
      * @return Api Client
      */
-    public ApiClient setHttpClient(OkHttpClient httpClient) {
+    public ScimApiClient setHttpClient(OkHttpClient httpClient) {
         this.httpClient = httpClient;
         return this;
     }
@@ -154,7 +179,7 @@ public class ApiClient {
      * @param json JSON object
      * @return Api client
      */
-    public ApiClient setJSON(JSON json) {
+    public ScimApiClient setJSON(JSON json) {
         this.json = json;
         return this;
     }
@@ -174,9 +199,9 @@ public class ApiClient {
      * NOTE: Do NOT set to false in production code, otherwise you would face multiple types of cryptographic attacks.
      *
      * @param verifyingSsl True to verify TLS/SSL connection
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setVerifyingSsl(boolean verifyingSsl) {
+    public ScimApiClient setVerifyingSsl(boolean verifyingSsl) {
         this.verifyingSsl = verifyingSsl;
         applySslSettings();
         return this;
@@ -196,9 +221,9 @@ public class ApiClient {
      * Use null to reset to default.
      *
      * @param sslCaCert input stream for SSL CA cert
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setSslCaCert(InputStream sslCaCert) {
+    public ScimApiClient setSslCaCert(InputStream sslCaCert) {
         this.sslCaCert = sslCaCert;
         applySslSettings();
         return this;
@@ -213,9 +238,9 @@ public class ApiClient {
      * Use null to reset to default.
      *
      * @param managers The KeyManagers to use
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setKeyManagers(KeyManager[] managers) {
+    public ScimApiClient setKeyManagers(KeyManager[] managers) {
         this.keyManagers = managers;
         applySslSettings();
         return this;
@@ -225,7 +250,7 @@ public class ApiClient {
         return dateFormat;
     }
 
-    public ApiClient setDateFormat(DateFormat dateFormat) {
+    public ScimApiClient setDateFormat(DateFormat dateFormat) {
         this.dateFormat = dateFormat;
         this.dateLength = this.dateFormat.format(new Date()).length();
         return this;
@@ -235,7 +260,7 @@ public class ApiClient {
         return datetimeFormat;
     }
 
-    public ApiClient setDatetimeFormat(DateFormat datetimeFormat) {
+    public ScimApiClient setDatetimeFormat(DateFormat datetimeFormat) {
         this.datetimeFormat = datetimeFormat;
         return this;
     }
@@ -249,7 +274,7 @@ public class ApiClient {
         return lenientDatetimeFormat;
     }
 
-    public ApiClient setLenientDatetimeFormat(boolean lenientDatetimeFormat) {
+    public ScimApiClient setLenientDatetimeFormat(boolean lenientDatetimeFormat) {
         this.lenientDatetimeFormat = lenientDatetimeFormat;
         return this;
     }
@@ -262,13 +287,13 @@ public class ApiClient {
      * @param str String to be parsed
      * @return Date
      */
-    public Date parseDate(String str) {
+    public Date parseDate(String str) throws ApiException{
         if (str == null)
             return null;
         try {
             return dateFormat.parse(str);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new ApiException(e);
         }
     }
 
@@ -292,7 +317,7 @@ public class ApiClient {
      * @param str Date time string to be parsed
      * @return Date representation of the string
      */
-    public Date parseDatetime(String str) {
+    public Date parseDatetime(String str) throws ApiException{
         if (str == null)
             return null;
 
@@ -321,7 +346,7 @@ public class ApiClient {
         try {
             return format.parse(str);
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new ApiException(e);
         }
     }
 
@@ -331,7 +356,7 @@ public class ApiClient {
      * @param str Date time string to be parsed
      * @return Date representation of the string
      */
-    public Date parseDateOrDatetime(String str) {
+    public Date parseDateOrDatetime(String str) throws ApiException {
         if (str == null)
             return null;
         else if (str.length() <= dateLength)
@@ -458,9 +483,9 @@ public class ApiClient {
      * Set the User-Agent header's value (by adding to the default header map).
      *
      * @param userAgent HTTP request's user agent
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setUserAgent(String userAgent) {
+    public ScimApiClient setUserAgent(String userAgent) {
         addDefaultHeader("User-Agent", userAgent);
         return this;
     }
@@ -470,9 +495,9 @@ public class ApiClient {
      *
      * @param key The header's key
      * @param value The header's value
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient addDefaultHeader(String key, String value) {
+    public ScimApiClient addDefaultHeader(String key, String value) {
         defaultHeaderMap.put(key, value);
         return this;
     }
@@ -490,9 +515,9 @@ public class ApiClient {
      * Set LenientOnJson
      *
      * @param lenient True to enable lenientOnJson
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setLenientOnJson(boolean lenient) {
+    public ScimApiClient setLenientOnJson(boolean lenient) {
         this.lenientOnJson = lenient;
         return this;
     }
@@ -510,9 +535,9 @@ public class ApiClient {
      * Enable/disable debugging for this API client.
      *
      * @param debugging To enable (true) or disable (false) debugging
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setDebugging(boolean debugging) {
+    public ScimApiClient setDebugging(boolean debugging) {
         if (debugging != this.debugging) {
             if (debugging) {
                 loggingInterceptor = new HttpLoggingInterceptor();
@@ -543,9 +568,9 @@ public class ApiClient {
      * Set the tempoaray folder path (for downloading files)
      *
      * @param tempFolderPath Temporary folder path
-     * @return ApiClient
+     * @return ScimApiClient
      */
-    public ApiClient setTempFolderPath(String tempFolderPath) {
+    public ScimApiClient setTempFolderPath(String tempFolderPath) {
         this.tempFolderPath = tempFolderPath;
         return this;
     }
@@ -566,7 +591,7 @@ public class ApiClient {
      * @param connectionTimeout connection timeout in milliseconds
      * @return Api client
      */
-    public ApiClient setConnectTimeout(int connectionTimeout) {
+    public ScimApiClient setConnectTimeout(int connectionTimeout) {
         httpClient.setConnectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
         return this;
     }
@@ -716,7 +741,7 @@ public class ApiClient {
      */
     public String selectHeaderContentType(String[] contentTypes) {
         if (contentTypes.length == 0) {
-            return "application/json";
+            return jsonContentType;
         }
         for (String contentType : contentTypes) {
             if (isJsonMime(contentType)) {
@@ -786,7 +811,7 @@ public class ApiClient {
         String contentType = response.headers().get("Content-Type");
         if (contentType == null) {
             // ensuring a default content type
-            contentType = "application/json";
+            contentType = jsonContentType;
         }
         if (isJsonMime(contentType)) {
             return json.deserialize(respBody, returnType);
@@ -826,7 +851,7 @@ public class ApiClient {
                 content = null;
             }
             try {
-                MediaType mediaType = MediaType.parse("application/json");
+                MediaType mediaType = MediaType.parse(jsonContentType);
                 return RequestBody.create(mediaType, content.getBytes("UTF-8"));
             } catch (UnsupportedEncodingException e) {
             }
@@ -1020,15 +1045,15 @@ public class ApiClient {
         String contentType = headerParams.get("Content-Type");
         // ensuring a default content type
         if (contentType == null) {
-            contentType = "application/json";
+            contentType = jsonContentType;
         }
 
         RequestBody reqBody;
         if (!HttpMethod.permitsRequestBody(method)) {
             reqBody = null;
-        } else if ("application/x-www-form-urlencoded".equals(contentType)) {
+        } else if (urlEncodedContentType.equals(contentType)) {
             reqBody = buildRequestBodyFormEncoding(formParams);
-        } else if ("multipart/form-data".equals(contentType)) {
+        } else if (multiparFormDataContentType.equals(contentType)) {
             reqBody = buildRequestBodyMultipart(formParams);
         } else if (body == null) {
             if ("DELETE".equals(method)) {
@@ -1157,7 +1182,7 @@ public class ApiClient {
     public String guessContentTypeFromFile(File file) {
         String contentType = URLConnection.guessContentTypeFromName(file.getName());
         if (contentType == null) {
-            return "application/octet-stream";
+            return octetStreamContentType;
         } else {
             return contentType;
         }
