@@ -16,8 +16,8 @@
 
 package org.wso2.scim2.operation;
 
-import io.scim2.swagger.client.ApiException;
-import io.scim2.swagger.client.ApiResponse;
+import io.scim2.swagger.client.ScimApiException;
+import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2UsersApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class UserOperations extends AbstractOperations {
             .getName());
 
     public UserOperations(SCIMProvider scimProvider, SCIMObject object,
-                          Map<String, Object> additionalInformation) throws ApiException{
+                          Map<String, Object> additionalInformation) throws ScimApiException {
 
         super(scimProvider, object, additionalInformation);
     }
@@ -60,7 +60,7 @@ public class UserOperations extends AbstractOperations {
 
             client.setURL(userEPURL);
             Scimv2UsersApi api = new Scimv2UsersApi(client);
-            ApiResponse<String> response = api.createUser(null, null,
+            ScimApiResponse<String> response = api.createUser(null, null,
                     encodedUser);
             logger.info("SCIM - create user operation returned with response code: " + response.getStatusCode());
             if (logger.isDebugEnabled()) {
@@ -81,7 +81,7 @@ public class UserOperations extends AbstractOperations {
             throw new IdentitySCIMException(
                     "Error in encoding the object to be provisioned for user with userName: "
                             + userName, e);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (AbstractCharonException e) {
             throw new IdentitySCIMException(
@@ -108,13 +108,13 @@ public class UserOperations extends AbstractOperations {
 
                 client.setURL(userEPURL+"/"+userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
-                ApiResponse response = api.deleteUser();
+                ScimApiResponse response = api.deleteUser();
 
                 handleSCIMErrorResponse(response);
             } else {
                 logger.error("No Users found with userName: " + ((User) scimObject).getUserName());
             }
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (IOException | AbstractCharonException e) {
             throw new IdentitySCIMException(
@@ -150,7 +150,7 @@ public class UserOperations extends AbstractOperations {
 
                 client.setURL(userEPURL+"/"+userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
-                ApiResponse<String> response = api.updateUser(null, null, encodedObject, httpMethod);
+                ScimApiResponse<String> response = api.updateUser(null, null, encodedObject, httpMethod);
 
                 if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                     scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.USER);
@@ -167,7 +167,7 @@ public class UserOperations extends AbstractOperations {
             throw new IdentitySCIMException(
                     "Error in encoding the object to be provisioned for user : "
                             + userName, e);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (IOException | AbstractCharonException e) {
             throw new IdentitySCIMException(

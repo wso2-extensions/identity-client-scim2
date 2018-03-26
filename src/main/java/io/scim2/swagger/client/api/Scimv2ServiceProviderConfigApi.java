@@ -20,8 +20,8 @@ import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.ScimApiClient;
-import io.scim2.swagger.client.ApiException;
-import io.scim2.swagger.client.ApiResponse;
+import io.scim2.swagger.client.ScimApiException;
+import io.scim2.swagger.client.ScimApiResponse;
 
 import java.lang.reflect.Type;
 
@@ -37,7 +37,7 @@ public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
         super(scimApiClient);
     }
     
-    private Call getServiceProviderConfigValidateBeforeCall() throws ApiException {
+    private Call getServiceProviderConfigValidateBeforeCall() throws ScimApiException {
 
         Call call = getResourceTypeCall();
         return call;
@@ -47,20 +47,20 @@ public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
      * Return the ServiceProviderConfig schema.
      * Returns HTTP 200 if the schema is found.
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String getServiceProviderConfig() throws ApiException {
-        ApiResponse<String> resp = getServiceProviderConfigWithHttpInfo();
+    public String getServiceProviderConfig() throws ScimApiException {
+        ScimApiResponse<String> resp = getServiceProviderConfigWithHttpInfo();
         return resp.getData();
     }
 
     /**
      * Return the ServiceProviderConfig schema.
      * Returns HTTP 200 if the schema is found.
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getServiceProviderConfigWithHttpInfo() throws ApiException {
+    public ScimApiResponse<String> getServiceProviderConfigWithHttpInfo() throws ScimApiException {
         Call call = getServiceProviderConfigValidateBeforeCall();
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);

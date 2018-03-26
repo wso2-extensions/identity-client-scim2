@@ -201,7 +201,7 @@ public class ScimApiClient {
      * @param verifyingSsl True to verify TLS/SSL connection
      * @return ScimApiClient
      */
-    public ScimApiClient setVerifyingSsl(boolean verifyingSsl) throws ApiException{
+    public ScimApiClient setVerifyingSsl(boolean verifyingSsl) throws ScimApiException {
         this.verifyingSsl = verifyingSsl;
         applySslSettings();
         return this;
@@ -223,7 +223,7 @@ public class ScimApiClient {
      * @param sslCaCert input stream for SSL CA cert
      * @return ScimApiClient
      */
-    public ScimApiClient setSslCaCert(InputStream sslCaCert) throws ApiException{
+    public ScimApiClient setSslCaCert(InputStream sslCaCert) throws ScimApiException {
         this.sslCaCert = sslCaCert;
         applySslSettings();
         return this;
@@ -240,7 +240,7 @@ public class ScimApiClient {
      * @param managers The KeyManagers to use
      * @return ScimApiClient
      */
-    public ScimApiClient setKeyManagers(KeyManager[] managers) throws ApiException{
+    public ScimApiClient setKeyManagers(KeyManager[] managers) throws ScimApiException {
         this.keyManagers = managers;
         applySslSettings();
         return this;
@@ -287,13 +287,13 @@ public class ScimApiClient {
      * @param str String to be parsed
      * @return Date
      */
-    public Date parseDate(String str) throws ApiException{
+    public Date parseDate(String str) throws ScimApiException {
         if (str == null)
             return null;
         try {
             return dateFormat.parse(str);
         } catch (ParseException e) {
-            throw new ApiException(e);
+            throw new ScimApiException(e);
         }
     }
 
@@ -317,7 +317,7 @@ public class ScimApiClient {
      * @param str Date time string to be parsed
      * @return Date representation of the string
      */
-    public Date parseDatetime(String str) throws ApiException{
+    public Date parseDatetime(String str) throws ScimApiException {
         if (str == null)
             return null;
 
@@ -346,7 +346,7 @@ public class ScimApiClient {
         try {
             return format.parse(str);
         } catch (ParseException e) {
-            throw new ApiException(e);
+            throw new ScimApiException(e);
         }
     }
 
@@ -356,7 +356,7 @@ public class ScimApiClient {
      * @param str Date time string to be parsed
      * @return Date representation of the string
      */
-    public Date parseDateOrDatetime(String str) throws ApiException {
+    public Date parseDateOrDatetime(String str) throws ScimApiException {
         if (str == null)
             return null;
         else if (str.length() <= dateLength)
@@ -409,14 +409,14 @@ public class ScimApiClient {
      *
      * @param username Username
      */
-    public void setUsername(String username) throws ApiException{
+    public void setUsername(String username) throws ScimApiException {
         for (Authentication auth : authentications.values()) {
             if (auth instanceof HttpBasicAuth) {
                 ((HttpBasicAuth) auth).setUsername(username);
                 return;
             }
         }
-        throw new ApiException("No HTTP basic authentication configured!");
+        throw new ScimApiException("No HTTP basic authentication configured!");
     }
 
     /**
@@ -424,14 +424,14 @@ public class ScimApiClient {
      *
      * @param password Password
      */
-    public void setPassword(String password) throws ApiException{
+    public void setPassword(String password) throws ScimApiException {
         for (Authentication auth : authentications.values()) {
             if (auth instanceof HttpBasicAuth) {
                 ((HttpBasicAuth) auth).setPassword(password);
                 return;
             }
         }
-        throw new ApiException("No HTTP basic authentication configured!");
+        throw new ScimApiException("No HTTP basic authentication configured!");
     }
 
     /**
@@ -439,14 +439,14 @@ public class ScimApiClient {
      *
      * @param apiKey API key
      */
-    public void setApiKey(String apiKey) throws ApiException{
+    public void setApiKey(String apiKey) throws ScimApiException {
         for (Authentication auth : authentications.values()) {
             if (auth instanceof ApiKeyAuth) {
                 ((ApiKeyAuth) auth).setApiKey(apiKey);
                 return;
             }
         }
-        throw new ApiException("No API key authentication configured!");
+        throw new ScimApiException("No API key authentication configured!");
     }
 
     /**
@@ -454,14 +454,14 @@ public class ScimApiClient {
      *
      * @param apiKeyPrefix API key prefix
      */
-    public void setApiKeyPrefix(String apiKeyPrefix) throws ApiException{
+    public void setApiKeyPrefix(String apiKeyPrefix) throws ScimApiException {
         for (Authentication auth : authentications.values()) {
             if (auth instanceof ApiKeyAuth) {
                 ((ApiKeyAuth) auth).setApiKeyPrefix(apiKeyPrefix);
                 return;
             }
         }
-        throw new ApiException("No API key authentication configured!");
+        throw new ScimApiException("No API key authentication configured!");
     }
 
     /**
@@ -469,14 +469,14 @@ public class ScimApiClient {
      *
      * @param accessToken Access token
      */
-    public void setAccessToken(String accessToken) throws ApiException{
+    public void setAccessToken(String accessToken) throws ScimApiException {
         for (Authentication auth : authentications.values()) {
             if (auth instanceof OAuth) {
                 ((OAuth) auth).setAccessToken(accessToken);
                 return;
             }
         }
-        throw new ApiException("No OAuth2 authentication configured!");
+        throw new ScimApiException("No OAuth2 authentication configured!");
     }
 
     /**
@@ -773,11 +773,11 @@ public class ScimApiClient {
      * @param response HTTP response
      * @param returnType The type of the Java object
      * @return The deserialized Java object
-     * @throws ApiException If fail to deserialize response body, i.e. cannot read response body
+     * @throws ScimApiException If fail to deserialize response body, i.e. cannot read response body
      *   or the Content-Type of the response is not supported.
      */
     @SuppressWarnings("unchecked")
-    public <T> T deserialize(Response response, Type returnType) throws ApiException {
+    public <T> T deserialize(Response response, Type returnType) throws ScimApiException {
         if (response == null || returnType == null) {
             return null;
         }
@@ -787,7 +787,7 @@ public class ScimApiClient {
             try {
                 return (T) response.body().bytes();
             } catch (IOException e) {
-                throw new ApiException(e);
+                throw new ScimApiException(e);
             }
         } else if (returnType.equals(File.class)) {
             // Handle file downloading.
@@ -801,7 +801,7 @@ public class ScimApiClient {
             else
                 respBody = null;
         } catch (IOException e) {
-            throw new ApiException(e);
+            throw new ScimApiException(e);
         }
 
         if (respBody == null || "".equals(respBody)) {
@@ -819,7 +819,7 @@ public class ScimApiClient {
             // Expecting string, return the raw response body.
             return (T) respBody;
         } else {
-            throw new ApiException(
+            throw new ScimApiException(
                     "Content type \"" + contentType + "\" is not supported for type: " + returnType,
                     response.code(),
                     response.headers().toMultimap(),
@@ -834,9 +834,9 @@ public class ScimApiClient {
      * @param obj The Java object
      * @param contentType The request Content-Type
      * @return The serialized request body
-     * @throws ApiException If fail to serialize the given object
+     * @throws ScimApiException If fail to serialize the given object
      */
-    public RequestBody serialize(Object obj, String contentType) throws ApiException {
+    public RequestBody serialize(Object obj, String contentType) throws ScimApiException {
         if (obj instanceof byte[]) {
             // Binary (byte array) body parameter support.
             return RequestBody.create(MediaType.parse(contentType), (byte[]) obj);
@@ -856,7 +856,7 @@ public class ScimApiClient {
             } catch (UnsupportedEncodingException e) {
             }
         } else {
-            throw new ApiException("Content type \"" + contentType + "\" is not supported");
+            throw new ScimApiException("Content type \"" + contentType + "\" is not supported");
         }
 
         return null;
@@ -866,10 +866,10 @@ public class ScimApiClient {
      * Download file from the given response.
      *
      * @param response An instance of the Response object
-     * @throws ApiException If fail to read file content from response and write to disk
+     * @throws ScimApiException If fail to read file content from response and write to disk
      * @return Downloaded file
      */
-    public File downloadFileFromResponse(Response response) throws ApiException {
+    public File downloadFileFromResponse(Response response) throws ScimApiException {
         try {
             File file = prepareDownloadFile(response);
             BufferedSink sink = Okio.buffer(Okio.sink(file));
@@ -877,7 +877,7 @@ public class ScimApiClient {
             sink.close();
             return file;
         } catch (IOException e) {
-            throw new ApiException(e);
+            throw new ScimApiException(e);
         }
     }
 
@@ -929,10 +929,10 @@ public class ScimApiClient {
      *
      * @param <T> Type
      * @param call An instance of the Call object
-     * @throws ApiException If fail to execute the call
-     * @return ApiResponse&lt;T&gt;
+     * @throws ScimApiException If fail to execute the call
+     * @return ScimApiResponse&lt;T&gt;
      */
-    public <T> ApiResponse<T> execute(Call call) throws ApiException {
+    public <T> ScimApiResponse<T> execute(Call call) throws ScimApiException {
         return execute(call, null);
     }
 
@@ -942,18 +942,18 @@ public class ScimApiClient {
      * @param returnType The return type used to deserialize HTTP response body
      * @param <T> The return type corresponding to (same with) returnType
      * @param call Call
-     * @return ApiResponse object containing response status, headers and
+     * @return ScimApiResponse object containing response status, headers and
      *   data, which is a Java object deserialized from response body and would be null
      *   when returnType is null.
-     * @throws ApiException If fail to execute the call
+     * @throws ScimApiException If fail to execute the call
      */
-    public <T> ApiResponse<T> execute(Call call, Type returnType) throws ApiException {
+    public <T> ScimApiResponse<T> execute(Call call, Type returnType) throws ScimApiException {
         try {
             Response response = call.execute();
             T data = handleResponse(response, returnType);
-            return new ApiResponse<T>(response.code(), response.headers().toMultimap(), data);
+            return new ScimApiResponse<T>(response.code(), response.headers().toMultimap(), data);
         } catch (IOException e) {
-            throw new ApiException(e);
+            throw new ScimApiException(e);
         }
     }
 
@@ -963,11 +963,11 @@ public class ScimApiClient {
      * @param <T> Type
      * @param response Response
      * @param returnType Return type
-     * @throws ApiException If the response has a unsuccessful status code or
+     * @throws ScimApiException If the response has a unsuccessful status code or
      *   fail to deserialize the response body
      * @return Type
      */
-    public <T> T handleResponse(Response response, Type returnType) throws ApiException {
+    public <T> T handleResponse(Response response, Type returnType) throws ScimApiException {
 
     	if (response.isSuccessful()) {
             if (returnType == null || response.code() == 204) {
@@ -977,7 +977,7 @@ public class ScimApiClient {
                     try {
                         response.body().close();
                     } catch (IOException e) {
-                        throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                        throw new ScimApiException(response.message(), e, response.code(), response.headers().toMultimap());
                     }
                 }
                 return null;
@@ -990,10 +990,10 @@ public class ScimApiClient {
                 try {
                     respBody = response.body().string();
                 } catch (IOException e) {
-                    throw new ApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                    throw new ScimApiException(response.message(), e, response.code(), response.headers().toMultimap());
                 }
             }
-            throw new ApiException(response.message(), response.code(), response.headers().toMultimap(), respBody);
+            throw new ScimApiException(response.message(), response.code(), response.headers().toMultimap(), respBody);
         }
     }
 
@@ -1007,9 +1007,9 @@ public class ScimApiClient {
      * @param formParams The form parameters
      * @param authNames The authentications to apply
      * @return The HTTP call
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call buildCall(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
+    public Call buildCall(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ScimApiException {
         Request request = buildRequest(method, queryParams, body, headerParams, formParams, authNames);
 
         return httpClient.newCall(request);
@@ -1030,9 +1030,9 @@ public class ScimApiClient {
      * @param formParams The form parameters
      * @param authNames The authentications to apply
      * @return The HTTP request
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Request buildRequest(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ApiException {
+    public Request buildRequest(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ScimApiException {
 
         updateParamsForAuth(authNames, queryParams, headerParams);
 
@@ -1129,10 +1129,10 @@ public class ScimApiClient {
      * @param headerParams  Map of header parameters
      */
     public void updateParamsForAuth(String[] authNames, List<Pair> queryParams, Map<String, String> headerParams)
-            throws ApiException{
+            throws ScimApiException {
         for (String authName : authNames) {
             Authentication auth = authentications.get(authName);
-            if (auth == null) throw new ApiException("Authentication undefined: " + authName);
+            if (auth == null) throw new ScimApiException("Authentication undefined: " + authName);
             auth.applyToParams(queryParams, headerParams);
         }
     }
@@ -1213,7 +1213,7 @@ public class ScimApiClient {
      * Apply SSL related settings to httpClient according to the current values of
      * verifyingSsl and sslCaCert.
      */
-    private void applySslSettings() throws ApiException{
+    private void applySslSettings() throws ScimApiException {
         try {
             TrustManager[] trustManagers = null;
             HostnameVerifier hostnameVerifier = null;
@@ -1259,7 +1259,7 @@ public class ScimApiClient {
             }
             httpClient.setHostnameVerifier(hostnameVerifier);
         } catch (GeneralSecurityException e) {
-            throw new ApiException(e);
+            throw new ScimApiException(e);
         }
     }
 

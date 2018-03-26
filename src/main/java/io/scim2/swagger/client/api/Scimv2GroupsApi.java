@@ -44,9 +44,9 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call createGroupCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public Call createGroupCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
         Object localVarPostBody = body;
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -75,7 +75,7 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
         return scimApiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
-    private Call createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    private Call createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
         Call call = createGroupCall(attributes, excludedAttributes, body);
         return call;
@@ -88,10 +88,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> createGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        ApiResponse<String> resp = createGroupWithHttpInfo(attributes, excludedAttributes, body);
+    public ScimApiResponse<String> createGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+        ScimApiResponse<String> resp = createGroupWithHttpInfo(attributes, excludedAttributes, body);
         return resp;
     }
 
@@ -101,16 +101,16 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> createGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ScimApiResponse<String> createGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
         Call call = createGroupValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
     
-    private Call deleteGroupValidateBeforeCall() throws ApiException {
+    private Call deleteGroupValidateBeforeCall() throws ScimApiException {
 
         Call call = deleteResourceCall();
         return call;
@@ -119,21 +119,21 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
     /**
      * Delete the group with the given id
      * Returns HTTP 204 if the group is successfully deleted.
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> deleteGroup() throws ApiException {
+    public ScimApiResponse<String> deleteGroup() throws ScimApiException {
 
-        ApiResponse<String> resp = deleteGroupWithHttpInfo();
+        ScimApiResponse<String> resp = deleteGroupWithHttpInfo();
         return resp;
     }
 
     /**
      * Delete the group with the given id
      * Returns HTTP 204 if the group is successfully deleted.
-     * @return ApiResponse&lt;Void&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;Void&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> deleteGroupWithHttpInfo() throws ApiException {
+    public ScimApiResponse<String> deleteGroupWithHttpInfo() throws ScimApiException {
 
         Call call = deleteGroupValidateBeforeCall();
         return scimApiClient.execute(call);
@@ -149,9 +149,9 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
      * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getGroupCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
+    public Call getGroupCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ScimApiException {
         Object localVarPostBody = null;
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -190,7 +190,7 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
         return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames);
     }
     
-    private Call getGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
+    private Call getGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ScimApiException {
         
         Call call = getGroupCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
         return call;
@@ -207,10 +207,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
      * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getGroup(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
-        ApiResponse<String> resp = getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
+    public ScimApiResponse<String> getGroup(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ScimApiException {
+        ScimApiResponse<String> resp = getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
         return resp;
     }
 
@@ -224,16 +224,16 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param count Specifies the desired maximum number of query results per page. (optional)
      * @param sortBy Specifies the attribute whose value SHALL be used to order the returned responses (optional)
      * @param sortOder The order in which the \&quot;sortBy\&quot; parameter is applied. (optional)
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ApiException {
+    public ScimApiResponse<String> getGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex, Integer count, String sortBy, String sortOder) throws ScimApiException {
         Call call = getGroupValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
     
-    private Call getGroupByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
+    private Call getGroupByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
 
         Call call = getResourceCall(attributes, excludedAttributes);
         return call;
@@ -245,10 +245,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String getGroupById(List<String> attributes, List<String> excludedAttributes) throws ApiException {
-        ApiResponse<String> resp = getGroupByIdWithHttpInfo(attributes, excludedAttributes);
+    public String getGroupById(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
+        ScimApiResponse<String> resp = getGroupByIdWithHttpInfo(attributes, excludedAttributes);
         return resp.getData();
     }
 
@@ -257,16 +257,16 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * Returns HTTP 200 if the group is found.
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getGroupByIdWithHttpInfo(List<String> attributes, List<String> excludedAttributes) throws ApiException {
+    public ScimApiResponse<String> getGroupByIdWithHttpInfo(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
         Call call = getGroupByIdValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
     
-    private Call getGroupsByPostValidateBeforeCall(String body) throws ApiException {
+    private Call getGroupsByPostValidateBeforeCall(String body) throws ScimApiException {
 
         Call call = getResourcesByPostCall(body);
         return call;
@@ -277,10 +277,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * Returns HTTP 404 if the groups are not found.
      * @param body  (optional)
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String getGroupsByPost(String body) throws ApiException {
-        ApiResponse<String> resp = getGroupsByPostWithHttpInfo(body);
+    public String getGroupsByPost(String body) throws ScimApiException {
+        ScimApiResponse<String> resp = getGroupsByPostWithHttpInfo(body);
         return resp.getData();
     }
 
@@ -288,16 +288,16 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * Return groups according to the filter, sort and pagination parameters
      * Returns HTTP 404 if the groups are not found.
      * @param body  (optional)
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> getGroupsByPostWithHttpInfo(String body) throws ApiException {
+    public ScimApiResponse<String> getGroupsByPostWithHttpInfo(String body) throws ScimApiException {
         Call call = getGroupsByPostValidateBeforeCall(body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
     
-    private Call updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    private Call updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
         Call call = updateResourceCall(attributes, excludedAttributes, body);
         return call;
@@ -310,10 +310,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        ApiResponse<String> resp = updateGroupWithHttpInfo(attributes, excludedAttributes, body);
+    public ScimApiResponse<String> updateGroup(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+        ScimApiResponse<String> resp = updateGroupWithHttpInfo(attributes, excludedAttributes, body);
         return resp;
     }
 
@@ -323,10 +323,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> updateGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ScimApiResponse<String> updateGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
         Call call = updateGroupValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);

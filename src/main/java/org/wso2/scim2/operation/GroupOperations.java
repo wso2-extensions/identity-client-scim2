@@ -16,8 +16,8 @@
 
 package org.wso2.scim2.operation;
 
-import io.scim2.swagger.client.ApiException;
-import io.scim2.swagger.client.ApiResponse;
+import io.scim2.swagger.client.ScimApiException;
+import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class GroupOperations extends AbstractOperations {
             .getName());
 
     public GroupOperations(SCIMProvider scimProvider, SCIMObject object,
-                           Map<String, Object> additionalInformation) throws ApiException{
+                           Map<String, Object> additionalInformation) throws ScimApiException {
 
         super(scimProvider, object, additionalInformation);
     }
@@ -89,7 +89,7 @@ public class GroupOperations extends AbstractOperations {
             client.setURL(groupEPURL);
             Scimv2GroupsApi api = new Scimv2GroupsApi(client);
 
-            ApiResponse<String> response = api.createGroup(null, null, encodedGroup);
+            ScimApiResponse<String> response = api.createGroup(null, null, encodedGroup);
 
             logger.info("SCIM - create group operation returned with response code: " + response.getStatusCode());
 
@@ -107,7 +107,7 @@ public class GroupOperations extends AbstractOperations {
             }
         } catch (IOException | AbstractCharonException e) {
             throw new IdentitySCIMException("Error in provisioning 'create group' operation for user : " + userName, e);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         }
     }
@@ -127,7 +127,7 @@ public class GroupOperations extends AbstractOperations {
 
                 client.setURL(groupEPURL+"/"+groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-                ApiResponse<String> response = api.deleteGroup();
+                ScimApiResponse<String> response = api.deleteGroup();
 
                 logger.info("SCIM - delete group operation returned with response code: " +
                         response.getStatusCode());
@@ -135,7 +135,7 @@ public class GroupOperations extends AbstractOperations {
             }
         } catch (AbstractCharonException | IOException e) {
             throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user : " + userName, e);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         }
     }
@@ -167,7 +167,7 @@ public class GroupOperations extends AbstractOperations {
 
                 client.setURL(groupEPURL+"/"+groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-                ApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
+                ScimApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
 
                 logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
 
@@ -186,7 +186,7 @@ public class GroupOperations extends AbstractOperations {
             }
         } catch (AbstractCharonException | IOException e) {
             throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         }
     }

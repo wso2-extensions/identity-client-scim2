@@ -18,7 +18,7 @@ package io.scim2.swagger.client.api;
 
 import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.ScimApiClient;
-import io.scim2.swagger.client.ApiException;
+import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
 
@@ -53,9 +53,9 @@ public class Scimv2BaseApi {
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call createResourceCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public Call createResourceCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
         Object localVarPostBody = body;
 
@@ -89,9 +89,9 @@ public class Scimv2BaseApi {
     /**
      * Build call for delete
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call deleteResourceCall() throws ApiException {
+    public Call deleteResourceCall() throws ScimApiException {
 
         Object localVarPostBody = null;
 
@@ -122,9 +122,9 @@ public class Scimv2BaseApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getResourceCall(List<String> attributes, List<String> excludedAttributes) throws ApiException {
+    public Call getResourceCall(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
 
         Object localVarPostBody = null;
 
@@ -158,9 +158,9 @@ public class Scimv2BaseApi {
      * Build call
      * @param body  (optional)
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getResourcesByPostCall(String body) throws ApiException {
+    public Call getResourcesByPostCall(String body) throws ScimApiException {
 
         Object localVarPostBody = body;
 
@@ -192,9 +192,9 @@ public class Scimv2BaseApi {
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public Call updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
         Object localVarPostBody = body;
 
@@ -227,9 +227,9 @@ public class Scimv2BaseApi {
     /**
      * Build call
      * @return Call to execute
-     * @throws ApiException If fail to serialize the request body object
+     * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getResourceTypeCall() throws ApiException {
+    public Call getResourceTypeCall() throws ScimApiException {
 
         Object localVarPostBody = null;
 

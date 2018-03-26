@@ -16,7 +16,7 @@
 
 package org.wso2.scim2.client;
 
-import io.scim2.swagger.client.ApiException;
+import io.scim2.swagger.client.ScimApiException;
 import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.operation.GroupOperations;
@@ -63,7 +63,7 @@ public class ProvisioningClient {
 			operation = new UserOperations(provider, scimObject,
 					additionalProvisioningInformation);
 			operation.createUser();
-		} catch (ApiException | IdentitySCIMException e) {
+		} catch (ScimApiException | IdentitySCIMException e) {
 			throw new IdentitySCIMException("Unable to create the User.", e);
 		}
 	}
@@ -75,7 +75,7 @@ public class ProvisioningClient {
 			operation = new UserOperations(provider, scimObject,
 					additionalProvisioningInformation);
 			operation.deleteUser();
-		} catch (ApiException | IdentitySCIMException e) {
+		} catch (ScimApiException | IdentitySCIMException e) {
 			throw new IdentitySCIMException("Unable to delete the User.", e);
 		}
 	}
@@ -87,7 +87,7 @@ public class ProvisioningClient {
 			operation = new UserOperations(provider, scimObject,
 					additionalProvisioningInformation);
 			operation.updateUser();
-		} catch (ApiException | IdentitySCIMException e) {
+		} catch (ScimApiException | IdentitySCIMException e) {
 			throw new IdentitySCIMException("Unable to update the User.", e);
 		}
 	}
@@ -99,7 +99,7 @@ public class ProvisioningClient {
 			operation = new GroupOperations(provider, scimObject,
 					additionalProvisioningInformation);
 			operation.createGroup();
-		} catch (ApiException | IdentitySCIMException e) {
+		} catch (ScimApiException | IdentitySCIMException e) {
 			throw new IdentitySCIMException("Unable to create the Group.", e);
 		}
 	}
@@ -111,7 +111,7 @@ public class ProvisioningClient {
 			operation = new GroupOperations(provider, scimObject,
 					additionalProvisioningInformation);
 			operation.deleteGroup();
-		} catch (ApiException | IdentitySCIMException e) {
+		} catch (ScimApiException | IdentitySCIMException e) {
 			throw new IdentitySCIMException("Unable to delete the Group.", e);
 		}
 	}
@@ -123,7 +123,7 @@ public class ProvisioningClient {
 			operation = new GroupOperations(provider, scimObject,
 					additionalProvisioningInformation);
 			operation.updateGroup();
-		} catch (ApiException | IdentitySCIMException e) {
+		} catch (ScimApiException | IdentitySCIMException e) {
 			throw new IdentitySCIMException("Unable to update the Group.", e);
 		}
 	}

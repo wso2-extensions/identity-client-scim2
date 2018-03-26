@@ -23,7 +23,7 @@ Returns HTTP 201 if the user is successfully created.
 ### Example
 ```java
 // Import classes:
-//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.ScimApiException;
 //import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
@@ -71,8 +71,8 @@ Returns HTTP 204 if the user is successfully deleted.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2UsersApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
 Scimv2UsersApi apiInstance = new Scimv2UsersApi();
@@ -115,8 +115,8 @@ Returns HTTP 404 if the users are not found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2UsersApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
 Scimv2UsersApi apiInstance = new Scimv2UsersApi();
@@ -171,8 +171,8 @@ Returns HTTP 200 if the user is found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2UsersApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
 Scimv2UsersApi apiInstance = new Scimv2UsersApi();
@@ -263,8 +263,8 @@ Returns HTTP 404 if the user is not found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2UsersApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2UsersApi;
 
 
 Scimv2UsersApi apiInstance = new Scimv2UsersApi();

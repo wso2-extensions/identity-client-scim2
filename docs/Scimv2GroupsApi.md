@@ -23,8 +23,8 @@ Returns HTTP 201 if the group is successfully created.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2GroupsApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
@@ -71,7 +71,7 @@ Returns HTTP 204 if the group is successfully deleted.
 ### Example
 ```java
 // Import classes:
-//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.ScimApiException;
 //import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
@@ -115,8 +115,8 @@ Returns HTTP 404 if the groups are not found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2GroupsApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
@@ -171,8 +171,8 @@ Returns HTTP 200 if the group is found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2GroupsApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
@@ -219,8 +219,8 @@ Returns HTTP 404 if the groups are not found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2GroupsApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
@@ -263,8 +263,8 @@ Returns HTTP 404 if the group is not found.
 ### Example
 ```java
 // Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2GroupsApi;
+//import io.scim2.swagger.client.ScimApiException;
+//import io.scim2.swagger.client.api.Scimv2GroupsApi;
 
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();

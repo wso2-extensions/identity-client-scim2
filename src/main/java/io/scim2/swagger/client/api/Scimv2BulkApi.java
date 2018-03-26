@@ -19,8 +19,8 @@ package io.scim2.swagger.client.api;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.ScimApiClient;
-import io.scim2.swagger.client.ApiException;
-import io.scim2.swagger.client.ApiResponse;
+import io.scim2.swagger.client.ScimApiException;
+import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.Configuration;
 
 import java.lang.reflect.Type;
@@ -38,7 +38,7 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
         super(scimApiClient);
     }
     
-    private Call createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    private Call createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
         Call call = createResourceCall(attributes, excludedAttributes, body);
         return call;
@@ -51,10 +51,10 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
      * @return String
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String createBulk(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
-        ApiResponse<String> resp = createBulkWithHttpInfo(attributes, excludedAttributes, body);
+    public String createBulk(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+        ScimApiResponse<String> resp = createBulkWithHttpInfo(attributes, excludedAttributes, body);
         return resp.getData();
     }
 
@@ -64,10 +64,10 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
      * @param attributes SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body  (optional)
-     * @return ApiResponse&lt;String&gt;
-     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<String> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ApiException {
+    public ScimApiResponse<String> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
         Call call = createBulkValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>(){}.getType();
         return scimApiClient.execute(call, localVarReturnType);

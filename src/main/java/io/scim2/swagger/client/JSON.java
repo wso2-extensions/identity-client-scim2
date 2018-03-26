@@ -95,7 +95,7 @@ public class JSON {
      * @return The deserialized Java object
      */
     @SuppressWarnings("unchecked")
-    public <T> T deserialize(String body, Type returnType) throws ApiException {
+    public <T> T deserialize(String body, Type returnType) throws ScimApiException {
         try {
             if (scimApiClient.isLenientOnJson()) {
                 JsonReader jsonReader = new JsonReader(new StringReader(body));
@@ -162,7 +162,7 @@ class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
         String str = json.getAsJsonPrimitive().getAsString();
         try {
             return scimApiClient.parseDateOrDatetime(str);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             throw new JsonParseException(e);
         }
     }

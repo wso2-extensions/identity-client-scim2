@@ -17,8 +17,8 @@
 package org.wso2.scim2.operation;
 
 import io.scim2.swagger.client.ScimApiClient;
-import io.scim2.swagger.client.ApiException;
-import io.scim2.swagger.client.ApiResponse;
+import io.scim2.swagger.client.ScimApiException;
+import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import io.scim2.swagger.client.api.Scimv2UsersApi;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public abstract class AbstractOperations {
     protected ScimApiClient client;
 
     public AbstractOperations(SCIMProvider scimProvider, SCIMObject object,
-                           Map<String, Object> additionalInformation) throws ApiException {
+                           Map<String, Object> additionalInformation) throws ScimApiException {
 
         provider = scimProvider;
         scimObject = object;
@@ -74,7 +74,7 @@ public abstract class AbstractOperations {
 
     public List<SCIMObject> listWithGet(List<String> attributes,
                                    List<String> excludedAttributes, String filter, int startIndex,
-                                   int count, String sortBy, String sortOrder, int resourceType) throws ApiException, AbstractCharonException, IOException {
+                                   int count, String sortBy, String sortOrder, int resourceType) throws ScimApiException, AbstractCharonException, IOException {
 
 
         List<SCIMObject> returnedSCIMObject = new ArrayList<>();
@@ -104,7 +104,7 @@ public abstract class AbstractOperations {
             sortOrder = SCIMConstants.OperationalConstants.ASCENDING;
         }
 
-        ApiResponse<String> response;
+        ScimApiResponse<String> response;
         if(resourceType == SCIM2CommonConstants.USER) {
             client.setURL(userEPURL);
             response = new Scimv2UsersApi(client).getUser(attributes,
@@ -142,7 +142,7 @@ public abstract class AbstractOperations {
         return returnedSCIMObject;
     }
 
-    public void handleSCIMErrorResponse(ApiResponse<String> response) throws CharonException {
+    public void handleSCIMErrorResponse(ScimApiResponse<String> response) throws CharonException {
 
         SCIMClient scimClient = new SCIMClient();
         if (!scimClient.evaluateResponseStatus(response.getStatusCode())) {

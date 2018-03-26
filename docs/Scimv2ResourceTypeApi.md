@@ -18,7 +18,7 @@ Returns HTTP 200 if the schema is found.
 ### Example
 ```java
 // Import classes:
-//import io.scim2.swagger.client.ApiException;
+//import io.scim2.swagger.client.ScimApiException;
 //import io.scim2.swagger.client.api.Scimv2ResourceTypeApi;
 
 
