@@ -52,15 +52,14 @@ public class JSON {
     public JSON(ScimApiClient scimApiClient) {
         this.scimApiClient = scimApiClient;
         gson = new GsonBuilder()
-            .registerTypeAdapter(Date.class, new DateAdapter(scimApiClient))
-            .registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter())
-            .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
-            .create();
+                .registerTypeAdapter(Date.class, new DateAdapter(scimApiClient))
+                .registerTypeAdapter(DateTime.class, new DateTimeTypeAdapter())
+                .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+                .create();
     }
 
     /**
      * Get Gson.
-     *
      * @return Gson
      */
     public Gson getGson() {
@@ -69,7 +68,6 @@ public class JSON {
 
     /**
      * Set Gson.
-     *
      * @param gson Gson
      */
     public void setGson(Gson gson) {
@@ -89,8 +87,8 @@ public class JSON {
     /**
      * Deserialize the given JSON string to Java object.
      *
-     * @param <T> Type
-     * @param body The JSON string
+     * @param <T>        Type
+     * @param body       The JSON string
      * @param returnType The type to deserialize into
      * @return The deserialized Java object
      */
@@ -99,7 +97,8 @@ public class JSON {
         try {
             if (scimApiClient.isLenientOnJson()) {
                 JsonReader jsonReader = new JsonReader(new StringReader(body));
-                // see https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/stream/JsonReader.html#setLenient(boolean)
+                // see https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/stream/
+                // JsonReader.html#setLenient(boolean)
                 jsonReader.setLenient(true);
                 return gson.fromJson(jsonReader, returnType);
             } else {
@@ -113,7 +112,7 @@ public class JSON {
                 return (T) body;
             else if (returnType.equals(Date.class))
                 return (T) scimApiClient.parseDateOrDatetime(body);
-            else throw(e);
+            else throw (e);
         }
     }
 }
@@ -134,9 +133,9 @@ class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
     /**
      * Serialize
      *
-     * @param src Date
+     * @param src       Date
      * @param typeOfSrc Type
-     * @param context Json Serialization Context
+     * @param context   Json Serialization Context
      * @return Json Element
      */
     @Override
@@ -151,8 +150,8 @@ class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
     /**
      * Deserialize
      *
-     * @param json Json element
-     * @param date Type
+     * @param json    Json element
+     * @param date    Type
      * @param context Json Serialization Context
      * @return Date
      * @throws JsonParseException if fail to parse
@@ -163,7 +162,7 @@ class DateAdapter implements JsonSerializer<Date>, JsonDeserializer<Date> {
         try {
             return scimApiClient.parseDateOrDatetime(str);
         } catch (ScimApiException e) {
-            throw new JsonParseException(e);
+            throw new JsonParseException("Unable to parse the date time.",e);
         }
     }
 }

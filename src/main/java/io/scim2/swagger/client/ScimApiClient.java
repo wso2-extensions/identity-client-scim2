@@ -34,6 +34,7 @@ import io.scim2.swagger.client.auth.HttpBasicAuth;
 import io.scim2.swagger.client.auth.OAuth;
 import okio.BufferedSink;
 import okio.Okio;
+import org.apache.commons.lang.StringUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -115,10 +116,7 @@ public class ScimApiClient {
      */
     public ScimApiClient() {
         httpClient = new OkHttpClient();
-
-
         verifyingSsl = true;
-
         json = new JSON(this);
 
         /*
@@ -288,12 +286,11 @@ public class ScimApiClient {
      * @return Date
      */
     public Date parseDate(String str) throws ScimApiException {
-        if (str == null)
-            return null;
+        if (StringUtils.isEmpty(str)) return null;
         try {
             return dateFormat.parse(str);
         } catch (ParseException e) {
-            throw new ScimApiException(e);
+            throw new ScimApiException("Unable to parse the date.",e);
         }
     }
 
@@ -346,7 +343,7 @@ public class ScimApiClient {
         try {
             return format.parse(str);
         } catch (ParseException e) {
-            throw new ScimApiException(e);
+            throw new ScimApiException("Unable to parse the date time.",e);
         }
     }
 
@@ -503,7 +500,8 @@ public class ScimApiClient {
     }
 
     /**
-     * @see <a href="https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/stream/JsonReader.html#setLenient(boolean)">setLenient</a>
+     * @see <a href="https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/stream/JsonReader.html
+     * #setLenient(boolean)">setLenient</a>
      *
      * @return True if lenientOnJson is enabled, false otherwise.
      */
@@ -630,11 +628,10 @@ public class ScimApiClient {
      * @return A list of Pair objects
      */
     public List<Pair> parameterToPairs(String collectionFormat, String name, Object value){
-        List<Pair> params = new ArrayList<Pair>();
 
+        List<Pair> params = new ArrayList<Pair>();
         // preconditions
         if (name == null || name.isEmpty() || value == null) return params;
-
         Collection valueCollection = null;
         if (value instanceof Collection) {
             valueCollection = (Collection) value;
@@ -642,25 +639,20 @@ public class ScimApiClient {
             params.add(new Pair(name, parameterToString(value)));
             return params;
         }
-
         if (valueCollection.isEmpty()){
             return params;
         }
-
         // get the collection format
-        collectionFormat = (collectionFormat == null || collectionFormat.isEmpty() ? "csv" : collectionFormat); // default: csv
-
+        collectionFormat = (collectionFormat == null || collectionFormat.isEmpty() ? "csv" : collectionFormat);
+        // default: csv
         // create the params based on the collection format
         if (collectionFormat.equals("multi")) {
             for (Object item : valueCollection) {
                 params.add(new Pair(name, parameterToString(item)));
             }
-
             return params;
         }
-
         String delimiter = ",";
-
         if (collectionFormat.equals("csv")) {
             delimiter = ",";
         } else if (collectionFormat.equals("ssv")) {
@@ -670,15 +662,12 @@ public class ScimApiClient {
         } else if (collectionFormat.equals("pipes")) {
             delimiter = "|";
         }
-
         StringBuilder sb = new StringBuilder() ;
         for (Object item : valueCollection) {
             sb.append(delimiter);
             sb.append(parameterToString(item));
         }
-
         params.add(new Pair(name, sb.substring(1)));
-
         return params;
     }
 
@@ -820,10 +809,8 @@ public class ScimApiClient {
             return (T) respBody;
         } else {
             throw new ScimApiException(
-                    "Content type \"" + contentType + "\" is not supported for type: " + returnType,
-                    response.code(),
-                    response.headers().toMultimap(),
-                    respBody);
+                    "Content type \"" + contentType + "\" is not supported for type: " + returnType, response.code(),
+                    response.headers().toMultimap(), respBody);
         }
     }
 
@@ -858,7 +845,6 @@ public class ScimApiClient {
         } else {
             throw new ScimApiException("Content type \"" + contentType + "\" is not supported");
         }
-
         return null;
     }
 
@@ -977,7 +963,8 @@ public class ScimApiClient {
                     try {
                         response.body().close();
                     } catch (IOException e) {
-                        throw new ScimApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                        throw new ScimApiException(response.message(), e, response.code(), response.headers().
+                                toMultimap());
                     }
                 }
                 return null;
@@ -1009,14 +996,13 @@ public class ScimApiClient {
      * @return The HTTP call
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call buildCall(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ScimApiException {
+    public Call buildCall(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams,
+                          Map<String, Object> formParams, String[] authNames) throws ScimApiException {
         Request request = buildRequest(method, queryParams, body, headerParams, formParams, authNames);
-
         return httpClient.newCall(request);
     }
 
     public void setURL(String url) {
-
         this.url = url;
     }
 
@@ -1025,23 +1011,21 @@ public class ScimApiClient {
      *
      * @param method The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
      * @param queryParams The query parameters
-9     * @param body The request body object
+     * @param body The request body object
      * @param headerParams The header parameters
      * @param formParams The form parameters
      * @param authNames The authentications to apply
      * @return The HTTP request
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Request buildRequest(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams, Map<String, Object> formParams, String[] authNames) throws ScimApiException {
+    public Request buildRequest(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams,
+                                Map<String, Object> formParams, String[] authNames) throws ScimApiException {
 
         updateParamsForAuth(authNames, queryParams, headerParams);
-
         String path = this.url;
         final String url = buildUrl(path, queryParams);
-        
         final Request.Builder reqBuilder = new Request.Builder().url(url);
         processHeaderParams(headerParams, reqBuilder);
-
         String contentType = headerParams.get("Content-Type");
         // ensuring a default content type
         if (contentType == null) {
@@ -1066,9 +1050,7 @@ public class ScimApiClient {
         } else {
             reqBody = serialize(body, contentType);
         }
-
         Request request = reqBuilder.method(method, reqBody).build();
-
         return request;
     }
 
@@ -1083,7 +1065,6 @@ public class ScimApiClient {
 
         final StringBuilder url = new StringBuilder();
         url.append(path);
-
         if (queryParams != null && !queryParams.isEmpty()) {
             // support (constant) query string in `path`, e.g. "/posts?draft=1"
             String prefix = path.contains("?") ? "&" : "?";
@@ -1100,7 +1081,6 @@ public class ScimApiClient {
                 }
             }
         }
-
         return url.toString();
     }
 
@@ -1163,7 +1143,8 @@ public class ScimApiClient {
         for (Entry<String, Object> param : formParams.entrySet()) {
             if (param.getValue() instanceof File) {
                 File file = (File) param.getValue();
-                Headers partHeaders = Headers.of("Content-Disposition", "form-data; name=\"" + param.getKey() + "\"; filename=\"" + file.getName() + "\"");
+                Headers partHeaders = Headers.of("Content-Disposition", "form-data; name=\"" + param.getKey()
+                        + "\"; filename=\"" + file.getName() + "\"");
                 MediaType mediaType = MediaType.parse(guessContentTypeFromFile(file));
                 mpBuilder.addPart(partHeaders, RequestBody.create(mediaType, file));
             } else {
@@ -1220,9 +1201,11 @@ public class ScimApiClient {
             if (!verifyingSsl) {
                 TrustManager trustAll = new X509TrustManager() {
                     @Override
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                    public void checkClientTrusted(X509Certificate[] chain, String authType)
+                            throws CertificateException {}
                     @Override
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType)
+                            throws CertificateException {}
                     @Override
                     public X509Certificate[] getAcceptedIssuers() { return null; }
                 };
@@ -1245,7 +1228,8 @@ public class ScimApiClient {
                     String certificateAlias = "ca" + Integer.toString(index++);
                     caKeyStore.setCertificateEntry(certificateAlias, certificate);
                 }
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.
+                        getDefaultAlgorithm());
                 trustManagerFactory.init(caKeyStore);
                 trustManagers = trustManagerFactory.getTrustManagers();
             }

@@ -28,8 +28,7 @@ import org.wso2.charon3.core.schema.SCIMResourceTypeSchema;
 public class ClientSideValidator extends AbstractValidator {
 
     //validate scim object received from the server side.
-    public static void validateRetrievedSCIMObject(AbstractSCIMObject scimObject,
-                                                   SCIMResourceTypeSchema schema)
+    public static void validateRetrievedSCIMObject(AbstractSCIMObject scimObject, SCIMResourceTypeSchema schema)
             throws CharonException, BadRequestException {
         validateSCIMObjectForRequiredAttributes(scimObject, schema);
         validateSchemaList(scimObject, schema);

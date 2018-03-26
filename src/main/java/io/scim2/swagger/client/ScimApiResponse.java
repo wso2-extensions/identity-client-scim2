@@ -31,7 +31,7 @@ public class ScimApiResponse<T> {
 
     /**
      * @param statusCode The status code of HTTP response
-     * @param headers The headers of HTTP response
+     * @param headers    The headers of HTTP response
      */
     public ScimApiResponse(int statusCode, Map<String, List<String>> headers) {
         this(statusCode, headers, null);
@@ -39,8 +39,8 @@ public class ScimApiResponse<T> {
 
     /**
      * @param statusCode The status code of HTTP response
-     * @param headers The headers of HTTP response
-     * @param data The object deserialized from response bod
+     * @param headers    The headers of HTTP response
+     * @param data       The object deserialized from response bod
      */
     public ScimApiResponse(int statusCode, Map<String, List<String>> headers, T data) {
         this.statusCode = statusCode;

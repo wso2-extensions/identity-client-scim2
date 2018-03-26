@@ -41,9 +41,8 @@ public class SCIMDecoder {
      * @return
      * @throws CharonException
      */
-    public List<SCIMObject> decodeListedResource(String scimString,
-                                               ResourceTypeSchema resourceSchemaOfListedResource,
-                                               AbstractSCIMObject scimObjectOfListedResource)
+    public List<SCIMObject> decodeListedResource(String scimString, ResourceTypeSchema resourceSchemaOfListedResource,
+                                                 AbstractSCIMObject scimObjectOfListedResource)
             throws CharonException, BadRequestException {
 
         List<SCIMObject> scimObjects = null;
@@ -60,7 +59,7 @@ public class SCIMDecoder {
             for (int i = 0; i < (((JSONArray) resources).length()); i++) {
                 Object object = ((JSONArray) resources).get(i);
                 String scimResourceString = null;
-                if(object instanceof String) {
+                if (object instanceof String) {
                     scimResourceString = ((JSONArray) resources).getString(i);
                 } else if (object instanceof JSONObject) {
                     scimResourceString = ((JSONArray) resources).getJSONObject(i).toString();
@@ -69,12 +68,10 @@ public class SCIMDecoder {
                         scimObjectOfListedResource);
                 scimObjects.add(scimObject);
             }
-
         } catch (JSONException e) {
-            String error = "JSON string could not be decoded properly.";
-            throw new BadRequestException(error);
+            throw new BadRequestException("JSON string could not be decoded properly.");
         } catch (InternalErrorException e) {
-            String error = "Error decoding SCIMObject";
+            throw new CharonException("Error decoding SCIMObject");
         }
 
         return scimObjects;

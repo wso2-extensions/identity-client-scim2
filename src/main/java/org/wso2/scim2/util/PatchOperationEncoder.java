@@ -33,14 +33,11 @@ public class PatchOperationEncoder {
     public String encodeRequest(List<PatchOperation> patchOperations) throws BadRequestException, JSONException {
 
         JSONObject encodedObject = new JSONObject();
-
         JSONArray schemaArray = new JSONArray();
         schemaArray.put(PATCH_OP_SCHEMA);
-
         JSONArray operationsArray = new JSONArray();
         for (PatchOperation patchOperation : patchOperations) {
             JSONObject obj = new JSONObject();
-
             String operation = patchOperation.getOperation();
             if (operation != null && (operation.equals(SCIMConstants.OperationalConstants.ADD))
                     || operation.equals(SCIMConstants.OperationalConstants.REMOVE)
@@ -55,13 +52,10 @@ public class PatchOperationEncoder {
             if (patchOperation.getValues() != null) {
                 obj.put(SCIMConstants.OperationalConstants.VALUE, patchOperation.getValues());
             }
-
             operationsArray.put(obj);
         }
-
         encodedObject.put(SCIMConstants.CommonSchemaConstants.SCHEMAS, schemaArray);
         encodedObject.put(SCIMConstants.OperationalConstants.OPERATIONS, operationsArray);
-
         return encodedObject.toString();
     }
 }

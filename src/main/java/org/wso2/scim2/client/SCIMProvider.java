@@ -56,21 +56,18 @@ public class SCIMProvider {
     }
 
     public String getProperty(String key) {
-        return this.properties.containsKey(key) ? (String)this.properties.get(key) : null;
+        return this.properties.containsKey(key) ? (String) this.properties.get(key) : null;
     }
 
     public void setPatchOperationsList(List<PatchOperation> patchOperationsList) {
-
         this.patchOperationList = patchOperationsList;
     }
 
     public void addPatchOperation(PatchOperation patchOperation) {
-
         this.patchOperationList.add(patchOperation);
     }
 
     public List<PatchOperation> getPatchOperationList() {
-
         return patchOperationList;
     }
 }

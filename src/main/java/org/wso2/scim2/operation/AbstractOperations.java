@@ -45,8 +45,7 @@ public abstract class AbstractOperations {
     public static final String USER_FILTER = "userName%20Eq%20";
     public static final String GROUP_FILTER = "displayName%20Eq%20";
 
-    private static Logger logger = LoggerFactory.getLogger(AbstractOperations.class
-            .getName());
+    private static Logger logger = LoggerFactory.getLogger(AbstractOperations.class.getName());
 
     protected SCIMObject scimObject;
     protected SCIMProvider provider;
@@ -57,7 +56,7 @@ public abstract class AbstractOperations {
     protected ScimApiClient client;
 
     public AbstractOperations(SCIMProvider scimProvider, SCIMObject object,
-                           Map<String, Object> additionalInformation) throws ScimApiException {
+                              Map<String, Object> additionalInformation) throws ScimApiException {
 
         provider = scimProvider;
         scimObject = object;
@@ -72,61 +71,47 @@ public abstract class AbstractOperations {
         client.setPassword(provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD));
     }
 
-    public List<SCIMObject> listWithGet(List<String> attributes,
-                                   List<String> excludedAttributes, String filter, int startIndex,
-                                   int count, String sortBy, String sortOrder, int resourceType) throws ScimApiException, AbstractCharonException, IOException {
-
+    public List<SCIMObject> listWithGet(List<String> attributes, List<String> excludedAttributes, String filter,
+                                        int startIndex, int count, String sortBy, String sortOrder, int resourceType)
+            throws ScimApiException, AbstractCharonException, IOException {
 
         List<SCIMObject> returnedSCIMObject = new ArrayList<>();
-
         SCIMClient scimClient = new SCIMClient();
-
         if (startIndex < 1) {
             startIndex = 1;
         }
-
         if (count == 0) {
-            count = CharonConfiguration.getInstance()
-                    .getCountValueForPagination();
+            count = CharonConfiguration.getInstance().getCountValueForPagination();
         }
-
         if (sortOrder != null) {
             if (!(sortOrder
                     .equalsIgnoreCase(SCIMConstants.OperationalConstants.ASCENDING) || sortOrder
                     .equalsIgnoreCase(SCIMConstants.OperationalConstants.DESCENDING))) {
                 String error = " Invalid sortOrder value is specified";
-                throw new BadRequestException(error,
-                        ResponseCodeConstants.INVALID_VALUE);
+                throw new BadRequestException(error, ResponseCodeConstants.INVALID_VALUE);
             }
         }
-
         if (sortOrder == null && sortBy != null) {
             sortOrder = SCIMConstants.OperationalConstants.ASCENDING;
         }
-
         ScimApiResponse<String> response;
-        if(resourceType == SCIM2CommonConstants.USER) {
+        if (resourceType == SCIM2CommonConstants.USER) {
             client.setURL(userEPURL);
-            response = new Scimv2UsersApi(client).getUser(attributes,
-                    excludedAttributes, filter, startIndex, count, sortBy,
-                    sortOrder);
+            response = new Scimv2UsersApi(client).getUser(attributes, excludedAttributes, filter, startIndex, count,
+                    sortBy, sortOrder);
         } else {
             client.setURL(groupEPURL);
-            response = new Scimv2GroupsApi(client).getGroup(attributes,
-                    excludedAttributes, filter, startIndex, count, sortBy,
-                    sortOrder);
+            response = new Scimv2GroupsApi(client).getGroup(attributes, excludedAttributes, filter, startIndex, count,
+                    sortBy, sortOrder);
         }
-
         if (logger.isDebugEnabled()) {
-            logger.debug("SCIM - filter operation inside 'get' " +
-                    "returned with response code: " + response.getStatusCode());
+            logger.debug("SCIM - filter operation inside 'get' " + "returned with response code: " +
+                    response.getStatusCode());
             logger.debug("Filter Response: " + response.getData());
         }
-
         if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
-
-            returnedSCIMObject = scimClient.decodeSCIMResponseWithListedResource(response.getData(), SCIMConstants.JSON, resourceType);
-
+            returnedSCIMObject = scimClient.decodeSCIMResponseWithListedResource(response.getData(), SCIMConstants.JSON,
+                    resourceType);
             if (returnedSCIMObject.isEmpty()) {
                 String error = "No results found.";
                 throw new NotFoundException(error);
@@ -134,11 +119,9 @@ public abstract class AbstractOperations {
         } else {
             //decode scim exception and extract the specific error message.
             AbstractCharonException exception =
-                    scimClient.decodeSCIMException(
-                            response.getData(), SCIMConstants.JSON);
+                    scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
             logger.error(exception.getMessage());
         }
-
         return returnedSCIMObject;
     }
 
@@ -148,8 +131,7 @@ public abstract class AbstractOperations {
         if (!scimClient.evaluateResponseStatus(response.getStatusCode())) {
             //decode scim exception and extract the specific error message.
             AbstractCharonException exception =
-                    scimClient.decodeSCIMException(
-                            response.getData(), SCIMConstants.JSON);
+                    scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
             logger.error(exception.getMessage());
         }
     }

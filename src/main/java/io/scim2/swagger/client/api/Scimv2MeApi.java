@@ -29,16 +29,15 @@ import java.util.List;
 public class Scimv2MeApi extends Scimv2BaseApi {
 
     public Scimv2MeApi() {
-
         this(Configuration.getDefaultScimApiClient());
     }
 
     public Scimv2MeApi(ScimApiClient scimApiClient) {
-
         super(scimApiClient);
     }
 
-    private Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+    private Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
 
         Call call = createResourceCall(attributes, excludedAttributes, body);
         return call;
@@ -47,13 +46,15 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Return the user which was anonymously created
      * Returns HTTP 201 if the user is successfully created.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
+     * @param body               (optional)
      * @return String
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String createMe(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+    public String createMe(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
 
         ScimApiResponse<String> resp = createMeWithHttpInfo(attributes, excludedAttributes, body);
         return resp.getData();
@@ -62,19 +63,20 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Return the user which was anonymously created
      * Returns HTTP 201 if the user is successfully created.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
+     * @param body               (optional)
      * @return ScimApiResponse&lt;String&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ScimApiResponse<String> createMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
-
+    public ScimApiResponse<String> createMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
+                                                        String body) throws ScimApiException {
         Call call = createMeValidateBeforeCall(attributes, excludedAttributes, body);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
-    
+
     private Call deleteMeValidateBeforeCall() throws ScimApiException {
 
         Call call = deleteResourceCall();
@@ -84,6 +86,7 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Delete the authenticated user.
      * Returns HTTP 204 if the user is successfully deleted.
+     *
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public void deleteMe() throws ScimApiException {
@@ -94,6 +97,7 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Delete the authenticated user.
      * Returns HTTP 204 if the user is successfully deleted.
+     *
      * @return ScimApiResponse&lt;Void&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
@@ -102,9 +106,9 @@ public class Scimv2MeApi extends Scimv2BaseApi {
         Call call = deleteMeValidateBeforeCall();
         return scimApiClient.execute(call);
     }
-    
-    private Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
-        
+
+    private Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
+            throws ScimApiException {
         Call call = getResourceCall(attributes, excludedAttributes);
         return call;
     }
@@ -112,7 +116,8 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Return the authenticated user.
      * Returns HTTP 200 if the user is found.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return String
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
@@ -126,20 +131,21 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Return the authenticated user.
      * Returns HTTP 200 if the user is found.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @return ScimApiResponse&lt;String&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ScimApiResponse<String> getMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
-
+    public ScimApiResponse<String> getMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes)
+            throws ScimApiException {
         Call call = getMeValidateBeforeCall(attributes, excludedAttributes);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
-    
-    private Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
+    private Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
         Call call = updateResourceCall(attributes, excludedAttributes, body);
         return call;
     }
@@ -147,14 +153,15 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Return the updated user
      * Returns HTTP 404 if the user is not found.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
+     * @param body               (optional)
      * @return String
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String updateMe(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
-
+    public String updateMe(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
         ScimApiResponse<String> resp = updateMeWithHttpInfo(attributes, excludedAttributes, body);
         return resp.getData();
     }
@@ -162,16 +169,17 @@ public class Scimv2MeApi extends Scimv2BaseApi {
     /**
      * Return the updated user
      * Returns HTTP 404 if the user is not found.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
+     * @param body               (optional)
      * @return ScimApiResponse&lt;String&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ScimApiResponse<String> updateMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
-
+    public ScimApiResponse<String> updateMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
+                                                        String body) throws ScimApiException {
         Call call = updateMeValidateBeforeCall(attributes, excludedAttributes, body);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 }

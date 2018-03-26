@@ -85,17 +85,15 @@ public class SCIMClient {
             switch (containedResourceType) {
                 case 1:
                     return scimDecoder.decodeListedResource(scimResponse,
-                            SCIMSchemaDefinitions.SCIM_USER_SCHEMA,
-                            new User());
+                            SCIMSchemaDefinitions.SCIM_USER_SCHEMA, new User());
                 case 2:
                     return scimDecoder.decodeListedResource(scimResponse,
-                            SCIMSchemaDefinitions.SCIM_GROUP_SCHEMA,
-                            new Group());
+                            SCIMSchemaDefinitions.SCIM_GROUP_SCHEMA, new Group());
                 default:
                     throw new CharonException("Resource type didn't match any existing types.");
             }
         } else {
-            throw new CharonException("Encoder in the given format is not properly initialized..");
+            throw new CharonException("Encoder in the given format is not properly initialized.");
         }
     }
 
@@ -113,28 +111,23 @@ public class SCIMClient {
             throws AbstractCharonException {
         if ((format.equals(SCIMConstants.JSON)) && (jsonDecoder != null)) {
             return decodeSCIMResponse(scimResponse, jsonDecoder, resourceType);
-
         } else {
-            throw new CharonException("Encoder in the given format is not properly initialized..");
+            throw new CharonException("Encoder in the given format is not properly initialized.");
         }
     }
 
-    private SCIMObject decodeSCIMResponse(String scimResponse, JSONDecoder decoder,
-                                          int resourceType)
+    private SCIMObject decodeSCIMResponse(String scimResponse, JSONDecoder decoder, int resourceType)
             throws AbstractCharonException {
 
         switch (resourceType) {
             case 1:
                 User userObject = (User) decoder.decodeResource(scimResponse,
-                        SCIMSchemaDefinitions.SCIM_USER_SCHEMA,
-                        new User());
-                ClientSideValidator.validateRetrievedSCIMObject(userObject,
-                        SCIMSchemaDefinitions.SCIM_USER_SCHEMA);
+                        SCIMSchemaDefinitions.SCIM_USER_SCHEMA, new User());
+                ClientSideValidator.validateRetrievedSCIMObject(userObject, SCIMSchemaDefinitions.SCIM_USER_SCHEMA);
                 return userObject;
             case 2:
                 Group groupObject = (Group) decoder.decodeResource(scimResponse,
-                        SCIMSchemaDefinitions.SCIM_GROUP_SCHEMA,
-                        new Group());
+                        SCIMSchemaDefinitions.SCIM_GROUP_SCHEMA, new Group());
                 ClientSideValidator.validateRetrievedSCIMObject(groupObject,
                         SCIMSchemaDefinitions.SCIM_GROUP_SCHEMA);
                 return groupObject;
@@ -158,11 +151,9 @@ public class SCIMClient {
 
         if ((format.equals(SCIMConstants.JSON)) && (jsonDecoder != null)) {
             return jsonDecoder.decodeResource(scimResponse, resourceSchema, scimObject);
-
         } else {
             throw new CharonException("Encoder in the given format is not properly initialized..");
         }
-
     }
 
     /**
@@ -177,12 +168,8 @@ public class SCIMClient {
             throws CharonException {
         if ((format.equals(SCIMConstants.JSON)) && (jsonDecoder != null)) {
             return this.decodeException(scimResponse);
-
-        } /*else if ((format.equals(SCIMConstants.XML)) && (xmlEncoder != null)) {
-            return xmlDecoder.decodeException(scimResponse);
-
-        }*/ else {
-            throw new CharonException("Encoder in the given format is not properly initialized..");
+        } else {
+            throw new CharonException("Encoder in the given format is not properly initialized.");
         }
     }
 
@@ -221,9 +208,7 @@ public class SCIMClient {
                 return new AbstractCharonException(errorDescription);
             }
         } catch (JSONException e) {
-            //log error
-            String error = "Error in building exception from the JSON representation";
-            throw new CharonException(error);
+            throw new CharonException("Error in building exception from the JSON representation");
         }
         return null;
     }
@@ -236,12 +221,11 @@ public class SCIMClient {
      * @return
      * @throws CharonException
      */
-    public String encodeSCIMObject(AbstractSCIMObject scimObject, String format)
-            throws CharonException {
+    public String encodeSCIMObject(AbstractSCIMObject scimObject, String format) throws CharonException {
         if ((format.equals(SCIMConstants.JSON)) && (jsonEncoder != null)) {
             return jsonEncoder.encodeSCIMObject(scimObject);
         } else {
-            throw new CharonException("Encoder in the given format is not properly initialized..");
+            throw new CharonException("Encoder in the given format is not properly initialized.");
         }
     }
 
@@ -256,9 +240,8 @@ public class SCIMClient {
 
         if ((format.equals(SCIMConstants.JSON)) && (jsonEncoder != null)) {
             return jsonEncoder.encodeBulkResponseData(bulkData);
-
         } else {
-            throw new CharonException("Encoder in the given format is not properly initialized..");
+            throw new CharonException("Encoder in the given format is not properly initialized.");
         }
     }
 
@@ -271,30 +254,22 @@ public class SCIMClient {
      */
     public boolean evaluateResponseStatus(int statusCode) {
         switch (statusCode) {
-            //ok
             case ResponseCodeConstants.CODE_OK:
                 return true;
             case ResponseCodeConstants.CODE_CREATED:
                 return true;
-
             case ResponseCodeConstants.CODE_NO_CONTENT:
                 return true;
-
             case ResponseCodeConstants.CODE_UNAUTHORIZED:
                 return false;
-
             case ResponseCodeConstants.CODE_FORMAT_NOT_SUPPORTED:
                 return false;
-
             case ResponseCodeConstants.CODE_INTERNAL_ERROR:
                 return false;
-
             case ResponseCodeConstants.CODE_RESOURCE_NOT_FOUND:
                 return false;
-
             case ResponseCodeConstants.CODE_BAD_REQUEST:
                 return false;
-
             default:
                 return false;
         }

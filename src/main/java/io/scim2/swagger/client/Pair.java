@@ -16,11 +16,13 @@
 
 package io.scim2.swagger.client;
 
+import org.apache.commons.lang.StringUtils;
+
 public class Pair {
     private String name = "";
     private String value = "";
 
-    public Pair (String name, String value) {
+    public Pair(String name, String value) {
         setName(name);
         setValue(value);
     }
@@ -46,9 +48,7 @@ public class Pair {
     }
 
     private boolean isValidString(String arg) {
-        if (arg == null) return false;
-        if (arg.trim().isEmpty()) return false;
-
+        if (StringUtils.isEmpty(arg.trim())) return false;
         return true;
     }
 }

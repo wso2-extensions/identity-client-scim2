@@ -24,7 +24,8 @@ public class ScimApiException extends Exception {
     private Map<String, List<String>> responseHeaders = null;
     private String responseBody = null;
 
-    public ScimApiException() {}
+    public ScimApiException() {
+    }
 
     public ScimApiException(Throwable throwable) {
         super(throwable);
@@ -34,7 +35,12 @@ public class ScimApiException extends Exception {
         super(message);
     }
 
-    public ScimApiException(String message, Throwable throwable, int code, Map<String, List<String>> responseHeaders, String responseBody) {
+    public ScimApiException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public ScimApiException(String message, Throwable throwable, int code, Map<String, List<String>> responseHeaders,
+                            String responseBody) {
         super(message, throwable);
         this.code = code;
         this.responseHeaders = responseHeaders;

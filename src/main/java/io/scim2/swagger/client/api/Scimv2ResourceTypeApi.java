@@ -28,17 +28,14 @@ import java.lang.reflect.Type;
 public class Scimv2ResourceTypeApi extends Scimv2BaseApi {
 
     public Scimv2ResourceTypeApi() {
-
         this(Configuration.getDefaultScimApiClient());
     }
 
     public Scimv2ResourceTypeApi(ScimApiClient scimApiClient) {
-
         super(scimApiClient);
     }
-    
+
     private Call getResourceTypeValidateBeforeCall() throws ScimApiException {
-        
         Call call = getResourceTypeCall();
         return call;
     }
@@ -46,11 +43,11 @@ public class Scimv2ResourceTypeApi extends Scimv2BaseApi {
     /**
      * Return the ResourceType schema.
      * Returns HTTP 200 if the schema is found.
+     *
      * @return String
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public String getResourceType() throws ScimApiException {
-
         ScimApiResponse<String> resp = getResourceTypeWithHttpInfo();
         return resp.getData();
     }
@@ -58,13 +55,14 @@ public class Scimv2ResourceTypeApi extends Scimv2BaseApi {
     /**
      * Return the ResourceType schema.
      * Returns HTTP 200 if the schema is found.
+     *
      * @return ScimApiResponse&lt;String&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> getResourceTypeWithHttpInfo() throws ScimApiException {
 
         Call call = getResourceTypeValidateBeforeCall();
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 }

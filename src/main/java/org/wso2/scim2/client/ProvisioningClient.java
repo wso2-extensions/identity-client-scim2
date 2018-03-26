@@ -32,99 +32,93 @@ import java.util.Map;
 public class ProvisioningClient {
 
 
-	SCIMObject scimObject;
-	SCIMProvider provider;
-	private Map<String, Object> additionalProvisioningInformation;
+    SCIMObject scimObject;
+    SCIMProvider provider;
+    private Map<String, Object> additionalProvisioningInformation;
 
-	/**
-	 * Initialize parameters to be used in the SCIM operation which will be
-	 * invoked by the run operation of the thread.
-	 *
-	 * @param scimProvider
-	 * @param object
-	 * @param additionalInformation
-	 */
-	public ProvisioningClient(SCIMProvider scimProvider, SCIMObject object,
-			Map<String, Object> additionalInformation) {
+    /**
+     * Initialize parameters to be used in the SCIM operation which will be
+     * invoked by the run operation of the thread.
+     *
+     * @param scimProvider
+     * @param object
+     * @param additionalInformation
+     */
+    public ProvisioningClient(SCIMProvider scimProvider, SCIMObject object,
+                              Map<String, Object> additionalInformation) {
 
-		provider = scimProvider;
-		scimObject = object;
-		additionalProvisioningInformation = additionalInformation;
-	}
-	
-	 /**
+        provider = scimProvider;
+        scimObject = object;
+        additionalProvisioningInformation = additionalInformation;
+    }
+
+    /**
      * Provision the SCIM User Object passed to the provisioning client in the constructor, to the
      * SCIM Provider whose details are also sent at the initialization.
      */
-	public void provisionCreateUser() throws IdentitySCIMException {
+    public void provisionCreateUser() throws IdentitySCIMException {
 
-		UserOperations operation;
-		try {
-			operation = new UserOperations(provider, scimObject,
-					additionalProvisioningInformation);
-			operation.createUser();
-		} catch (ScimApiException | IdentitySCIMException e) {
-			throw new IdentitySCIMException("Unable to create the User.", e);
-		}
-	}
-	
-	public void provisionDeleteUser() throws IdentitySCIMException {
+        UserOperations operation;
+        try {
+            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+            operation.createUser();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to create the User.", e);
+        }
+    }
 
-		UserOperations operation;
-		try {
-			operation = new UserOperations(provider, scimObject,
-					additionalProvisioningInformation);
-			operation.deleteUser();
-		} catch (ScimApiException | IdentitySCIMException e) {
-			throw new IdentitySCIMException("Unable to delete the User.", e);
-		}
-	}
+    public void provisionDeleteUser() throws IdentitySCIMException {
 
-	public void provisionUpdateUser() throws IdentitySCIMException {
+        UserOperations operation;
+        try {
+            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+            operation.deleteUser();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to delete the User.", e);
+        }
+    }
 
-		UserOperations operation;
-		try {
-			operation = new UserOperations(provider, scimObject,
-					additionalProvisioningInformation);
-			operation.updateUser();
-		} catch (ScimApiException | IdentitySCIMException e) {
-			throw new IdentitySCIMException("Unable to update the User.", e);
-		}
-	}
+    public void provisionUpdateUser() throws IdentitySCIMException {
 
-	public void provisionCreateGroup() throws IdentitySCIMException {
+        UserOperations operation;
+        try {
+            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+            operation.updateUser();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to update the User.", e);
+        }
+    }
 
-		GroupOperations operation;
-		try {
-			operation = new GroupOperations(provider, scimObject,
-					additionalProvisioningInformation);
-			operation.createGroup();
-		} catch (ScimApiException | IdentitySCIMException e) {
-			throw new IdentitySCIMException("Unable to create the Group.", e);
-		}
-	}
+    public void provisionCreateGroup() throws IdentitySCIMException {
+
+        GroupOperations operation;
+        try {
+            operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation);
+            operation.createGroup();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to create the Group.", e);
+        }
+    }
 
     public void provisionDeleteGroup() throws IdentitySCIMException {
 
-		GroupOperations operation;
-		try {
-			operation = new GroupOperations(provider, scimObject,
-					additionalProvisioningInformation);
-			operation.deleteGroup();
-		} catch (ScimApiException | IdentitySCIMException e) {
-			throw new IdentitySCIMException("Unable to delete the Group.", e);
-		}
-	}
+        GroupOperations operation;
+        try {
+            operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation);
+            operation.deleteGroup();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to delete the Group.", e);
+        }
+    }
 
-	public void provisionUpdateGroup() throws IdentitySCIMException {
+    public void provisionUpdateGroup() throws IdentitySCIMException {
 
-		GroupOperations operation;
-		try {
-			operation = new GroupOperations(provider, scimObject,
-					additionalProvisioningInformation);
-			operation.updateGroup();
-		} catch (ScimApiException | IdentitySCIMException e) {
-			throw new IdentitySCIMException("Unable to update the Group.", e);
-		}
-	}
+        GroupOperations operation;
+        try {
+            operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation);
+            operation.updateGroup();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to update the Group.", e);
+        }
+    }
 }

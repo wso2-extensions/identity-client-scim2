@@ -40,12 +40,10 @@ import java.util.Map;
 
 public class GroupOperations extends AbstractOperations {
 
-    private static Logger logger = LoggerFactory.getLogger(UserOperations.class
-            .getName());
+    private static Logger logger = LoggerFactory.getLogger(UserOperations.class.getName());
 
     public GroupOperations(SCIMProvider scimProvider, SCIMObject object,
                            Map<String, Object> additionalInformation) throws ScimApiException {
-
         super(scimProvider, object, additionalInformation);
     }
 
@@ -55,9 +53,7 @@ public class GroupOperations extends AbstractOperations {
             SCIMClient scimClient = new SCIMClient();
             //get list of users in the group, if any, by userNames
             List<String> users = ((Group) scimObject).getMembersWithDisplayName();
-
             Group copiedGroup = null;
-
             if (CollectionUtils.isNotEmpty(users)) {
                 //create a deep copy of the group since we are going to update the member ids
                 copiedGroup = (Group) CopyUtil.deepCopy(scimObject);
@@ -67,8 +63,8 @@ public class GroupOperations extends AbstractOperations {
                 //get corresponding userIds
                 for (String user : users) {
                     String filter = USER_FILTER + user;
-                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.USER);
-
+                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null,
+                            SCIM2CommonConstants.USER);
                     String userId = null;
                     for (SCIMObject filteredUser : filteredUsers) {
                         userId = ((User) filteredUser).getId();
@@ -82,17 +78,12 @@ public class GroupOperations extends AbstractOperations {
                 encodedGroup = scimClient.encodeSCIMObject(copiedGroup,
                         SCIMConstants.JSON);
             } else {
-                encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
-                        SCIMConstants.JSON);
+                encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
             }
-
             client.setURL(groupEPURL);
             Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-
             ScimApiResponse<String> response = api.createGroup(null, null, encodedGroup);
-
             logger.info("SCIM - create group operation returned with response code: " + response.getStatusCode());
-
             if (logger.isDebugEnabled()) {
                 logger.debug("Create Group Response: " + response.getData());
             }
@@ -116,21 +107,17 @@ public class GroupOperations extends AbstractOperations {
 
         try {
             String filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
-
-            List<Group> groups = (List<Group>)(List<?>)listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.GROUP);
-            if(groups != null && groups.size() > 0) {
+            List<Group> groups = (List<Group>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null,
+                    SCIM2CommonConstants.GROUP);
+            if (groups != null && groups.size() > 0) {
                 String groupId = groups.get(0).getId();
-
                 if (groupId == null) {
                     return;
                 }
-
-                client.setURL(groupEPURL+"/"+groupId);
+                client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
                 ScimApiResponse<String> response = api.deleteGroup();
-
-                logger.info("SCIM - delete group operation returned with response code: " +
-                        response.getStatusCode());
+                logger.info("SCIM - delete group operation returned with response code: " + response.getStatusCode());
                 handleSCIMErrorResponse(response);
             }
         } catch (AbstractCharonException | IOException e) {
@@ -143,7 +130,6 @@ public class GroupOperations extends AbstractOperations {
     public void updateGroup() throws IdentitySCIMException {
 
         String filter;
-
         try {
             //check if role name is updated
             if (additionalInformation != null && (Boolean) additionalInformation.get(
@@ -152,25 +138,19 @@ public class GroupOperations extends AbstractOperations {
             } else {
                 filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
             }
-
-            List<Group> groups = (List<Group>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null, SCIM2CommonConstants.GROUP);
-            if(groups != null && groups.size() > 0) {
+            List<Group> groups = (List<Group>) (List<?>) listWithGet(null, null, filter, 1, 1, null, null,
+                    SCIM2CommonConstants.GROUP);
+            if (groups != null && groups.size() > 0) {
                 SCIMClient scimClient = new SCIMClient();
                 String groupId = groups.get(0).getId();
-
                 if (groupId == null) {
                     return;
                 }
-
-                String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
-                        SCIMConstants.JSON);
-
-                client.setURL(groupEPURL+"/"+groupId);
+                String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
                 ScimApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
-
                 logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
-
                 if (logger.isDebugEnabled()) {
                     logger.debug("Update Group Response: " + response.getData());
                 }
@@ -190,5 +170,4 @@ public class GroupOperations extends AbstractOperations {
             throw new IdentitySCIMException(e.getMessage(), e);
         }
     }
-
 }

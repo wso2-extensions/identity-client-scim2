@@ -29,17 +29,15 @@ import java.util.List;
 public class Scimv2BulkApi extends Scimv2BaseApi {
 
     public Scimv2BulkApi() {
-
         this(Configuration.getDefaultScimApiClient());
     }
 
     public Scimv2BulkApi(ScimApiClient scimApiClient) {
-
         super(scimApiClient);
     }
-    
-    private Call createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
 
+    private Call createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
         Call call = createResourceCall(attributes, excludedAttributes, body);
         return call;
     }
@@ -47,13 +45,15 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
     /**
      * Return the bulk which was created.
      * Returns HTTP 201 if the bulk is successfully created.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
+     * @param body               (optional)
      * @return String
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public String createBulk(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+    public String createBulk(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
         ScimApiResponse<String> resp = createBulkWithHttpInfo(attributes, excludedAttributes, body);
         return resp.getData();
     }
@@ -61,15 +61,17 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
     /**
      * Return the bulk which was created.
      * Returns HTTP 201 if the bulk is successfully created.
-     * @param attributes SCIM defined attributes parameter. (optional)
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
-     * @param body  (optional)
+     * @param body               (optional)
      * @return ScimApiResponse&lt;String&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ScimApiResponse<String> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes, String body) throws ScimApiException {
+    public ScimApiResponse<String> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
+                                                          String body) throws ScimApiException {
         Call call = createBulkValidateBeforeCall(attributes, excludedAttributes, body);
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 }

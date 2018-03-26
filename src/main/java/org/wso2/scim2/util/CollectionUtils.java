@@ -26,15 +26,15 @@ public class CollectionUtils {
 
     public static boolean sizeIsEmpty(Object object) {
         if (object instanceof Collection) {
-            return ((Collection)object).isEmpty();
+            return ((Collection) object).isEmpty();
         } else if (object instanceof Map) {
-            return ((Map)object).isEmpty();
+            return ((Map) object).isEmpty();
         } else if (object instanceof Object[]) {
-            return ((Object[])((Object[])object)).length == 0;
+            return ((Object[]) ((Object[]) object)).length == 0;
         } else if (object instanceof Iterator) {
-            return !((Iterator)object).hasNext();
+            return !((Iterator) object).hasNext();
         } else if (object instanceof Enumeration) {
-            return !((Enumeration)object).hasMoreElements();
+            return !((Enumeration) object).hasMoreElements();
         } else if (object == null) {
             throw new IllegalArgumentException("Unsupported object type: null");
         } else {

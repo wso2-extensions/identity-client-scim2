@@ -28,17 +28,14 @@ import java.lang.reflect.Type;
 public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
 
     public Scimv2ServiceProviderConfigApi() {
-
         this(Configuration.getDefaultScimApiClient());
     }
 
     public Scimv2ServiceProviderConfigApi(ScimApiClient scimApiClient) {
-
         super(scimApiClient);
     }
-    
-    private Call getServiceProviderConfigValidateBeforeCall() throws ScimApiException {
 
+    private Call getServiceProviderConfigValidateBeforeCall() throws ScimApiException {
         Call call = getResourceTypeCall();
         return call;
     }
@@ -46,6 +43,7 @@ public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
     /**
      * Return the ServiceProviderConfig schema.
      * Returns HTTP 200 if the schema is found.
+     *
      * @return String
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
@@ -57,12 +55,13 @@ public class Scimv2ServiceProviderConfigApi extends Scimv2BaseApi {
     /**
      * Return the ServiceProviderConfig schema.
      * Returns HTTP 200 if the schema is found.
+     *
      * @return ScimApiResponse&lt;String&gt;
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> getServiceProviderConfigWithHttpInfo() throws ScimApiException {
         Call call = getServiceProviderConfigValidateBeforeCall();
-        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 }
