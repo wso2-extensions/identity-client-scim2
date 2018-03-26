@@ -201,7 +201,7 @@ public class ScimApiClient {
      * @param verifyingSsl True to verify TLS/SSL connection
      * @return ScimApiClient
      */
-    public ScimApiClient setVerifyingSsl(boolean verifyingSsl) {
+    public ScimApiClient setVerifyingSsl(boolean verifyingSsl) throws ApiException{
         this.verifyingSsl = verifyingSsl;
         applySslSettings();
         return this;
@@ -223,7 +223,7 @@ public class ScimApiClient {
      * @param sslCaCert input stream for SSL CA cert
      * @return ScimApiClient
      */
-    public ScimApiClient setSslCaCert(InputStream sslCaCert) {
+    public ScimApiClient setSslCaCert(InputStream sslCaCert) throws ApiException{
         this.sslCaCert = sslCaCert;
         applySslSettings();
         return this;
@@ -240,7 +240,7 @@ public class ScimApiClient {
      * @param managers The KeyManagers to use
      * @return ScimApiClient
      */
-    public ScimApiClient setKeyManagers(KeyManager[] managers) {
+    public ScimApiClient setKeyManagers(KeyManager[] managers) throws ApiException{
         this.keyManagers = managers;
         applySslSettings();
         return this;
@@ -409,14 +409,14 @@ public class ScimApiClient {
      *
      * @param username Username
      */
-    public void setUsername(String username) {
+    public void setUsername(String username) throws ApiException{
         for (Authentication auth : authentications.values()) {
             if (auth instanceof HttpBasicAuth) {
                 ((HttpBasicAuth) auth).setUsername(username);
                 return;
             }
         }
-        throw new RuntimeException("No HTTP basic authentication configured!");
+        throw new ApiException("No HTTP basic authentication configured!");
     }
 
     /**
@@ -424,14 +424,14 @@ public class ScimApiClient {
      *
      * @param password Password
      */
-    public void setPassword(String password) {
+    public void setPassword(String password) throws ApiException{
         for (Authentication auth : authentications.values()) {
             if (auth instanceof HttpBasicAuth) {
                 ((HttpBasicAuth) auth).setPassword(password);
                 return;
             }
         }
-        throw new RuntimeException("No HTTP basic authentication configured!");
+        throw new ApiException("No HTTP basic authentication configured!");
     }
 
     /**
@@ -439,14 +439,14 @@ public class ScimApiClient {
      *
      * @param apiKey API key
      */
-    public void setApiKey(String apiKey) {
+    public void setApiKey(String apiKey) throws ApiException{
         for (Authentication auth : authentications.values()) {
             if (auth instanceof ApiKeyAuth) {
                 ((ApiKeyAuth) auth).setApiKey(apiKey);
                 return;
             }
         }
-        throw new RuntimeException("No API key authentication configured!");
+        throw new ApiException("No API key authentication configured!");
     }
 
     /**
@@ -454,14 +454,14 @@ public class ScimApiClient {
      *
      * @param apiKeyPrefix API key prefix
      */
-    public void setApiKeyPrefix(String apiKeyPrefix) {
+    public void setApiKeyPrefix(String apiKeyPrefix) throws ApiException{
         for (Authentication auth : authentications.values()) {
             if (auth instanceof ApiKeyAuth) {
                 ((ApiKeyAuth) auth).setApiKeyPrefix(apiKeyPrefix);
                 return;
             }
         }
-        throw new RuntimeException("No API key authentication configured!");
+        throw new ApiException("No API key authentication configured!");
     }
 
     /**
@@ -469,14 +469,14 @@ public class ScimApiClient {
      *
      * @param accessToken Access token
      */
-    public void setAccessToken(String accessToken) {
+    public void setAccessToken(String accessToken) throws ApiException{
         for (Authentication auth : authentications.values()) {
             if (auth instanceof OAuth) {
                 ((OAuth) auth).setAccessToken(accessToken);
                 return;
             }
         }
-        throw new RuntimeException("No OAuth2 authentication configured!");
+        throw new ApiException("No OAuth2 authentication configured!");
     }
 
     /**
@@ -1128,10 +1128,11 @@ public class ScimApiClient {
      * @param queryParams  List of query parameters
      * @param headerParams  Map of header parameters
      */
-    public void updateParamsForAuth(String[] authNames, List<Pair> queryParams, Map<String, String> headerParams) {
+    public void updateParamsForAuth(String[] authNames, List<Pair> queryParams, Map<String, String> headerParams)
+            throws ApiException{
         for (String authName : authNames) {
             Authentication auth = authentications.get(authName);
-            if (auth == null) throw new RuntimeException("Authentication undefined: " + authName);
+            if (auth == null) throw new ApiException("Authentication undefined: " + authName);
             auth.applyToParams(queryParams, headerParams);
         }
     }
@@ -1212,7 +1213,7 @@ public class ScimApiClient {
      * Apply SSL related settings to httpClient according to the current values of
      * verifyingSsl and sslCaCert.
      */
-    private void applySslSettings() {
+    private void applySslSettings() throws ApiException{
         try {
             TrustManager[] trustManagers = null;
             HostnameVerifier hostnameVerifier = null;
@@ -1258,7 +1259,7 @@ public class ScimApiClient {
             }
             httpClient.setHostnameVerifier(hostnameVerifier);
         } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            throw new ApiException(e);
         }
     }
 

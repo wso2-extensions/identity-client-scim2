@@ -152,8 +152,7 @@ public class SCIMClient {
      * @param resourceSchema
      * @return
      */
-    public SCIMObject decodeSCIMResponse(String scimResponse, String format,
-                                         ResourceTypeSchema resourceSchema,
+    public SCIMObject decodeSCIMResponse(String scimResponse, String format, ResourceTypeSchema resourceSchema,
                                          AbstractSCIMObject scimObject)
             throws CharonException, BadRequestException, InternalErrorException {
 

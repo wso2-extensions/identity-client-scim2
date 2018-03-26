@@ -57,7 +57,7 @@ public abstract class AbstractOperations {
     protected ScimApiClient client;
 
     public AbstractOperations(SCIMProvider scimProvider, SCIMObject object,
-                           Map<String, Object> additionalInformation) {
+                           Map<String, Object> additionalInformation) throws ApiException {
 
         provider = scimProvider;
         scimObject = object;

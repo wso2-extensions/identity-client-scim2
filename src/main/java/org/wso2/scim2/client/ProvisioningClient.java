@@ -16,6 +16,7 @@
 
 package org.wso2.scim2.client;
 
+import io.scim2.swagger.client.ApiException;
 import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.operation.GroupOperations;
@@ -57,43 +58,73 @@ public class ProvisioningClient {
      */
 	public void provisionCreateUser() throws IdentitySCIMException {
 
-		UserOperations operation = new UserOperations(provider, scimObject,
-				additionalProvisioningInformation);
-		operation.createUser();
+		UserOperations operation;
+		try {
+			operation = new UserOperations(provider, scimObject,
+					additionalProvisioningInformation);
+			operation.createUser();
+		} catch (ApiException | IdentitySCIMException e) {
+			throw new IdentitySCIMException("Unable to create the User.", e);
+		}
 	}
 	
 	public void provisionDeleteUser() throws IdentitySCIMException {
 
-		UserOperations operation = new UserOperations(provider, scimObject,
-				additionalProvisioningInformation);
-		operation.deleteUser();
+		UserOperations operation;
+		try {
+			operation = new UserOperations(provider, scimObject,
+					additionalProvisioningInformation);
+			operation.deleteUser();
+		} catch (ApiException | IdentitySCIMException e) {
+			throw new IdentitySCIMException("Unable to delete the User.", e);
+		}
 	}
 
 	public void provisionUpdateUser() throws IdentitySCIMException {
 
-	    UserOperations operation = new UserOperations(provider, scimObject,
-                additionalProvisioningInformation);
-        operation.updateUser();
-    }
+		UserOperations operation;
+		try {
+			operation = new UserOperations(provider, scimObject,
+					additionalProvisioningInformation);
+			operation.updateUser();
+		} catch (ApiException | IdentitySCIMException e) {
+			throw new IdentitySCIMException("Unable to update the User.", e);
+		}
+	}
 
 	public void provisionCreateGroup() throws IdentitySCIMException {
 
-		GroupOperations operation = new GroupOperations(provider, scimObject,
-				additionalProvisioningInformation);
-		operation.createGroup();
+		GroupOperations operation;
+		try {
+			operation = new GroupOperations(provider, scimObject,
+					additionalProvisioningInformation);
+			operation.createGroup();
+		} catch (ApiException | IdentitySCIMException e) {
+			throw new IdentitySCIMException("Unable to create the Group.", e);
+		}
 	}
 
     public void provisionDeleteGroup() throws IdentitySCIMException {
 
-        GroupOperations operation = new GroupOperations(provider, scimObject,
-                additionalProvisioningInformation);
-        operation.deleteGroup();
-    }
+		GroupOperations operation;
+		try {
+			operation = new GroupOperations(provider, scimObject,
+					additionalProvisioningInformation);
+			operation.deleteGroup();
+		} catch (ApiException | IdentitySCIMException e) {
+			throw new IdentitySCIMException("Unable to delete the Group.", e);
+		}
+	}
 
 	public void provisionUpdateGroup() throws IdentitySCIMException {
 
-		GroupOperations operation = new GroupOperations(provider, scimObject,
-				additionalProvisioningInformation);
-		operation.updateGroup();
+		GroupOperations operation;
+		try {
+			operation = new GroupOperations(provider, scimObject,
+					additionalProvisioningInformation);
+			operation.updateGroup();
+		} catch (ApiException | IdentitySCIMException e) {
+			throw new IdentitySCIMException("Unable to update the Group.", e);
+		}
 	}
 }

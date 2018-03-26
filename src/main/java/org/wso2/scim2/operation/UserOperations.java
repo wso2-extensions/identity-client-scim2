@@ -42,7 +42,7 @@ public class UserOperations extends AbstractOperations {
             .getName());
 
     public UserOperations(SCIMProvider scimProvider, SCIMObject object,
-                          Map<String, Object> additionalInformation) {
+                          Map<String, Object> additionalInformation) throws ApiException{
 
         super(scimProvider, object, additionalInformation);
     }
