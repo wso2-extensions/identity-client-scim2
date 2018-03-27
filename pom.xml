@@ -164,6 +164,13 @@
         </plugins>
     </build>
 
+    <scm>
+        <url>https://github.com/wso2-extensions/identity-client-scim2.git</url>
+        <developerConnection>scm:git:https://github.com/wso2-extensions/identity-client-scim2.git</developerConnection>
+        <connection>scm:git:https://github.com/wso2-extensions/identity-client-scim2.git</connection>
+        <tag>HEAD</tag>
+    </scm>
+
     <profiles>
         <profile>
             <id>sign-artifacts</id>
