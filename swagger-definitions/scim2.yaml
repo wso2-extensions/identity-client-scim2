@@ -1,0 +1,712 @@
+swagger: '2.0'
+info:
+  description: SCIM 2.0 APIs Documentation
+  version: 1.0.0
+  title: SCIM 2.0 APIs Documentation
+  contact:
+    name: WSO2 Identity Server Team
+    url: 'http://wso2.com'
+    email: dev@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+paths:
+  /scim/v2/Users:
+    get:
+      tags:
+        - scimv2Users
+      summary: 'Return users according to the filter, sort and pagination parameters'
+      description: Returns HTTP 404 if the users are not found.
+      operationId: getUser
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: filter
+          in: query
+          description: Filter expression for filtering
+          required: false
+          type: string
+        - name: startIndex
+          in: query
+          description: The 1-based index of the first query result
+          required: false
+          type: integer
+          format: int32
+        - name: count
+          in: query
+          description: Specifies the desired maximum number of query results per page.
+          required: false
+          type: integer
+          format: int32
+        - name: sortBy
+          in: query
+          description: |-
+            Specifies the attribute whose value
+            SHALL be used to order the returned responses
+          required: false
+          type: string
+        - name: sortOder
+          in: query
+          description: The order in which the "sortBy" parameter is applied.
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Valid users are found
+          schema:
+            type: string
+        '404':
+          description: Valid users are not found
+    post:
+      tags:
+        - scimv2Users
+      summary: Return the user which was created
+      description: Returns HTTP 201 if the user is successfully created.
+      operationId: createUser
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Valid user is created
+          schema:
+            type: string
+        '404':
+          description: User is not found
+  /scim/v2/Users/.search:
+    post:
+      tags:
+        - scimv2Users
+      summary: 'Return users according to the filter, sort and pagination parameters'
+      description: Returns HTTP 404 if the users are not found.
+      operationId: getUsersByPost
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Valid users are found
+          schema:
+            type: string
+        '404':
+          description: Valid users are not found
+  '/scim/v2/Users/{id}':
+    get:
+      tags:
+        - scimv2Users
+      summary: Return the user with the given id
+      description: Returns HTTP 200 if the user is found.
+      operationId: getUser by id
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the resource type.
+          required: true
+          type: string
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+      responses:
+        '200':
+          description: Valid user is found
+          schema:
+            type: string
+        '404':
+          description: Valid user is not found
+    put:
+      tags:
+        - scimv2Users
+      summary: Return the updated user
+      description: Returns HTTP 404 if the user is not found.
+      operationId: updateUser
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the resource type.
+          required: true
+          type: string
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User is updated
+          schema:
+            type: string
+        '404':
+          description: Valid user is not found
+    delete:
+      tags:
+        - scimv2Users
+      summary: Delete the user with the given id
+      description: Returns HTTP 204 if the user is successfully deleted.
+      operationId: deleteUser
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the resource type.
+          required: true
+          type: string
+      responses:
+        '204':
+          description: User is deleted
+        '404':
+          description: Valid user is not found
+  /scim/v2/Groups:
+    get:
+      tags:
+        - scimv2Groups
+      summary: 'Return groups according to the filter, sort and pagination parameters'
+      description: Returns HTTP 404 if the groups are not found.
+      operationId: getGroup
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: filter
+          in: query
+          description: Filter expression for filtering
+          required: false
+          type: string
+        - name: startIndex
+          in: query
+          description: The 1-based index of the first query result
+          required: false
+          type: integer
+          format: int32
+        - name: count
+          in: query
+          description: Specifies the desired maximum number of query results per page.
+          required: false
+          type: integer
+          format: int32
+        - name: sortBy
+          in: query
+          description: |-
+            Specifies the attribute whose value
+            SHALL be used to order the returned responses
+          required: false
+          type: string
+        - name: sortOder
+          in: query
+          description: The order in which the "sortBy" parameter is applied.
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Valid groups are found
+          schema:
+            type: string
+        '404':
+          description: Valid groups are not found
+    post:
+      tags:
+        - scimv2Groups
+      summary: Return the group which was created
+      description: Returns HTTP 201 if the group is successfully created.
+      operationId: createGroup
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Valid group is created
+          schema:
+            type: string
+        '404':
+          description: Group is not found
+  /scim/v2/Groups/.search:
+    post:
+      tags:
+        - scimv2Groups
+      summary: 'Return groups according to the filter, sort and pagination parameters'
+      description: Returns HTTP 404 if the groups are not found.
+      operationId: getGroupsByPost
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Valid groups are found
+          schema:
+            type: string
+        '404':
+          description: Valid groups are not found
+  '/scim/v2/Groups/{id}':
+    get:
+      tags:
+        - scimv2Groups
+      summary: Return the group with the given id
+      description: Returns HTTP 200 if the group is found.
+      operationId: getGroup by id
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the resource type.
+          required: true
+          type: string
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+      responses:
+        '200':
+          description: Valid group is found
+          schema:
+            type: string
+        '404':
+          description: Valid group is not found
+    put:
+      tags:
+        - scimv2Groups
+      summary: Return the updated group
+      description: Returns HTTP 404 if the group is not found.
+      operationId: updateGroup
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the resource type.
+          required: true
+          type: string
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group is updated
+          schema:
+            type: string
+        '404':
+          description: Valid group is not found
+    delete:
+      tags:
+        - scimv2Groups
+      summary: Delete the group with the given id
+      description: Returns HTTP 204 if the group is successfully deleted.
+      operationId: deleteGroup
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the resource type.
+          required: true
+          type: string
+      responses:
+        '204':
+          description: Group is deleted
+        '404':
+          description: Valid group is not found
+  /scim/v2/Me:
+    get:
+      tags:
+        - scimv2Me
+      summary: Return the authenticated user.
+      description: Returns HTTP 200 if the user is found.
+      operationId: getMe
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+      responses:
+        '200':
+          description: Valid user is found
+          schema:
+            type: string
+        '404':
+          description: Valid user is not found
+    post:
+      tags:
+        - scimv2Me
+      summary: Return the user which was anonymously created
+      description: Returns HTTP 201 if the user is successfully created.
+      operationId: createMe
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Valid user is created
+          schema:
+            type: string
+        '404':
+          description: User is not found
+    put:
+      tags:
+        - scimv2Me
+      summary: Return the updated user
+      description: Returns HTTP 404 if the user is not found.
+      operationId: updateMe
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User is updated
+          schema:
+            type: string
+        '404':
+          description: Valid user is not found
+    delete:
+      tags:
+        - scimv2Me
+      summary: Delete the authenticated user.
+      description: Returns HTTP 204 if the user is successfully deleted.
+      operationId: deleteMe
+      produces:
+        - application/json
+        - application/scim+json
+      parameters: []
+      responses:
+        '204':
+          description: User is deleted
+        '404':
+          description: Valid user is not found
+  /scim/v2/Bulk:
+    post:
+      tags:
+        - scimv2Bulk
+      summary: Return the bulk which was created.
+      description: Returns HTTP 201 if the bulk is successfully created.
+      operationId: createBulk
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Valid bulk is created
+          schema:
+            type: string
+        '404':
+          description: Bulk is not found
+  /scim/v2/ResourceType:
+    get:
+      tags:
+        - scimv2ResourceType
+      summary: Return the ResourceType schema.
+      description: Returns HTTP 200 if the schema is found.
+      operationId: getResourceType
+      produces:
+        - application/json
+        - application/scim+json
+      parameters: []
+      responses:
+        '200':
+          description: Schema is found
+          schema:
+            type: string
+        '404':
+          description: Schema is not found
+  /scim/v2/ServiceProviderConfig:
+    get:
+      tags:
+        - scimv2ServiceProviderConfig
+      summary: Return the ServiceProviderConfig schema.
+      description: Returns HTTP 200 if the schema is found.
+      operationId: getServiceProviderConfig
+      produces:
+        - application/json
+        - application/scim+json
+      parameters: []
+      responses:
+        '200':
+          description: Schema is found
+          schema:
+            type: string
+        '404':
+          description: Schema is not found
+securityDefinitions:
+  basicAuth:
+    type: basic
+security:
+  - basicAuth: []

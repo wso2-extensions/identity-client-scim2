@@ -1,0 +1,56 @@
+swagger: '2.0'
+info:
+  description: SCIM 2.0 /Bulk endpoint
+  version: '1.0'
+  title: /Bulk Endpoint Swagger Definition
+  contact:
+    name: WSO2 Identity Server Team
+    url: 'http://wso2.com'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+basePath: /scim/v2/Bulk
+tags:
+  - name: scimv2Bulk
+paths:
+  /scim/v2/Bulk:
+    post:
+      tags:
+        - scimv2Bulk
+      summary: Return the bulk which was created.
+      description: Returns HTTP 201 if the bulk is successfully created.
+      operationId: createBulk
+      consumes:
+        - application/scim+json
+      produces:
+        - application/json
+        - application/scim+json
+      parameters:
+        - name: attributes
+          in: query
+          description: SCIM defined attributes parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - name: excludedAttributes
+          in: query
+          description: SCIM defined excludedAttribute parameter.
+          required: false
+          type: array
+          uniqueItems: true
+          collectionFormat: csv
+          items:
+            type: string
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Valid bulk is created
+        '404':
+          description: Bulk is not found
