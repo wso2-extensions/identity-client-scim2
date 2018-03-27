@@ -20,10 +20,6 @@ Returns HTTP 201 if the user is successfully created.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2MeApi;
-
 
 Scimv2MeApi apiInstance = new Scimv2MeApi();
 List<String> attributes = Arrays.asList("attributes_example"); // List<String> | SCIM defined attributes parameter.
@@ -31,7 +27,7 @@ List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); /
 String body = "body_example"; // String | 
 try {
     apiInstance.createMe(attributes, excludedAttributes, body);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2MeApi#createMe");
     e.printStackTrace();
 }
@@ -68,15 +64,11 @@ Returns HTTP 204 if the user is successfully deleted.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2MeApi;
-
 
 Scimv2MeApi apiInstance = new Scimv2MeApi();
 try {
     apiInstance.deleteMe();
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2MeApi#deleteMe");
     e.printStackTrace();
 }
@@ -108,17 +100,13 @@ Returns HTTP 200 if the user is found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2MeApi;
-
 
 Scimv2MeApi apiInstance = new Scimv2MeApi();
 List<String> attributes = Arrays.asList("attributes_example"); // List<String> | SCIM defined attributes parameter.
 List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); // List<String> | SCIM defined excludedAttribute parameter.
 try {
     apiInstance.getMe(attributes, excludedAttributes);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2MeApi#getMe");
     e.printStackTrace();
 }
@@ -154,10 +142,6 @@ Returns HTTP 404 if the user is not found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2MeApi;
-
 
 Scimv2MeApi apiInstance = new Scimv2MeApi();
 List<String> attributes = Arrays.asList("attributes_example"); // List<String> | SCIM defined attributes parameter.
@@ -165,7 +149,7 @@ List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); /
 String body = "body_example"; // String | 
 try {
     apiInstance.updateMe(attributes, excludedAttributes, body);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2MeApi#updateMe");
     e.printStackTrace();
 }

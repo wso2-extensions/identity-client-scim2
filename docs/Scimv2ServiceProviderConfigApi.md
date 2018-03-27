@@ -17,15 +17,11 @@ Returns HTTP 200 if the schema is found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2ServiceProviderConfigApi;
-
 
 Scimv2ServiceProviderConfigApi apiInstance = new Scimv2ServiceProviderConfigApi();
 try {
     apiInstance.getServiceProviderConfig();
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2ServiceProviderConfigApi#getServiceProviderConfig");
     e.printStackTrace();
 }

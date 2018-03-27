@@ -17,10 +17,6 @@ Returns HTTP 201 if the bulk is successfully created.
 
 ### Example
 ```java
-// Import classes:
-//import io.swagger.client.ApiException;
-//import io.swagger.client.api.Scimv2BulkApi;
-
 
 Scimv2BulkApi apiInstance = new Scimv2BulkApi();
 List<String> attributes = Arrays.asList("attributes_example"); // List<String> | SCIM defined attributes parameter.
@@ -28,7 +24,7 @@ List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); /
 String body = "body_example"; // String | 
 try {
     apiInstance.createBulk(attributes, excludedAttributes, body);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2BulkApi#createBulk");
     e.printStackTrace();
 }
