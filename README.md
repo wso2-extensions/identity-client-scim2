@@ -50,14 +50,6 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```java
 
-import io.scim2.swagger.client.*;
-import io.scim2.swagger.client.auth.*;
-import io.scim2.swagger.client.model.*;
-import io.scim2.swagger.client.api.Scimv2BulkApi;
-
-import java.io.File;
-import java.util.*;
-
 public class Scimv2BulkApiExample {
 
     public static void main(String[] args) {
@@ -68,7 +60,7 @@ public class Scimv2BulkApiExample {
         String body = "body_example"; // String | 
         try {
             apiInstance.createBulk(attributes, excludedAttributes, body);
-        } catch (ApiException e) {
+        } catch (ScimApiException e) {
             System.err.println("Exception when calling Scimv2BulkApi#createBulk");
             e.printStackTrace();
         }
@@ -114,7 +106,7 @@ Authentication schemes defined for the API:
 
 ## Recommendation
 
-It's recommended to create an instance of `ApiClient` per thread in a multithreaded environment to avoid any potential issues.
+It's recommended to create an instance of `ScimApiClient` per thread in a multithreaded environment to avoid any potential issues.
 
 ## Author
 

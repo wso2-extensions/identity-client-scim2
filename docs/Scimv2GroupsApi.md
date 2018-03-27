@@ -22,10 +22,6 @@ Returns HTTP 201 if the group is successfully created.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2GroupsApi;
-
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
 List<String> attributes = Arrays.asList("attributes_example"); // List<String> | SCIM defined attributes parameter.
@@ -33,7 +29,7 @@ List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); /
 String body = "body_example"; // String | 
 try {
     apiInstance.createGroup(attributes, excludedAttributes, body);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2GroupsApi#createGroup");
     e.printStackTrace();
 }
@@ -70,16 +66,12 @@ Returns HTTP 204 if the group is successfully deleted.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2GroupsApi;
-
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
 String id = "id_example"; // String | Unique id of the resource type.
 try {
     apiInstance.deleteGroup(id);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2GroupsApi#deleteGroup");
     e.printStackTrace();
 }
@@ -114,10 +106,6 @@ Returns HTTP 404 if the groups are not found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2GroupsApi;
-
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
 List<String> attributes = Arrays.asList("attributes_example"); // List<String> | SCIM defined attributes parameter.
@@ -129,7 +117,7 @@ String sortBy = "sortBy_example"; // String | Specifies the attribute whose valu
 String sortOder = "sortOder_example"; // String | The order in which the \"sortBy\" parameter is applied.
 try {
     apiInstance.getGroup(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2GroupsApi#getGroup");
     e.printStackTrace();
 }
@@ -170,10 +158,6 @@ Returns HTTP 200 if the group is found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2GroupsApi;
-
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
 String id = "id_example"; // String | Unique id of the resource type.
@@ -181,7 +165,7 @@ List<String> attributes = Arrays.asList("attributes_example"); // List<String> |
 List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); // List<String> | SCIM defined excludedAttribute parameter.
 try {
     apiInstance.getGroupById(id, attributes, excludedAttributes);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2GroupsApi#getGroupById");
     e.printStackTrace();
 }
@@ -218,16 +202,12 @@ Returns HTTP 404 if the groups are not found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2GroupsApi;
-
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
 String body = "body_example"; // String | 
 try {
     apiInstance.getGroupsByPost(body);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2GroupsApi#getGroupsByPost");
     e.printStackTrace();
 }
@@ -262,10 +242,6 @@ Returns HTTP 404 if the group is not found.
 
 ### Example
 ```java
-// Import classes:
-//import io.scim2.swagger.client.ScimApiException;
-//import io.scim2.swagger.client.api.Scimv2GroupsApi;
-
 
 Scimv2GroupsApi apiInstance = new Scimv2GroupsApi();
 String id = "id_example"; // String | Unique id of the resource type.
@@ -274,7 +250,7 @@ List<String> excludedAttributes = Arrays.asList("excludedAttributes_example"); /
 String body = "body_example"; // String | 
 try {
     apiInstance.updateGroup(id, attributes, excludedAttributes, body);
-} catch (ApiException e) {
+} catch (ScimApiException e) {
     System.err.println("Exception when calling Scimv2GroupsApi#updateGroup");
     e.printStackTrace();
 }
