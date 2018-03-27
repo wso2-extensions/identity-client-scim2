@@ -50,10 +50,10 @@ Please follow the [installation](#installation) instruction and execute the foll
 
 ```java
 
-import io.swagger.client.*;
-import io.swagger.client.auth.*;
-import io.swagger.client.model.*;
-import io.swagger.client.api.Scimv2BulkApi;
+import io.scim2.swagger.client.*;
+import io.scim2.swagger.client.auth.*;
+import io.scim2.swagger.client.model.*;
+import io.scim2.swagger.client.api.Scimv2BulkApi;
 
 import java.io.File;
 import java.util.*;
