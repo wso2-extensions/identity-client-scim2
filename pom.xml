@@ -336,6 +336,7 @@
         <maven-plugin-version>1.0.0</maven-plugin-version>
         <junit-version>4.12</junit-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.scm.id>wso2-scm-server</project.scm.id>
     </properties>
     
     <repositories>
