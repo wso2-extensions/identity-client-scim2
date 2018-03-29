@@ -124,7 +124,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
                             Integer count, String sortBy, String sortOrder) throws ScimApiException {
 
         Object localVarPostBody = null;
-        List<Pair> localVarQueryParams = new ArrayList<>();
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
             localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes",
                     attributes));
@@ -143,8 +143,8 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
         if (sortOrder != null)
             localVarQueryParams.addAll(scimApiClient.parameterToPairs("", "sortOrder", sortOrder));
 
-        Map<String, String> localVarHeaderParams = new HashMap<>();
-        Map<String, Object> localVarFormParams = new HashMap<>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
         /*final String[] localVarAccepts = {
             "application/json", "application/scim+json"
         };
@@ -295,7 +295,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
             throws ScimApiException {
 
         Object localVarPostBody = body;
-        List<Pair> localVarQueryParams = new ArrayList<>();
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
             localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "attributes",
                     attributes));
@@ -303,8 +303,8 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
             localVarQueryParams.addAll(scimApiClient.parameterToPairs("csv", "excludedAttributes",
                     excludedAttributes));
 
-        Map<String, String> localVarHeaderParams = new HashMap<>();
-        Map<String, Object> localVarFormParams = new HashMap<>();
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
         final String[] localVarAccepts = {"application/json", "application/scim+json"};
         final String localVarAccept = scimApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);

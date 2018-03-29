@@ -75,7 +75,7 @@ public abstract class AbstractOperations {
                                         int startIndex, int count, String sortBy, String sortOrder, int resourceType)
             throws ScimApiException, AbstractCharonException, IOException {
 
-        List<SCIMObject> returnedSCIMObject = new ArrayList<>();
+        List<SCIMObject> returnedSCIMObject = new ArrayList<SCIMObject>();
         SCIMClient scimClient = new SCIMClient();
         if (startIndex < 1) {
             startIndex = 1;
