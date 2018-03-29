@@ -96,10 +96,12 @@ public class GroupOperations extends AbstractOperations {
                         scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
                 logger.error(exception.getMessage());
             }
-        } catch (IOException | AbstractCharonException e) {
+        } catch (IOException e) {
             throw new IdentitySCIMException("Error in provisioning 'create group' operation for user : " + userName, e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
+        } catch ( AbstractCharonException e){
+            throw new IdentitySCIMException("Error in provisioning 'create group' operation for user : " + userName, e);
         }
     }
 
@@ -120,10 +122,12 @@ public class GroupOperations extends AbstractOperations {
                 logger.info("SCIM - delete group operation returned with response code: " + response.getStatusCode());
                 handleSCIMErrorResponse(response);
             }
-        } catch (AbstractCharonException | IOException e) {
+        } catch (AbstractCharonException e) {
             throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user : " + userName, e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user : " + userName, e);
         }
     }
 
@@ -164,10 +168,12 @@ public class GroupOperations extends AbstractOperations {
                     logger.error(exception.getMessage());
                 }
             }
-        } catch (AbstractCharonException | IOException e) {
+        } catch (AbstractCharonException e) {
             throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         }
     }
 }

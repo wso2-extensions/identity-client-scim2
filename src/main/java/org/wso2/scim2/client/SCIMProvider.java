@@ -27,7 +27,7 @@ public class SCIMProvider {
 
     private String id;
     private Map<String, String> properties = new HashMap<String, String>();
-    private List<PatchOperation> patchOperationList = new ArrayList<>();
+    private List<PatchOperation> patchOperationList = new ArrayList<PatchOperation>();
 
     public SCIMProvider() {
     }

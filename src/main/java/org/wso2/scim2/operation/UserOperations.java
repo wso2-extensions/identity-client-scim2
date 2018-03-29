@@ -108,7 +108,10 @@ public class UserOperations extends AbstractOperations {
             }
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
-        } catch (IOException | AbstractCharonException e) {
+        } catch (IOException e) {
+            throw new IdentitySCIMException(
+                    "Error in invoking provisioning operation for the user with id: " + userName, e);
+        } catch ( AbstractCharonException e){
             throw new IdentitySCIMException(
                     "Error in invoking provisioning operation for the user with id: " + userName, e);
         }
@@ -157,7 +160,10 @@ public class UserOperations extends AbstractOperations {
                     "Error in encoding the object to be provisioned for user : " + userName, e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
-        } catch (IOException | AbstractCharonException e) {
+        } catch (IOException e) {
+            throw new IdentitySCIMException(
+                    "Error in invoking provisioning operation for the user with id: " + userName, e);
+        } catch ( AbstractCharonException e){
             throw new IdentitySCIMException(
                     "Error in invoking provisioning operation for the user with id: " + userName, e);
         }
