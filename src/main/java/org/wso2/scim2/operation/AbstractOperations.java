@@ -21,8 +21,8 @@ import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import io.scim2.swagger.client.api.Scimv2UsersApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.charon3.core.config.CharonConfiguration;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
 import org.wso2.charon3.core.exceptions.BadRequestException;
@@ -45,7 +45,7 @@ public abstract class AbstractOperations {
     public static final String USER_FILTER = "userName%20Eq%20";
     public static final String GROUP_FILTER = "displayName%20Eq%20";
 
-    private static Logger logger = LoggerFactory.getLogger(AbstractOperations.class.getName());
+    private static Log logger = LogFactory.getLog(AbstractOperations.class.getName());
 
     protected SCIMObject scimObject;
     protected SCIMProvider provider;
