@@ -19,8 +19,8 @@ package org.wso2.scim2.operation;
 import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2UsersApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
 import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.objects.AbstractSCIMObject;
@@ -38,7 +38,7 @@ import java.util.Map;
 
 public class UserOperations extends AbstractOperations {
 
-    private static Logger logger = LoggerFactory.getLogger(UserOperations.class.getName());
+    private static final Log logger = LogFactory.getLog(UserOperations.class.getName());
 
     public UserOperations(SCIMProvider scimProvider, SCIMObject object,
                           Map<String, Object> additionalInformation) throws ScimApiException {
