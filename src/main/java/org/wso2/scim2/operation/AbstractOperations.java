@@ -45,7 +45,7 @@ public abstract class AbstractOperations {
     public static final String USER_FILTER = "userName%20Eq%20";
     public static final String GROUP_FILTER = "displayName%20Eq%20";
 
-    private static Log logger = LogFactory.getLog(AbstractOperations.class.getName());
+    private static final Log logger = LogFactory.getLog(AbstractOperations.class.getName());
 
     protected SCIMObject scimObject;
     protected SCIMProvider provider;

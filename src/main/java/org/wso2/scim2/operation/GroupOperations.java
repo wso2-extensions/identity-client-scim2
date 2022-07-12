@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class GroupOperations extends AbstractOperations {
 
-    private static Log logger = LogFactory.getLog(UserOperations.class.getName());
+    private static final Log logger = LogFactory.getLog(UserOperations.class.getName());
 
     public GroupOperations(SCIMProvider scimProvider, SCIMObject object,
                            Map<String, Object> additionalInformation) throws ScimApiException {

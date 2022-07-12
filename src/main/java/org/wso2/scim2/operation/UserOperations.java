@@ -38,7 +38,7 @@ import java.util.Map;
 
 public class UserOperations extends AbstractOperations {
 
-    private static Log logger = LogFactory.getLog(UserOperations.class.getName());
+    private static final Log logger = LogFactory.getLog(UserOperations.class.getName());
 
     public UserOperations(SCIMProvider scimProvider, SCIMObject object,
                           Map<String, Object> additionalInformation) throws ScimApiException {
