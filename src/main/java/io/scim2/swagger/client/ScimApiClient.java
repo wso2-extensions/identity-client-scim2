@@ -982,11 +982,7 @@ public class ScimApiClient {
             } else {
                 content = "";
             }
-            try {
-                return new ByteArrayEntity(content.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON);
-            } catch (UnsupportedCharsetException e) {
-                throw new ScimApiException("Unsupported encoding: UTF-8", e);
-            }
+            return new ByteArrayEntity(content.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON);
         } else {
             throw new ScimApiException("Content type \"" + contentType + "\" is not supported");
         }
@@ -1300,11 +1296,11 @@ public class ScimApiClient {
     public HttpEntity buildRequestBodyFormEncoding(Map<String, Object> formParams) {
 
         List<NameValuePair> params = new ArrayList<>();
-        for (Map.Entry<String, Object> param : formParams.entrySet()) {
+        for (Entry<String, Object> param : formParams.entrySet()) {
             params.add(new BasicNameValuePair(param.getKey(), parameterToString(param.getValue())));
         }
 
-        return new UrlEncodedFormEntity(params, ContentType.APPLICATION_FORM_URLENCODED.getCharset());
+        return new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
     }
 
     /**
