@@ -55,14 +55,24 @@
             <version>${swagger-core-version}</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp-version}</version>
+            <groupId>org.wso2.orbit.org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.orbit.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>logging-interceptor</artifactId>
-            <version>${okhttp-version}</version>
+            <groupId>org.apache.httpcomponents.wso2</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${httpcore.orbit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${httpclient.orbit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons-codec.orbit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -139,7 +149,12 @@
                             org.wso2.scim2.*;version=${project.version},
                             io.scim2.swagger.client.*;version=${project.version},
                             com.squareup.okio.*,
-                            com.squareup.okhttp.*,
+                            org.apache.http.auth.*; version="${httpclient.orbit.version}",
+                            org.apache.http.client.*; version="${httpclient.orbit.version}",
+                            org.apache.http.conn.*; version="${httpclient.orbit.version}",
+                            org.apache.http.impl.client; version="${httpclient.orbit.version}",
+                            org.apache.http.*;version="${httpcore.orbit.version}",
+                            org.apache.commons.codec.*;"${commons-codec.orbit.version}"
                             com.google.gson.*;version=${gson-version},
                             org.joda.time.*;version=${jodatime-version}
                         </Export-Package>
@@ -353,7 +368,9 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <swagger-core-version>1.5.15</swagger-core-version>
         <commons-lang.wso2.version>2.6.0.wso2v1</commons-lang.wso2.version>
-        <okhttp-version>2.7.5</okhttp-version>
+        <httpclient.orbit.version>4.5.13.wso2v1</httpclient.orbit.version>
+        <httpcore.orbit.version>4.4.16.wso2v1</httpcore.orbit.version>
+        <commons-codec.orbit.version>1.16.0.wso2v1</commons-codec.orbit.version>
         <gson-version>2.8.1</gson-version>
         <jodatime-version>2.9.9</jodatime-version>
         <commons.logging.version>1.2</commons.logging.version>

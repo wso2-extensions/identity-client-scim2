@@ -17,8 +17,12 @@
 package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.okhttp.Call;
-import io.scim2.swagger.client.*;
+import io.scim2.swagger.client.Configuration;
+import io.scim2.swagger.client.Pair;
+import io.scim2.swagger.client.ScimApiClient;
+import io.scim2.swagger.client.ScimApiException;
+import io.scim2.swagger.client.ScimApiResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -45,7 +49,7 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call createGroupCall(List<String> attributes, List<String> excludedAttributes, String body)
+    public HttpUriRequest createGroupCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
         Object localVarPostBody = body;
 
@@ -73,11 +77,10 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
                 localVarFormParams, localVarAuthNames);
     }
 
-    private Call createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+    private HttpUriRequest createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
 
-        Call call = createGroupCall(attributes, excludedAttributes, body);
-        return call;
+        return createGroupCall(attributes, excludedAttributes, body);
     }
 
     /**
@@ -92,8 +95,8 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> createGroup(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
-        ScimApiResponse<String> resp = createGroupWithHttpInfo(attributes, excludedAttributes, body);
-        return resp;
+
+        return createGroupWithHttpInfo(attributes, excludedAttributes, body);
     }
 
     /**
@@ -108,15 +111,15 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> createGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                            String body) throws ScimApiException {
-        Call call = createGroupValidateBeforeCall(attributes, excludedAttributes, body);
+        HttpUriRequest call = createGroupValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>() {
         }.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call deleteGroupValidateBeforeCall() throws ScimApiException {
-        Call call = deleteResourceCall();
-        return call;
+    private HttpUriRequest deleteGroupValidateBeforeCall() throws ScimApiException {
+
+        return deleteResourceCall();
     }
 
     /**
@@ -126,8 +129,8 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> deleteGroup() throws ScimApiException {
-        ScimApiResponse<String> resp = deleteGroupWithHttpInfo();
-        return resp;
+
+        return deleteGroupWithHttpInfo();
     }
 
     /**
@@ -138,7 +141,7 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body.
      */
     public ScimApiResponse<String> deleteGroupWithHttpInfo() throws ScimApiException {
-        Call call = deleteGroupValidateBeforeCall();
+        HttpUriRequest call = deleteGroupValidateBeforeCall();
         return scimApiClient.execute(call);
     }
 
@@ -156,7 +159,7 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getGroupCall(List<String> attributes, List<String> excludedAttributes, String filter,
+    public HttpUriRequest getGroupCall(List<String> attributes, List<String> excludedAttributes, String filter,
                              Integer startIndex, Integer count, String sortBy, String sortOder)
             throws ScimApiException {
         Object localVarPostBody = null;
@@ -195,11 +198,11 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
                 localVarFormParams, localVarAuthNames);
     }
 
-    private Call getGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter,
+    private HttpUriRequest getGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter,
                                             Integer startIndex, Integer count, String sortBy, String sortOder) throws
             ScimApiException {
-        Call call = getGroupCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
-        return call;
+
+        return getGroupCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
     }
 
     /**
@@ -219,9 +222,9 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
     public ScimApiResponse<String> getGroup(List<String> attributes, List<String> excludedAttributes, String filter,
                                             Integer startIndex, Integer count, String sortBy, String sortOder)
             throws ScimApiException {
-        ScimApiResponse<String> resp = getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count,
+
+        return getGroupWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count,
                 sortBy, sortOder);
-        return resp;
     }
 
     /**
@@ -241,16 +244,16 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
     public ScimApiResponse<String> getGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                         String filter, Integer startIndex, Integer count, String sortBy,
                                                         String sortOder) throws ScimApiException {
-        Call call = getGroupValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy,
+        HttpUriRequest call = getGroupValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy,
                 sortOder);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call getGroupByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
+    private HttpUriRequest getGroupByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
             throws ScimApiException {
-        Call call = getResourceCall(attributes, excludedAttributes);
-        return call;
+
+        return getResourceCall(attributes, excludedAttributes);
     }
 
     /**
@@ -278,15 +281,14 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> getGroupByIdWithHttpInfo(List<String> attributes, List<String> excludedAttributes)
             throws ScimApiException {
-        Call call = getGroupByIdValidateBeforeCall(attributes, excludedAttributes);
+        HttpUriRequest call = getGroupByIdValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call getGroupsByPostValidateBeforeCall(String body) throws ScimApiException {
+    private HttpUriRequest getGroupsByPostValidateBeforeCall(String body) throws ScimApiException {
 
-        Call call = getResourcesByPostCall(body);
-        return call;
+        return getResourcesByPostCall(body);
     }
 
     /**
@@ -311,16 +313,15 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> getGroupsByPostWithHttpInfo(String body) throws ScimApiException {
-        Call call = getGroupsByPostValidateBeforeCall(body);
+        HttpUriRequest call = getGroupsByPostValidateBeforeCall(body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+    private HttpUriRequest updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
 
-        Call call = updateResourceCall(attributes, excludedAttributes, body);
-        return call;
+        return updateResourceCall(attributes, excludedAttributes, body);
     }
 
     /**
@@ -335,8 +336,8 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> updateGroup(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
-        ScimApiResponse<String> resp = updateGroupWithHttpInfo(attributes, excludedAttributes, body);
-        return resp;
+
+        return updateGroupWithHttpInfo(attributes, excludedAttributes, body);
     }
 
     /**
@@ -351,7 +352,7 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> updateGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                            String body) throws ScimApiException {
-        Call call = updateGroupValidateBeforeCall(attributes, excludedAttributes, body);
+        HttpUriRequest call = updateGroupValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }

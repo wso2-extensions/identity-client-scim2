@@ -17,11 +17,11 @@
 package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.ScimApiResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.lang.reflect.Type;
 
@@ -35,9 +35,9 @@ public class Scimv2ResourceTypeApi extends Scimv2BaseApi {
         super(scimApiClient);
     }
 
-    private Call getResourceTypeValidateBeforeCall() throws ScimApiException {
-        Call call = getResourceTypeCall();
-        return call;
+    private HttpUriRequest getResourceTypeValidateBeforeCall() throws ScimApiException {
+
+        return getResourceTypeCall();
     }
 
     /**
@@ -61,7 +61,7 @@ public class Scimv2ResourceTypeApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> getResourceTypeWithHttpInfo() throws ScimApiException {
 
-        Call call = getResourceTypeValidateBeforeCall();
+        HttpUriRequest call = getResourceTypeValidateBeforeCall();
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }

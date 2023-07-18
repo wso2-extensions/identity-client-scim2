@@ -17,11 +17,11 @@
 package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.Configuration;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -36,10 +36,10 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
         super(scimApiClient);
     }
 
-    private Call createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+    private HttpUriRequest createBulkValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
-        Call call = createResourceCall(attributes, excludedAttributes, body);
-        return call;
+
+        return createResourceCall(attributes, excludedAttributes, body);
     }
 
     /**
@@ -70,7 +70,7 @@ public class Scimv2BulkApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> createBulkWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                           String body) throws ScimApiException {
-        Call call = createBulkValidateBeforeCall(attributes, excludedAttributes, body);
+        HttpUriRequest call = createBulkValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }

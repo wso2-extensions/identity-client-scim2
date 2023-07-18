@@ -16,8 +16,10 @@
 
 package io.scim2.swagger.client.auth;
 
-import com.squareup.okhttp.Credentials;
 import io.scim2.swagger.client.Pair;
+import org.apache.http.HttpHeaders;
+import org.apache.commons.codec.binary.Base64;
+
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class HttpBasicAuth implements Authentication {
         if (username == null || password == null) {
             return;
         }
-        headerParams.put("Authorization", Credentials.basic( username, password));
+        String credentials = username + ":" + password;
+        headerParams.put(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeBase64String(credentials.getBytes()));
     }
 }
