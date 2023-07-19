@@ -76,7 +76,6 @@ import java.lang.reflect.Type;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.charset.UnsupportedCharsetException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -103,7 +102,7 @@ import java.util.stream.Collectors;
 
 public class ScimApiClient {
 
-    private static Log logger = LogFactory.getLog(ScimApiClient.class);
+    private static final Log logger = LogFactory.getLog(ScimApiClient.class);
 
     public static final double JAVA_VERSION;
 
@@ -116,6 +115,9 @@ public class ScimApiClient {
      */
     public static final String LENIENT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
+    private static final String URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
+    private static final String MULTIPART_FORM_DATA_CONTENT_TYPE = "multipart/form-data";
+    private static final String OCTET_STREAM_CONTENT_TYPE = "application/octet-stream";
     private static final String JSON_CONTENT_TYPE = "application/json";
     private boolean lenientOnJson = false;
     private boolean debugging = false;
@@ -665,10 +667,12 @@ public class ScimApiClient {
                 .collect(Collectors.joining(", "))
                 + "]";
 
-        BufferedReader buffer = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        String payload = buffer.lines().collect(Collectors.joining("\n"));
-        response.setEntity(new StringEntity(payload));
-        message += "\nPayload: \n" + payload;
+        if (response.getEntity() != null) {
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String payload = buffer.lines().collect(Collectors.joining("\n"));
+            response.setEntity(new StringEntity(payload));
+            message += "\nPayload: \n" + payload;
+        }
 
         return message;
     }
@@ -720,7 +724,7 @@ public class ScimApiClient {
         requestConfig = RequestConfig.custom()
                 .setConnectTimeout(connectionTimeout)
                 .build();
-        this.httpClient = httpClientBuilder
+        httpClient = httpClientBuilder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
         return this;
@@ -1186,11 +1190,9 @@ public class ScimApiClient {
         HttpEntity reqBody;
         if (request instanceof HttpEntityEnclosingRequestBase) {
             HttpEntityEnclosingRequestBase entityRequest = (HttpEntityEnclosingRequestBase) request;
-            String urlEncodedContentType = "application/x-www-form-urlencoded";
-            String multipartFormDataContentType = "multipart/form-data";
-            if (urlEncodedContentType.equals(contentType)) {
+            if (URL_ENCODED_CONTENT_TYPE.equals(contentType)) {
                 reqBody = buildRequestBodyFormEncoding(formParams);
-            } else if (multipartFormDataContentType.equals(contentType)) {
+            } else if (MULTIPART_FORM_DATA_CONTENT_TYPE.equals(contentType)) {
                 reqBody = buildRequestBodyMultipart(formParams);
             } else if (body == null) {
                 // use an empty request body (for POST, PUT, and PATCH)
@@ -1340,7 +1342,7 @@ public class ScimApiClient {
 
         String contentType = URLConnection.guessContentTypeFromName(file.getName());
         if (contentType == null) {
-            return "application/octet-stream";
+            return OCTET_STREAM_CONTENT_TYPE;
         } else {
             return contentType;
         }
