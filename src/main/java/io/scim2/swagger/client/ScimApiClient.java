@@ -616,7 +616,7 @@ public class ScimApiClient {
                 if (debugging) {
                     logger.info("Enabling debug mode");
 
-                    // Create the logging interceptors
+                    // Create the logging interceptors.
                     HttpRequestInterceptor requestInterceptor =
                             (request, context) -> logger.debug(getRequestInfo(request));
                     HttpResponseInterceptor responseInterceptor =
@@ -1199,8 +1199,8 @@ public class ScimApiClient {
             } else if (MULTIPART_FORM_DATA_CONTENT_TYPE.equals(contentType)) {
                 reqBody = buildRequestBodyMultipart(formParams);
             } else if (body == null) {
-                // use an empty request body (for POST, PUT, and PATCH)
-                // no request body is allowed for DELETE
+                // Use an empty request body (for POST, PUT, and PATCH).
+                // No request body is allowed for DELETE.
                 reqBody = new StringEntity("", ContentType.parse(contentType));
             } else {
                 reqBody = serialize(body, contentType);
