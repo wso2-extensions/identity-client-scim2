@@ -36,6 +36,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -1210,16 +1212,20 @@ public class ScimApiClient {
 
     private HttpUriRequest createHttpRequest(String method, String url) {
 
-        switch (method) {
-            case "GET":
+        switch (HttpMethod.valueOf(method)) {
+            case GET:
                 return new HttpGet(url);
-            case "POST":
+            case HEAD:
+                return new HttpHead(url);
+            case OPTIONS:
+                return new HttpOptions(url);
+            case POST:
                 return new HttpPost(url);
-            case "PUT":
+            case PUT:
                 return new HttpPut(url);
-            case "PATCH":
+            case PATCH:
                 return new HttpPatch(url);
-            case "DELETE":
+            case DELETE:
                 return new HttpDelete(url);
             default:
                 throw new IllegalArgumentException("Invalid HTTP method: " + method);
