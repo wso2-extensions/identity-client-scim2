@@ -1,27 +1,29 @@
 /*
- * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.Configuration;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -36,11 +38,10 @@ public class Scimv2MeApi extends Scimv2BaseApi {
         super(scimApiClient);
     }
 
-    private Call createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+    private HttpUriRequest createMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
 
-        Call call = createResourceCall(attributes, excludedAttributes, body);
-        return call;
+        return createResourceCall(attributes, excludedAttributes, body);
     }
 
     /**
@@ -72,15 +73,14 @@ public class Scimv2MeApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> createMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                         String body) throws ScimApiException {
-        Call call = createMeValidateBeforeCall(attributes, excludedAttributes, body);
+        HttpUriRequest call = createMeValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call deleteMeValidateBeforeCall() throws ScimApiException {
+    private HttpUriRequest deleteMeValidateBeforeCall() throws ScimApiException {
 
-        Call call = deleteResourceCall();
-        return call;
+        return deleteResourceCall();
     }
 
     /**
@@ -103,14 +103,14 @@ public class Scimv2MeApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<Void> deleteMeWithHttpInfo() throws ScimApiException {
 
-        Call call = deleteMeValidateBeforeCall();
+        HttpUriRequest call = deleteMeValidateBeforeCall();
         return scimApiClient.execute(call);
     }
 
-    private Call getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
+    private HttpUriRequest getMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
             throws ScimApiException {
-        Call call = getResourceCall(attributes, excludedAttributes);
-        return call;
+
+        return getResourceCall(attributes, excludedAttributes);
     }
 
     /**
@@ -139,15 +139,15 @@ public class Scimv2MeApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> getMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes)
             throws ScimApiException {
-        Call call = getMeValidateBeforeCall(attributes, excludedAttributes);
+        HttpUriRequest call = getMeValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+    private HttpUriRequest updateMeValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
-        Call call = updateResourceCall(attributes, excludedAttributes, body);
-        return call;
+
+        return updateResourceCall(attributes, excludedAttributes, body);
     }
 
     /**
@@ -178,7 +178,7 @@ public class Scimv2MeApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> updateMeWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                         String body) throws ScimApiException {
-        Call call = updateMeValidateBeforeCall(attributes, excludedAttributes, body);
+        HttpUriRequest call = updateMeValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }

@@ -1,40 +1,65 @@
 /*
- * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package io.scim2.swagger.client;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.MultipartBuilder;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Headers;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.internal.http.HttpMethod;
-import com.squareup.okhttp.logging.HttpLoggingInterceptor;
-import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
 import io.scim2.swagger.client.auth.Authentication;
 import io.scim2.swagger.client.auth.ApiKeyAuth;
 import io.scim2.swagger.client.auth.HttpBasicAuth;
 import io.scim2.swagger.client.auth.OAuth;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import okio.BufferedSink;
 import okio.Okio;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -43,13 +68,18 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -61,6 +91,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -69,11 +100,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ScimApiClient {
+
+    private static final Log logger = LogFactory.getLog(ScimApiClient.class);
+
     public static final double JAVA_VERSION;
 
     static {
@@ -85,13 +119,13 @@ public class ScimApiClient {
      */
     public static final String LENIENT_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    private final String urlEncodedContentType = "application/x-www-form-urlencoded";
-    private final String multiparFormDataContentType = "multipart/form-data";
-    private final String octetStreamContentType = "application/octet-stream";
-    private final String jsonContentType = "application/json";
+    private static final String URL_ENCODED_CONTENT_TYPE = "application/x-www-form-urlencoded";
+    private static final String MULTIPART_FORM_DATA_CONTENT_TYPE = "multipart/form-data";
+    private static final String OCTET_STREAM_CONTENT_TYPE = "application/octet-stream";
+    private static final String JSON_CONTENT_TYPE = "application/json";
     private boolean lenientOnJson = false;
     private boolean debugging = false;
-    private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
+    private final Map<String, String> defaultHeaderMap = new HashMap<>();
     private String tempFolderPath = null;
 
     private Map<String, Authentication> authentications;
@@ -105,17 +139,22 @@ public class ScimApiClient {
     private boolean verifyingSsl;
     private KeyManager[] keyManagers;
 
-    private OkHttpClient httpClient;
+    private HttpClient httpClient;
+    private final HttpClientBuilder httpClientBuilder;
+    private RequestConfig requestConfig;
     private JSON json;
 
-    private HttpLoggingInterceptor loggingInterceptor;
     private String url;
 
     /*
      * Constructor for ScimApiClient
      */
     public ScimApiClient() {
-        httpClient = new OkHttpClient();
+
+        httpClientBuilder = HttpClientBuilder.create();
+        httpClient = httpClientBuilder.build();
+        requestConfig = RequestConfig.custom().build();
+
         verifyingSsl = true;
         json = new JSON(this);
 
@@ -136,7 +175,7 @@ public class ScimApiClient {
         setUserAgent("wso2/scim2/client");
 
         // Setup authentications (key: authentication name, value: authentication).
-        authentications = new HashMap<String, Authentication>();
+        authentications = new HashMap<>();
         authentications.put("basicAuth", new HttpBasicAuth());
         // Prevent the authentications from being modified.
         authentications = Collections.unmodifiableMap(authentications);
@@ -145,19 +184,21 @@ public class ScimApiClient {
     /**
      * Get HTTP client
      *
-     * @return An instance of OkHttpClient
+     * @return An instance of HttpClient
      */
-    public OkHttpClient getHttpClient() {
+    public HttpClient getHttpClient() {
+
         return httpClient;
     }
 
     /**
      * Set HTTP client
      *
-     * @param httpClient An instance of OkHttpClient
-     * @return Api Client
+     * @param httpClient An instance of HttpClient
+     * @return ScimApiClient
      */
-    public ScimApiClient setHttpClient(OkHttpClient httpClient) {
+    public ScimApiClient setHttpClient(HttpClient httpClient) {
+
         this.httpClient = httpClient;
         return this;
     }
@@ -168,6 +209,7 @@ public class ScimApiClient {
      * @return JSON object
      */
     public JSON getJSON() {
+
         return json;
     }
 
@@ -178,6 +220,7 @@ public class ScimApiClient {
      * @return Api client
      */
     public ScimApiClient setJSON(JSON json) {
+
         this.json = json;
         return this;
     }
@@ -188,6 +231,7 @@ public class ScimApiClient {
      * @return True if isVerifySsl flag is on
      */
     public boolean isVerifyingSsl() {
+
         return verifyingSsl;
     }
 
@@ -200,6 +244,7 @@ public class ScimApiClient {
      * @return ScimApiClient
      */
     public ScimApiClient setVerifyingSsl(boolean verifyingSsl) throws ScimApiException {
+
         this.verifyingSsl = verifyingSsl;
         applySslSettings();
         return this;
@@ -211,6 +256,7 @@ public class ScimApiClient {
      * @return Input stream to the SSL CA cert
      */
     public InputStream getSslCaCert() {
+
         return sslCaCert;
     }
 
@@ -222,12 +268,14 @@ public class ScimApiClient {
      * @return ScimApiClient
      */
     public ScimApiClient setSslCaCert(InputStream sslCaCert) throws ScimApiException {
+
         this.sslCaCert = sslCaCert;
         applySslSettings();
         return this;
     }
 
     public KeyManager[] getKeyManagers() {
+
         return keyManagers;
     }
 
@@ -239,40 +287,48 @@ public class ScimApiClient {
      * @return ScimApiClient
      */
     public ScimApiClient setKeyManagers(KeyManager[] managers) throws ScimApiException {
+
         this.keyManagers = managers;
         applySslSettings();
         return this;
     }
 
     public DateFormat getDateFormat() {
+
         return dateFormat;
     }
 
     public ScimApiClient setDateFormat(DateFormat dateFormat) {
+
         this.dateFormat = dateFormat;
         this.dateLength = this.dateFormat.format(new Date()).length();
         return this;
     }
 
     public DateFormat getDatetimeFormat() {
+
         return datetimeFormat;
     }
 
     public ScimApiClient setDatetimeFormat(DateFormat datetimeFormat) {
+
         this.datetimeFormat = datetimeFormat;
         return this;
     }
 
     /**
      * Whether to allow various ISO 8601 datetime formats when parsing a datetime string.
-     * @see #parseDatetime(String)
+     *
      * @return True if lenientDatetimeFormat flag is set to true
+     * @see #parseDatetime(String)
      */
     public boolean isLenientDatetimeFormat() {
+
         return lenientDatetimeFormat;
     }
 
     public ScimApiClient setLenientDatetimeFormat(boolean lenientDatetimeFormat) {
+
         this.lenientDatetimeFormat = lenientDatetimeFormat;
         return this;
     }
@@ -280,41 +336,45 @@ public class ScimApiClient {
     /**
      * Parse the given date string into Date object.
      * The default <code>dateFormat</code> supports these ISO 8601 date formats:
-     *   2015-08-16
-     *   2015-8-16
+     * 2015-08-16
+     * 2015-8-16
+     *
      * @param str String to be parsed
      * @return Date
      */
     public Date parseDate(String str) throws ScimApiException {
+
         if (StringUtils.isEmpty(str)) return null;
         try {
             return dateFormat.parse(str);
         } catch (ParseException e) {
-            throw new ScimApiException("Unable to parse the date.",e);
+            throw new ScimApiException("Unable to parse the date.", e);
         }
     }
 
     /**
      * Parse the given datetime string into Date object.
      * When lenientDatetimeFormat is enabled, the following ISO 8601 datetime formats are supported:
-     *   2015-08-16T08:20:05Z
-     *   2015-8-16T8:20:05Z
-     *   2015-08-16T08:20:05+00:00
-     *   2015-08-16T08:20:05+0000
-     *   2015-08-16T08:20:05.376Z
-     *   2015-08-16T08:20:05.376+00:00
-     *   2015-08-16T08:20:05.376+00
-     * Note: The 3-digit milli-seconds is optional. Time zone is required and can be in one of
-     *   these formats:
-     *   Z (same with +0000)
-     *   +08:00 (same with +0800)
-     *   -02 (same with -0200)
-     *   -0200
-     * @see <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a>
+     * 2015-08-16T08:20:05Z
+     * 2015-8-16T8:20:05Z
+     * 2015-08-16T08:20:05+00:00
+     * 2015-08-16T08:20:05+0000
+     * 2015-08-16T08:20:05.376Z
+     * 2015-08-16T08:20:05.376+00:00
+     * 2015-08-16T08:20:05.376+00
+     * Note: The 3-digit milliseconds is optional. Time zone is required and can be in one of
+     * these formats:
+     * Z (same with +0000)
+     * +08:00 (same with +0800)
+     * -02 (same with -0200)
+     * -0200
+     *
      * @param str Date time string to be parsed
      * @return Date representation of the string
+     * @see <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a>
      */
     public Date parseDatetime(String str) throws ScimApiException {
+
         if (str == null)
             return null;
 
@@ -343,7 +403,7 @@ public class ScimApiClient {
         try {
             return format.parse(str);
         } catch (ParseException e) {
-            throw new ScimApiException("Unable to parse the date time.",e);
+            throw new ScimApiException("Unable to parse the date time.", e);
         }
     }
 
@@ -354,6 +414,7 @@ public class ScimApiClient {
      * @return Date representation of the string
      */
     public Date parseDateOrDatetime(String str) throws ScimApiException {
+
         if (str == null)
             return null;
         else if (str.length() <= dateLength)
@@ -369,6 +430,7 @@ public class ScimApiClient {
      * @return Formatted date in string representation
      */
     public String formatDate(Date date) {
+
         return dateFormat.format(date);
     }
 
@@ -379,6 +441,7 @@ public class ScimApiClient {
      * @return Formatted datetime in string representation
      */
     public String formatDatetime(Date date) {
+
         return datetimeFormat.format(date);
     }
 
@@ -388,6 +451,7 @@ public class ScimApiClient {
      * @return Map of authentication objects
      */
     public Map<String, Authentication> getAuthentications() {
+
         return authentications;
     }
 
@@ -398,6 +462,7 @@ public class ScimApiClient {
      * @return The authentication, null if not found
      */
     public Authentication getAuthentication(String authName) {
+
         return authentications.get(authName);
     }
 
@@ -407,6 +472,7 @@ public class ScimApiClient {
      * @param username Username
      */
     public void setUsername(String username) throws ScimApiException {
+
         for (Authentication auth : authentications.values()) {
             if (auth instanceof HttpBasicAuth) {
                 ((HttpBasicAuth) auth).setUsername(username);
@@ -422,6 +488,7 @@ public class ScimApiClient {
      * @param password Password
      */
     public void setPassword(String password) throws ScimApiException {
+
         for (Authentication auth : authentications.values()) {
             if (auth instanceof HttpBasicAuth) {
                 ((HttpBasicAuth) auth).setPassword(password);
@@ -437,6 +504,7 @@ public class ScimApiClient {
      * @param apiKey API key
      */
     public void setApiKey(String apiKey) throws ScimApiException {
+
         for (Authentication auth : authentications.values()) {
             if (auth instanceof ApiKeyAuth) {
                 ((ApiKeyAuth) auth).setApiKey(apiKey);
@@ -452,6 +520,7 @@ public class ScimApiClient {
      * @param apiKeyPrefix API key prefix
      */
     public void setApiKeyPrefix(String apiKeyPrefix) throws ScimApiException {
+
         for (Authentication auth : authentications.values()) {
             if (auth instanceof ApiKeyAuth) {
                 ((ApiKeyAuth) auth).setApiKeyPrefix(apiKeyPrefix);
@@ -467,6 +536,7 @@ public class ScimApiClient {
      * @param accessToken Access token
      */
     public void setAccessToken(String accessToken) throws ScimApiException {
+
         for (Authentication auth : authentications.values()) {
             if (auth instanceof OAuth) {
                 ((OAuth) auth).setAccessToken(accessToken);
@@ -483,6 +553,7 @@ public class ScimApiClient {
      * @return ScimApiClient
      */
     public ScimApiClient setUserAgent(String userAgent) {
+
         addDefaultHeader("User-Agent", userAgent);
         return this;
     }
@@ -490,22 +561,23 @@ public class ScimApiClient {
     /**
      * Add a default header.
      *
-     * @param key The header's key
+     * @param key   The header's key
      * @param value The header's value
      * @return ScimApiClient
      */
     public ScimApiClient addDefaultHeader(String key, String value) {
+
         defaultHeaderMap.put(key, value);
         return this;
     }
 
     /**
+     * @return True if lenientOnJson is enabled, false otherwise.
      * @see <a href="https://google-gson.googlecode.com/svn/trunk/gson/docs/javadocs/com/google/gson/stream/JsonReader.html
      * #setLenient(boolean)">setLenient</a>
-     *
-     * @return True if lenientOnJson is enabled, false otherwise.
      */
     public boolean isLenientOnJson() {
+
         return lenientOnJson;
     }
 
@@ -516,16 +588,18 @@ public class ScimApiClient {
      * @return ScimApiClient
      */
     public ScimApiClient setLenientOnJson(boolean lenient) {
+
         this.lenientOnJson = lenient;
         return this;
     }
 
     /**
-     * Check that whether debugging is enabled for this API client.
+     * Check whether debugging is enabled for this API client.
      *
      * @return True if debugging is enabled, false otherwise.
      */
     public boolean isDebugging() {
+
         return debugging;
     }
 
@@ -536,39 +610,112 @@ public class ScimApiClient {
      * @return ScimApiClient
      */
     public ScimApiClient setDebugging(boolean debugging) {
-        if (debugging != this.debugging) {
-            if (debugging) {
-                loggingInterceptor = new HttpLoggingInterceptor();
-                loggingInterceptor.setLevel(Level.BODY);
-                httpClient.interceptors().add(loggingInterceptor);
-            } else {
-                httpClient.interceptors().remove(loggingInterceptor);
-                loggingInterceptor = null;
+
+        try {
+            if (debugging != this.debugging) {
+                if (debugging) {
+                    // Create the logging interceptors.
+                    HttpRequestInterceptor requestInterceptor =
+                            (request, context) -> logger.debug(getRequestInfo(request));
+                    HttpResponseInterceptor responseInterceptor =
+                            (response, context) -> logger.debug(getResponseInfo(response));
+
+                    httpClient = HttpClients.custom()
+                            .addInterceptorFirst(requestInterceptor)
+                            .addInterceptorFirst(responseInterceptor)
+                            .build();
+                } else {
+                    ((CloseableHttpClient) httpClient).close();
+                    httpClient = httpClientBuilder.build();
+                }
             }
+        } catch (IOException e) {
+            logger.error("An IOException occurred: {}", e);
         }
         this.debugging = debugging;
         return this;
     }
 
+    private String getRequestInfo(HttpRequest request) throws IOException {
+
+        StringBuilder message = new StringBuilder();
+        message.append("\nRequest - ")
+                .append(request.getRequestLine().getMethod())
+                .append(" ")
+                .append(request.getRequestLine().getUri())
+                .append("\nHeaders: [")
+                .append(getHeadersInfo(request.getAllHeaders()))
+                .append("]");
+
+        if (request instanceof HttpEntityEnclosingRequest) {
+            message.append("\nPayload:\n").append(getRequestEntityInfo(request));
+        }
+
+        return message.toString();
+    }
+
+    private String getResponseInfo(HttpResponse response) throws IOException {
+
+        StringBuilder message = new StringBuilder();
+        message.append("\nResponse - ")
+                .append(response.getStatusLine().getStatusCode())
+                .append(" ")
+                .append(response.getStatusLine().getReasonPhrase())
+                .append("\nHeaders: [")
+                .append(getHeadersInfo(response.getAllHeaders()))
+                .append("]");
+
+        if (response.getEntity() != null) {
+            message.append("\nPayload: \n").append(getResponseEntityInfo(response));
+        }
+
+        return message.toString();
+    }
+
+    private String getHeadersInfo(Header[] headers) {
+
+        return Arrays.stream(headers)
+                .map(header -> header.getName() + ": " + header.getValue())
+                .collect(Collectors.joining(", "));
+    }
+
+    private String getRequestEntityInfo(HttpRequest request) throws IOException {
+
+        HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        entity.writeTo(bs);
+        return bs.toString();
+    }
+
+    private String getResponseEntityInfo(HttpResponse response) throws IOException {
+
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        String payload = buffer.lines().collect(Collectors.joining("\n"));
+        response.setEntity(new StringEntity(payload));
+        return payload;
+    }
+
     /**
      * The path of temporary folder used to store downloaded files from endpoints
      * with file response. The default value is <code>null</code>, i.e. using
-     * the system's default tempopary folder.
+     * the system's default temporary folder.
      *
-     * @see <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html#createTempFile">createTempFile</a>
      * @return Temporary folder path
+     * @see <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html#createTempFile">createTempFile</a>
      */
     public String getTempFolderPath() {
+
         return tempFolderPath;
     }
 
     /**
-     * Set the tempoaray folder path (for downloading files)
+     * Set the temporary folder path (for downloading files)
      *
      * @param tempFolderPath Temporary folder path
      * @return ScimApiClient
      */
     public ScimApiClient setTempFolderPath(String tempFolderPath) {
+
         this.tempFolderPath = tempFolderPath;
         return this;
     }
@@ -579,18 +726,25 @@ public class ScimApiClient {
      * @return Timeout in milliseconds
      */
     public int getConnectTimeout() {
-        return httpClient.getConnectTimeout();
+
+        return requestConfig.getConnectTimeout();
     }
 
     /**
-     * Sets the connect timeout (in milliseconds).
+     * Sets the connection timeout (in milliseconds).
      * A value of 0 means no timeout, otherwise values must be between 1 and
      *
      * @param connectionTimeout connection timeout in milliseconds
      * @return Api client
      */
     public ScimApiClient setConnectTimeout(int connectionTimeout) {
-        httpClient.setConnectTimeout(connectionTimeout, TimeUnit.MILLISECONDS);
+
+        requestConfig = RequestConfig.custom()
+                .setConnectTimeout(connectionTimeout)
+                .build();
+        httpClient = httpClientBuilder
+                .setDefaultRequestConfig(requestConfig)
+                .build();
         return this;
     }
 
@@ -601,13 +755,14 @@ public class ScimApiClient {
      * @return String representation of the parameter
      */
     public String parameterToString(Object param) {
+
         if (param == null) {
             return "";
         } else if (param instanceof Date) {
             return formatDatetime((Date) param);
         } else if (param instanceof Collection) {
             StringBuilder b = new StringBuilder();
-            for (Object o : (Collection)param) {
+            for (Object o : (Collection) param) {
                 if (b.length() > 0) {
                     b.append(",");
                 }
@@ -623,11 +778,11 @@ public class ScimApiClient {
      * Format to {@code Pair} objects.
      *
      * @param collectionFormat collection format (e.g. csv, tsv)
-     * @param name Name
-     * @param value Value
+     * @param name             Name
+     * @param value            Value
      * @return A list of Pair objects
      */
-    public List<Pair> parameterToPairs(String collectionFormat, String name, Object value){
+    public List<Pair> parameterToPairs(String collectionFormat, String name, Object value) {
 
         List<Pair> params = new ArrayList<Pair>();
         // preconditions
@@ -639,7 +794,7 @@ public class ScimApiClient {
             params.add(new Pair(name, parameterToString(value)));
             return params;
         }
-        if (valueCollection.isEmpty()){
+        if (valueCollection.isEmpty()) {
             return params;
         }
         // get the collection format
@@ -662,7 +817,7 @@ public class ScimApiClient {
         } else if (collectionFormat.equals("pipes")) {
             delimiter = "|";
         }
-        StringBuilder sb = new StringBuilder() ;
+        StringBuilder sb = new StringBuilder();
         for (Object item : valueCollection) {
             sb.append(delimiter);
             sb.append(parameterToString(item));
@@ -679,32 +834,35 @@ public class ScimApiClient {
      * @return The sanitized filename
      */
     public String sanitizeFilename(String filename) {
+
         return filename.replaceAll(".*[/\\\\]", "");
     }
 
     /**
      * Check if the given MIME is a JSON MIME.
      * JSON MIME examples:
-     *   application/json
-     *   application/json; charset=UTF8
-     *   APPLICATION/JSON
-     *   application/vnd.company+json
+     * application/json
+     * application/json; charset=UTF8
+     * APPLICATION/JSON
+     * application/vnd.company+json
+     *
      * @param mime MIME (Multipurpose Internet Mail Extensions)
      * @return True if the given MIME is JSON, false otherwise.
      */
     public boolean isJsonMime(String mime) {
-      String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
-      return mime != null && (mime.matches(jsonMime) || mime.equalsIgnoreCase("application/json-patch+json"));
+
+        String jsonMime = "(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$";
+        return mime != null && (mime.matches(jsonMime) || mime.equalsIgnoreCase("application/json-patch+json"));
     }
 
     /**
      * Select the Accept header's value from the given accepts array:
-     *   if JSON exists in the given array, use it;
-     *   otherwise use all of them (joining into a string)
+     * if JSON exists in the given array, use it;
+     * otherwise use all of them (joining into a string)
      *
      * @param accepts The accepts array to select from
      * @return The Accept header to use. If the given array is empty,
-     *   null will be returned (not to set the Accept header explicitly).
+     * null will be returned (not to set the Accept header explicitly).
      */
     public String selectHeaderAccept(String[] accepts) {
         /*if (accepts.length == 0) {
@@ -721,16 +879,17 @@ public class ScimApiClient {
 
     /**
      * Select the Content-Type header's value from the given array:
-     *   if JSON exists in the given array, use it;
-     *   otherwise use the first one of the array.
+     * if JSON exists in the given array, use it;
+     * otherwise use the first one of the array.
      *
      * @param contentTypes The Content-Type array to select from
      * @return The Content-Type header to use. If the given array is empty,
-     *   JSON will be used.
+     * JSON will be used.
      */
     public String selectHeaderContentType(String[] contentTypes) {
+
         if (contentTypes.length == 0) {
-            return jsonContentType;
+            return JSON_CONTENT_TYPE;
         }
         for (String contentType : contentTypes) {
             if (isJsonMime(contentType)) {
@@ -747,6 +906,7 @@ public class ScimApiClient {
      * @return Escaped string
      */
     public String escapeString(String str) {
+
         try {
             return URLEncoder.encode(str, "utf8").replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
@@ -758,15 +918,16 @@ public class ScimApiClient {
      * Deserialize response body to Java object, according to the return type and
      * the Content-Type response header.
      *
-     * @param <T> Type
-     * @param response HTTP response
+     * @param <T>        Type
+     * @param response   HTTP response
      * @param returnType The type of the Java object
      * @return The deserialized Java object
      * @throws ScimApiException If fail to deserialize response body, i.e. cannot read response body
-     *   or the Content-Type of the response is not supported.
+     *                          or the Content-Type of the response is not supported.
      */
     @SuppressWarnings("unchecked")
-    public <T> T deserialize(Response response, Type returnType) throws ScimApiException {
+    public <T> T deserialize(HttpResponse response, Type returnType) throws ScimApiException {
+
         if (response == null || returnType == null) {
             return null;
         }
@@ -774,7 +935,8 @@ public class ScimApiClient {
         if ("byte[]".equals(returnType.toString())) {
             // Handle binary response (byte array).
             try {
-                return (T) response.body().bytes();
+                HttpEntity entity = response.getEntity();
+                return (T) EntityUtils.toByteArray(entity);
             } catch (IOException e) {
                 throw new ScimApiException(e);
             }
@@ -785,10 +947,11 @@ public class ScimApiClient {
 
         String respBody;
         try {
-            if (response.body() != null)
-                respBody = response.body().string();
-            else
+            if (response.getEntity() != null) {
+                respBody = EntityUtils.toString(response.getEntity());
+            } else {
                 respBody = null;
+            }
         } catch (IOException e) {
             throw new ScimApiException(e);
         }
@@ -797,10 +960,10 @@ public class ScimApiClient {
             return null;
         }
 
-        String contentType = response.headers().get("Content-Type");
+        String contentType = response.getFirstHeader("Content-Type").getValue();
         if (contentType == null) {
             // ensuring a default content type
-            contentType = jsonContentType;
+            contentType = JSON_CONTENT_TYPE;
         }
         if (isJsonMime(contentType)) {
             return json.deserialize(respBody, returnType);
@@ -809,8 +972,10 @@ public class ScimApiClient {
             return (T) respBody;
         } else {
             throw new ScimApiException(
-                    "Content type \"" + contentType + "\" is not supported for type: " + returnType, response.code(),
-                    response.headers().toMultimap(), respBody);
+                    "Content type \"" + contentType + "\" is not supported for type: " + returnType,
+                    response.getStatusLine().getStatusCode(),
+                    extractHeaders(response),
+                    respBody);
         }
     }
 
@@ -818,48 +983,46 @@ public class ScimApiClient {
      * Serialize the given Java object into request body according to the object's
      * class and the request Content-Type.
      *
-     * @param obj The Java object
+     * @param obj         The Java object
      * @param contentType The request Content-Type
      * @return The serialized request body
      * @throws ScimApiException If fail to serialize the given object
      */
-    public RequestBody serialize(Object obj, String contentType) throws ScimApiException {
+    public HttpEntity serialize(Object obj, String contentType) throws ScimApiException {
+
         if (obj instanceof byte[]) {
             // Binary (byte array) body parameter support.
-            return RequestBody.create(MediaType.parse(contentType), (byte[]) obj);
+            return new ByteArrayEntity((byte[]) obj, ContentType.parse(contentType));
         } else if (obj instanceof File) {
             // File body parameter support.
-            return RequestBody.create(MediaType.parse(contentType), (File) obj);
+            File file = (File) obj;
+            return new FileEntity(file, ContentType.parse(contentType));
         } else if (isJsonMime(contentType)) {
             String content;
             if (obj != null) {
-                content = (String)obj;//json.serialize(obj);
+                content = (String) obj;
             } else {
-                content = null;
+                content = "";
             }
-            try {
-                MediaType mediaType = MediaType.parse(jsonContentType);
-                return RequestBody.create(mediaType, content.getBytes("UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-            }
+            return new ByteArrayEntity(content.getBytes(StandardCharsets.UTF_8), ContentType.APPLICATION_JSON);
         } else {
             throw new ScimApiException("Content type \"" + contentType + "\" is not supported");
         }
-        return null;
     }
 
     /**
      * Download file from the given response.
      *
      * @param response An instance of the Response object
-     * @throws ScimApiException If fail to read file content from response and write to disk
      * @return Downloaded file
+     * @throws ScimApiException If fail to read file content from response and write to disk
      */
-    public File downloadFileFromResponse(Response response) throws ScimApiException {
+    public File downloadFileFromResponse(HttpResponse response) throws ScimApiException {
+
         try {
             File file = prepareDownloadFile(response);
             BufferedSink sink = Okio.buffer(Okio.sink(file));
-            sink.writeAll(response.body().source());
+            sink.writeAll(Okio.source(response.getEntity().getContent()));
             sink.close();
             return file;
         } catch (IOException e) {
@@ -871,12 +1034,13 @@ public class ScimApiClient {
      * Prepare file for download
      *
      * @param response An instance of the Response object
-     * @throws IOException If fail to prepare file for download
      * @return Prepared file for the download
+     * @throws IOException If fail to prepare file for download
      */
-    public File prepareDownloadFile(Response response) throws IOException {
+    public File prepareDownloadFile(HttpResponse response) throws IOException {
+
         String filename = null;
-        String contentDisposition = response.header("Content-Disposition");
+        String contentDisposition = response.getFirstHeader("Content-Disposition").getValue();
         if (contentDisposition != null && !"".equals(contentDisposition)) {
             // Get filename from the Content-Disposition header.
             Pattern pattern = Pattern.compile("filename=['\"]?([^'\"\\s]+)['\"]?");
@@ -911,33 +1075,35 @@ public class ScimApiClient {
     }
 
     /**
-     * {@link #execute(Call, Type)}
+     * Executes the provided HTTP request.
      *
-     * @param <T> Type
-     * @param call An instance of the Call object
-     * @throws ScimApiException If fail to execute the call
+     * @param <T>     Type
+     * @param request An instance of the Call object
      * @return ScimApiResponse&lt;T&gt;
+     * @throws ScimApiException If fail to execute the call
      */
-    public <T> ScimApiResponse<T> execute(Call call) throws ScimApiException {
-        return execute(call, null);
+    public <T> ScimApiResponse<T> execute(HttpUriRequest request) throws ScimApiException {
+
+        return execute(request, null);
     }
 
     /**
      * Execute HTTP call and deserialize the HTTP response body into the given return type.
      *
      * @param returnType The return type used to deserialize HTTP response body
-     * @param <T> The return type corresponding to (same with) returnType
-     * @param call Call
+     * @param <T>        The return type corresponding to (same with) returnType
+     * @param request    HttpUriRequest
      * @return ScimApiResponse object containing response status, headers and
-     *   data, which is a Java object deserialized from response body and would be null
-     *   when returnType is null.
+     * data, which is a Java object deserialized from response body and would be null
+     * when returnType is null.
      * @throws ScimApiException If fail to execute the call
      */
-    public <T> ScimApiResponse<T> execute(Call call, Type returnType) throws ScimApiException {
+    public <T> ScimApiResponse<T> execute(HttpUriRequest request, Type returnType) throws ScimApiException {
+
         try {
-            Response response = call.execute();
+            HttpResponse response = httpClient.execute(request);
             T data = handleResponse(response, returnType);
-            return new ScimApiResponse<T>(response.code(), response.headers().toMultimap(), data);
+            return new ScimApiResponse<>(response.getStatusLine().getStatusCode(), extractHeaders(response), data);
         } catch (IOException e) {
             throw new ScimApiException(e);
         }
@@ -946,25 +1112,27 @@ public class ScimApiClient {
     /**
      * Handle the given response, return the deserialized object when the response is successful.
      *
-     * @param <T> Type
-     * @param response Response
+     * @param <T>        Type
+     * @param response   Response
      * @param returnType Return type
-     * @throws ScimApiException If the response has a unsuccessful status code or
-     *   fail to deserialize the response body
      * @return Type
+     * @throws ScimApiException If the response has a unsuccessful status code or
+     *                          fail to deserialize the response body
      */
-    public <T> T handleResponse(Response response, Type returnType) throws ScimApiException {
+    public <T> T handleResponse(HttpResponse response, Type returnType) throws ScimApiException {
 
-    	if (response.isSuccessful()) {
-            if (returnType == null || response.code() == 204) {
+        int statusCode = response.getStatusLine().getStatusCode();
+        HttpEntity entity = response.getEntity();
+        if (statusCode >= 200 && statusCode < 300) {
+            if (returnType == null || statusCode == 204) {
                 // returning null if the returnType is not defined,
                 // or the status code is 204 (No Content)
-                if (response.body() != null) {
+                if (entity != null) {
                     try {
-                        response.body().close();
+                        EntityUtils.consume(entity);
                     } catch (IOException e) {
-                        throw new ScimApiException(response.message(), e, response.code(), response.headers().
-                                toMultimap());
+                        throw new ScimApiException(response.getStatusLine().getReasonPhrase(), e, statusCode,
+                                extractHeaders(response));
                     }
                 }
                 return null;
@@ -973,130 +1141,155 @@ public class ScimApiClient {
             }
         } else {
             String respBody = null;
-            if (response.body() != null) {
+            if (entity != null) {
                 try {
-                    respBody = response.body().string();
+                    respBody = EntityUtils.toString(entity);
                 } catch (IOException e) {
-                    throw new ScimApiException(response.message(), e, response.code(), response.headers().toMultimap());
+                    throw new ScimApiException(response.getStatusLine().getReasonPhrase(), e, statusCode,
+                            extractHeaders(response));
                 }
             }
-            throw new ScimApiException(response.message(), response.code(), response.headers().toMultimap(), respBody);
+            throw new ScimApiException(response.getStatusLine().getReasonPhrase(), statusCode, extractHeaders(response),
+                    respBody);
         }
     }
 
     /**
      * Build HTTP call with the given options.
      *
-     * @param method The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
-     * @param queryParams The query parameters
-     * @param body The request body object
+     * @param method       The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
+     * @param queryParams  The query parameters
+     * @param body         The request body object
      * @param headerParams The header parameters
-     * @param formParams The form parameters
-     * @param authNames The authentications to apply
+     * @param formParams   The form parameters
+     * @param authNames    The authentications to apply
      * @return The HTTP call
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call buildCall(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams,
-                          Map<String, Object> formParams, String[] authNames) throws ScimApiException {
-        Request request = buildRequest(method, queryParams, body, headerParams, formParams, authNames);
-        return httpClient.newCall(request);
+    public HttpUriRequest buildCall(String method, List<Pair> queryParams, Object body,
+                                    Map<String, String> headerParams,
+                                    Map<String, Object> formParams, String[] authNames) throws ScimApiException {
+
+        return buildRequest(method, queryParams, body, headerParams, formParams, authNames);
     }
 
     public void setURL(String url) {
+
         this.url = url;
     }
 
     /**
      * Build an HTTP request with the given options.
      *
-     * @param method The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
-     * @param queryParams The query parameters
-     * @param body The request body object
+     * @param method       The request method, one of "GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH" and "DELETE"
+     * @param queryParams  The query parameters
+     * @param body         The request body object
      * @param headerParams The header parameters
-     * @param formParams The form parameters
-     * @param authNames The authentications to apply
+     * @param formParams   The form parameters
+     * @param authNames    The authentications to apply
      * @return The HTTP request
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Request buildRequest(String method, List<Pair> queryParams, Object body, Map<String, String> headerParams,
-                                Map<String, Object> formParams, String[] authNames) throws ScimApiException {
+    public HttpUriRequest buildRequest(String method, List<Pair> queryParams, Object body,
+                                       Map<String, String> headerParams,
+                                       Map<String, Object> formParams, String[] authNames) throws ScimApiException {
 
         updateParamsForAuth(authNames, queryParams, headerParams);
         String path = this.url;
-        final String url = buildUrl(path, queryParams);
-        final Request.Builder reqBuilder = new Request.Builder().url(url);
-        processHeaderParams(headerParams, reqBuilder);
+        final String requestUrl = buildUrl(path, queryParams);
+        final HttpUriRequest request = createHttpRequest(method, requestUrl);
+        processHeaderParams(headerParams, request);
         String contentType = headerParams.get("Content-Type");
         // ensuring a default content type
         if (contentType == null) {
-            contentType = jsonContentType;
+            contentType = JSON_CONTENT_TYPE;
         }
 
-        RequestBody reqBody;
-        if (!HttpMethod.permitsRequestBody(method)) {
-            reqBody = null;
-        } else if (urlEncodedContentType.equals(contentType)) {
-            reqBody = buildRequestBodyFormEncoding(formParams);
-        } else if (multiparFormDataContentType.equals(contentType)) {
-            reqBody = buildRequestBodyMultipart(formParams);
-        } else if (body == null) {
-            if ("DELETE".equals(method)) {
-                // allow calling DELETE without sending a request body
-                reqBody = null;
+        HttpEntity reqBody;
+        if (request instanceof HttpEntityEnclosingRequestBase) {
+            HttpEntityEnclosingRequestBase entityRequest = (HttpEntityEnclosingRequestBase) request;
+            if (URL_ENCODED_CONTENT_TYPE.equals(contentType)) {
+                reqBody = buildRequestBodyFormEncoding(formParams);
+            } else if (MULTIPART_FORM_DATA_CONTENT_TYPE.equals(contentType)) {
+                reqBody = buildRequestBodyMultipart(formParams);
+            } else if (body == null) {
+                // Use an empty request body (for POST, PUT, and PATCH).
+                // No request body is allowed for DELETE.
+                reqBody = new StringEntity("", ContentType.parse(contentType));
             } else {
-                // use an empty request body (for POST, PUT and PATCH)
-                reqBody = RequestBody.create(MediaType.parse(contentType), "");
+                reqBody = serialize(body, contentType);
             }
-        } else {
-            reqBody = serialize(body, contentType);
+            entityRequest.setEntity(reqBody);
         }
-        Request request = reqBuilder.method(method, reqBody).build();
         return request;
+    }
+
+    private HttpUriRequest createHttpRequest(String method, String url) {
+
+        switch (HttpMethod.valueOf(method)) {
+            case GET:
+                return new HttpGet(url);
+            case HEAD:
+                return new HttpHead(url);
+            case OPTIONS:
+                return new HttpOptions(url);
+            case POST:
+                return new HttpPost(url);
+            case PUT:
+                return new HttpPut(url);
+            case PATCH:
+                return new HttpPatch(url);
+            case DELETE:
+                return new HttpDelete(url);
+            default:
+                throw new IllegalArgumentException("Invalid HTTP method: " + method);
+        }
     }
 
     /**
      * Build full URL by concatenating base path, the given sub path and query parameters.
      *
-     * @param path The sub path
+     * @param path        The sub path
      * @param queryParams The query parameters
      * @return The full URL
      */
     public String buildUrl(String path, List<Pair> queryParams) {
 
-        final StringBuilder url = new StringBuilder();
-        url.append(path);
+        final StringBuilder requestUrl = new StringBuilder();
+        requestUrl.append(path);
         if (queryParams != null && !queryParams.isEmpty()) {
             // support (constant) query string in `path`, e.g. "/posts?draft=1"
             String prefix = path.contains("?") ? "&" : "?";
             for (Pair param : queryParams) {
                 if (param.getValue() != null) {
                     if (prefix != null) {
-                        url.append(prefix);
+                        requestUrl.append(prefix);
                         prefix = null;
                     } else {
-                        url.append("&");
+                        requestUrl.append("&");
                     }
                     String value = parameterToString(param.getValue());
-                    url.append(escapeString(param.getName())).append("=").append(escapeString(value));
+                    requestUrl.append(escapeString(param.getName())).append("=").append(escapeString(value));
                 }
             }
         }
-        return url.toString();
+        return requestUrl.toString();
     }
 
     /**
      * Set header parameters to the request builder, including default headers.
      *
      * @param headerParams Header parameters in the ofrm of Map
-     * @param reqBuilder Reqeust.Builder
+     * @param request      HttpUriRequest
      */
-    public void processHeaderParams(Map<String, String> headerParams, Request.Builder reqBuilder) {
+    public void processHeaderParams(Map<String, String> headerParams, HttpUriRequest request) {
+
         for (Entry<String, String> param : headerParams.entrySet()) {
-            reqBuilder.header(param.getKey(), parameterToString(param.getValue()));
+            request.setHeader(param.getKey(), parameterToString(param.getValue()));
         }
         for (Entry<String, String> header : defaultHeaderMap.entrySet()) {
             if (!headerParams.containsKey(header.getKey())) {
-                reqBuilder.header(header.getKey(), parameterToString(header.getValue()));
+                request.setHeader(header.getKey(), parameterToString(header.getValue()));
             }
         }
     }
@@ -1104,12 +1297,13 @@ public class ScimApiClient {
     /**
      * Update query and header parameters based on authentication settings.
      *
-     * @param authNames The authentications to apply
+     * @param authNames    The authentications to apply
      * @param queryParams  List of query parameters
-     * @param headerParams  Map of header parameters
+     * @param headerParams Map of header parameters
      */
     public void updateParamsForAuth(String[] authNames, List<Pair> queryParams, Map<String, String> headerParams)
             throws ScimApiException {
+
         for (String authName : authNames) {
             Authentication auth = authentications.get(authName);
             if (auth == null) throw new ScimApiException("Authentication undefined: " + authName);
@@ -1123,12 +1317,14 @@ public class ScimApiClient {
      * @param formParams Form parameters in the form of Map
      * @return RequestBody
      */
-    public RequestBody buildRequestBodyFormEncoding(Map<String, Object> formParams) {
-        FormEncodingBuilder formBuilder  = new FormEncodingBuilder();
+    public HttpEntity buildRequestBodyFormEncoding(Map<String, Object> formParams) {
+
+        List<NameValuePair> params = new ArrayList<>();
         for (Entry<String, Object> param : formParams.entrySet()) {
-            formBuilder.add(param.getKey(), parameterToString(param.getValue()));
+            params.add(new BasicNameValuePair(param.getKey(), parameterToString(param.getValue())));
         }
-        return formBuilder.build();
+
+        return new UrlEncodedFormEntity(params, StandardCharsets.UTF_8);
     }
 
     /**
@@ -1138,21 +1334,24 @@ public class ScimApiClient {
      * @param formParams Form parameters in the form of Map
      * @return RequestBody
      */
-    public RequestBody buildRequestBodyMultipart(Map<String, Object> formParams) {
-        MultipartBuilder mpBuilder = new MultipartBuilder().type(MultipartBuilder.FORM);
+    public HttpEntity buildRequestBodyMultipart(Map<String, Object> formParams) {
+
+        MultipartEntityBuilder entityBuilder =
+                MultipartEntityBuilder.create().setContentType(ContentType.MULTIPART_FORM_DATA);
+
         for (Entry<String, Object> param : formParams.entrySet()) {
             if (param.getValue() instanceof File) {
                 File file = (File) param.getValue();
-                Headers partHeaders = Headers.of("Content-Disposition", "form-data; name=\"" + param.getKey()
-                        + "\"; filename=\"" + file.getName() + "\"");
-                MediaType mediaType = MediaType.parse(guessContentTypeFromFile(file));
-                mpBuilder.addPart(partHeaders, RequestBody.create(mediaType, file));
+                String fileName = file.getName();
+                ContentType contentType = ContentType.parse(guessContentTypeFromFile(file));
+                entityBuilder.addPart(param.getKey(), new FileBody(file, contentType, fileName));
             } else {
-                Headers partHeaders = Headers.of("Content-Disposition", "form-data; name=\"" + param.getKey() + "\"");
-                mpBuilder.addPart(partHeaders, RequestBody.create(null, parameterToString(param.getValue())));
+                String paramValue = parameterToString(param.getValue());
+                entityBuilder.addPart(param.getKey(), new StringBody(paramValue, ContentType.DEFAULT_TEXT));
             }
         }
-        return mpBuilder.build();
+
+        return entityBuilder.build();
     }
 
     /**
@@ -1162,9 +1361,10 @@ public class ScimApiClient {
      * @return The guessed Content-Type
      */
     public String guessContentTypeFromFile(File file) {
+
         String contentType = URLConnection.guessContentTypeFromName(file.getName());
         if (contentType == null) {
-            return octetStreamContentType;
+            return OCTET_STREAM_CONTENT_TYPE;
         } else {
             return contentType;
         }
@@ -1174,6 +1374,7 @@ public class ScimApiClient {
      * Initialize datetime format according to the current environment, e.g. Java 1.7 and Android.
      */
     private void initDatetimeFormat() {
+
         String formatWithTimeZone = null;
         if (JAVA_VERSION >= 1.7) {
             // The time zone format "XXX" is available since Java 1.7
@@ -1195,6 +1396,7 @@ public class ScimApiClient {
      * verifyingSsl and sslCaCert.
      */
     private void applySslSettings() throws ScimApiException {
+
         try {
             TrustManager[] trustManagers = null;
             HostnameVerifier hostnameVerifier = null;
@@ -1202,18 +1404,30 @@ public class ScimApiClient {
                 TrustManager trustAll = new X509TrustManager() {
                     @Override
                     public void checkClientTrusted(X509Certificate[] chain, String authType)
-                            throws CertificateException {}
+                            throws CertificateException {
+
+                    }
+
                     @Override
                     public void checkServerTrusted(X509Certificate[] chain, String authType)
-                            throws CertificateException {}
+                            throws CertificateException {
+
+                    }
+
                     @Override
-                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                    public X509Certificate[] getAcceptedIssuers() {
+
+                        return null;
+                    }
                 };
                 SSLContext sslContext = SSLContext.getInstance("TLS");
-                trustManagers = new TrustManager[]{ trustAll };
+                trustManagers = new TrustManager[]{trustAll};
                 hostnameVerifier = new HostnameVerifier() {
                     @Override
-                    public boolean verify(String hostname, SSLSession session) { return true; }
+                    public boolean verify(String hostname, SSLSession session) {
+
+                        return true;
+                    }
                 };
             } else if (sslCaCert != null) {
                 char[] password = null; // Any password will work.
@@ -1237,17 +1451,20 @@ public class ScimApiClient {
             if (keyManagers != null || trustManagers != null) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(keyManagers, trustManagers, new SecureRandom());
-                httpClient.setSslSocketFactory(sslContext.getSocketFactory());
+                SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext);
+                httpClientBuilder.setSSLSocketFactory(sslSocketFactory);
             } else {
-                httpClient.setSslSocketFactory(null);
+                httpClientBuilder.setSSLSocketFactory(null);
             }
-            httpClient.setHostnameVerifier(hostnameVerifier);
+            httpClientBuilder.setSSLHostnameVerifier(hostnameVerifier);
+            httpClient = httpClientBuilder.build();
         } catch (GeneralSecurityException e) {
             throw new ScimApiException(e);
         }
     }
 
     private KeyStore newEmptyKeyStore(char[] password) throws GeneralSecurityException {
+
         try {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, password);
@@ -1255,5 +1472,15 @@ public class ScimApiClient {
         } catch (IOException e) {
             throw new AssertionError(e);
         }
+    }
+
+    private Map<String, List<String>> extractHeaders(HttpResponse response) {
+
+        return Arrays.stream(response.getAllHeaders())
+                .collect(
+                Collectors.groupingBy(
+                        Header::getName,
+                        Collectors.mapping(Header::getValue, Collectors.toList())
+                                     ));
     }
 }

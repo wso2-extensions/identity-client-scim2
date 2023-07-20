@@ -1,28 +1,30 @@
 /*
- * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package io.scim2.swagger.client.api;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
 import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.ScimApiException;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -40,10 +42,10 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
         super(scimApiClient);
     }
 
-    private Call createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
+    private HttpUriRequest createUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
-        Call call = createResourceCall(attributes, excludedAttributes, body);
-        return call;
+
+        return createResourceCall(attributes, excludedAttributes, body);
     }
 
     /**
@@ -58,8 +60,8 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> createUser(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
-        ScimApiResponse<String> resp = createUserWithHttpInfo(attributes, excludedAttributes, body);
-        return resp;
+
+        return createUserWithHttpInfo(attributes, excludedAttributes, body);
     }
 
     /**
@@ -74,14 +76,14 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> createUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                           String body) throws ScimApiException {
-        Call call = createUserValidateBeforeCall(attributes, excludedAttributes, body);
+        HttpUriRequest call = createUserValidateBeforeCall(attributes, excludedAttributes, body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call deleteUserValidateBeforeCall() throws ScimApiException {
-        Call call = deleteResourceCall();
-        return call;
+    private HttpUriRequest deleteUserValidateBeforeCall() throws ScimApiException {
+
+        return deleteResourceCall();
     }
 
     /**
@@ -90,8 +92,8 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> deleteUser() throws ScimApiException {
-        ScimApiResponse<String> resp = deleteUserWithHttpInfo();
-        return resp;
+
+        return deleteUserWithHttpInfo();
     }
 
     /**
@@ -102,7 +104,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> deleteUserWithHttpInfo() throws ScimApiException {
-        Call call = deleteUserValidateBeforeCall();
+        HttpUriRequest call = deleteUserValidateBeforeCall();
         return scimApiClient.execute(call);
     }
 
@@ -120,7 +122,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex,
+    public HttpUriRequest getUserCall(List<String> attributes, List<String> excludedAttributes, String filter, Integer startIndex,
                             Integer count, String sortBy, String sortOrder) throws ScimApiException {
 
         Object localVarPostBody = null;
@@ -160,11 +162,11 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
                 localVarFormParams, localVarAuthNames);
     }
 
-    private Call getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter,
+    private HttpUriRequest getUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter,
                                            Integer startIndex, Integer count, String sortBy, String sortOder)
             throws ScimApiException {
-        Call call = getUserCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
-        return call;
+
+        return getUserCall(attributes, excludedAttributes, filter, startIndex, count, sortBy, sortOder);
     }
 
     /**
@@ -185,9 +187,9 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
     public ScimApiResponse<String> getUser(List<String> attributes, List<String> excludedAttributes, String filter,
                                            Integer startIndex, Integer count, String sortBy, String sortOrder)
             throws ScimApiException {
-        ScimApiResponse<String> resp = getUserWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count,
+
+        return getUserWithHttpInfo(attributes, excludedAttributes, filter, startIndex, count,
                 sortBy, sortOrder);
-        return resp;
     }
 
     /**
@@ -208,16 +210,16 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
     public ScimApiResponse<String> getUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                        String filter, Integer startIndex, Integer count, String sortBy,
                                                        String sortOrder) throws ScimApiException {
-        Call call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy,
+        HttpUriRequest call = getUserValidateBeforeCall(attributes, excludedAttributes, filter, startIndex, count, sortBy,
                 sortOrder);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call getUserByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
+    private HttpUriRequest getUserByIdValidateBeforeCall(List<String> attributes, List<String> excludedAttributes)
             throws ScimApiException {
-        Call call = getResourceCall(attributes, excludedAttributes);
-        return call;
+
+        return getResourceCall(attributes, excludedAttributes);
     }
 
     /**
@@ -245,14 +247,14 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> getUserByIdWithHttpInfo(List<String> attributes, List<String> excludedAttributes)
             throws ScimApiException {
-        Call call = getUserByIdValidateBeforeCall(attributes, excludedAttributes);
+        HttpUriRequest call = getUserByIdValidateBeforeCall(attributes, excludedAttributes);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private Call getUsersByPostValidateBeforeCall(String body) throws ScimApiException {
-        Call call = getResourcesByPostCall(body);
-        return call;
+    private HttpUriRequest getUsersByPostValidateBeforeCall(String body) throws ScimApiException {
+
+        return getResourcesByPostCall(body);
     }
 
     /**
@@ -277,7 +279,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
     public ScimApiResponse<String> getUsersByPostWithHttpInfo(String body) throws ScimApiException {
-        Call call = getUsersByPostValidateBeforeCall(body);
+        HttpUriRequest call = getUsersByPostValidateBeforeCall(body);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }
@@ -291,7 +293,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call updateUserCall(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod)
+    public HttpUriRequest updateUserCall(List<String> attributes, List<String> excludedAttributes, String body, String httpMethod)
             throws ScimApiException {
 
         Object localVarPostBody = body;
@@ -317,10 +319,10 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
                 localVarFormParams, localVarAuthNames);
     }
 
-    private Call updateUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body,
+    private HttpUriRequest updateUserValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body,
                                               String httpMethod) throws ScimApiException {
-        Call call = updateUserCall(attributes, excludedAttributes, body, httpMethod);
-        return call;
+
+        return updateUserCall(attributes, excludedAttributes, body, httpMethod);
     }
 
     /**
@@ -335,8 +337,8 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> updateUser(List<String> attributes, List<String> excludedAttributes, String body,
                                               String httpMethod) throws ScimApiException {
-        ScimApiResponse<String> resp = updateUserWithHttpInfo(attributes, excludedAttributes, body, httpMethod);
-        return resp;
+
+        return updateUserWithHttpInfo(attributes, excludedAttributes, body, httpMethod);
     }
 
     /**
@@ -351,7 +353,7 @@ public class Scimv2UsersApi extends Scimv2BaseApi {
      */
     public ScimApiResponse<String> updateUserWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                           String body, String httpMethod) throws ScimApiException {
-        Call call = updateUserValidateBeforeCall(attributes, excludedAttributes, body, httpMethod);
+        HttpUriRequest call = updateUserValidateBeforeCall(attributes, excludedAttributes, body, httpMethod);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }

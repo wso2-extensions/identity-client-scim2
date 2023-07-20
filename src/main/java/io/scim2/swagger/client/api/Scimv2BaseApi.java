@@ -1,26 +1,28 @@
 /*
- * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package io.scim2.swagger.client.api;
 
-import com.squareup.okhttp.Call;
 import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +58,7 @@ public class Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call createResourceCall(List<String> attributes, List<String> excludedAttributes, String body)
+    public HttpUriRequest createResourceCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
 
         Object localVarPostBody = body;
@@ -87,7 +89,7 @@ public class Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call deleteResourceCall() throws ScimApiException {
+    public HttpUriRequest deleteResourceCall() throws ScimApiException {
 
         Object localVarPostBody = null;
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -114,7 +116,7 @@ public class Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getResourceCall(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
+    public HttpUriRequest getResourceCall(List<String> attributes, List<String> excludedAttributes) throws ScimApiException {
 
         Object localVarPostBody = null;
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -145,7 +147,7 @@ public class Scimv2BaseApi {
      * @return Call to execute
      * @throws ScimApiException If fail to serialize the request body object
      */
-    public Call getResourcesByPostCall(String body) throws ScimApiException {
+    public HttpUriRequest getResourcesByPostCall(String body) throws ScimApiException {
 
         Object localVarPostBody = body;
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -172,7 +174,7 @@ public class Scimv2BaseApi {
      * @return Call to execute.
      * @throws ScimApiException If fail to serialize the request body object.
      */
-    public Call updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body)
+    public HttpUriRequest updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body)
             throws ScimApiException {
 
         Object localVarPostBody = body;
@@ -203,7 +205,7 @@ public class Scimv2BaseApi {
      * @return Call to execute.
      * @throws ScimApiException If fail to serialize the request body object.
      */
-    public Call getResourceTypeCall() throws ScimApiException {
+    public HttpUriRequest getResourceTypeCall() throws ScimApiException {
 
         Object localVarPostBody = null;
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
