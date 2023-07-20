@@ -614,8 +614,6 @@ public class ScimApiClient {
         try {
             if (debugging != this.debugging) {
                 if (debugging) {
-                    logger.info("Enabling debug mode");
-
                     // Create the logging interceptors.
                     HttpRequestInterceptor requestInterceptor =
                             (request, context) -> logger.debug(getRequestInfo(request));
@@ -627,7 +625,6 @@ public class ScimApiClient {
                             .addInterceptorFirst(responseInterceptor)
                             .build();
                 } else {
-                    logger.info("Disabling debug mode");
                     ((CloseableHttpClient) httpClient).close();
                     httpClient = httpClientBuilder.build();
                 }
@@ -641,44 +638,61 @@ public class ScimApiClient {
 
     private String getRequestInfo(HttpRequest request) throws IOException {
 
-        String message = "\nRequest - "
-                + request.getRequestLine().getMethod() + " "
-                + request.getRequestLine().getUri()
-                + "\nHeaders: ["
-                + Arrays.stream(request.getAllHeaders())
-                .map(header -> header.getName() + ": " + header.getValue())
-                .collect(Collectors.joining(", "))
-                + "]";
+        StringBuilder message = new StringBuilder();
+        message.append("\nRequest - ")
+                .append(request.getRequestLine().getMethod())
+                .append(" ")
+                .append(request.getRequestLine().getUri())
+                .append("\nHeaders: [")
+                .append(getHeadersInfo(request.getAllHeaders()))
+                .append("]");
 
         if (request instanceof HttpEntityEnclosingRequest) {
-            HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-            ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            entity.writeTo(bs);
-            message += "\nPayload:\n" + bs;
+            message.append("\nPayload:\n").append(getRequestEntityInfo(request));
         }
 
-        return message;
+        return message.toString();
     }
 
     private String getResponseInfo(HttpResponse response) throws IOException {
 
-        String message = "\nResponse - "
-                + response.getStatusLine().getStatusCode() + " "
-                + response.getStatusLine().getReasonPhrase()
-                + "\nHeaders: ["
-                + Arrays.stream(response.getAllHeaders())
-                .map(header -> header.getName() + ": " + header.getValue())
-                .collect(Collectors.joining(", "))
-                + "]";
+        StringBuilder message = new StringBuilder();
+        message.append("\nResponse - ")
+                .append(response.getStatusLine().getStatusCode())
+                .append(" ")
+                .append(response.getStatusLine().getReasonPhrase())
+                .append("\nHeaders: [")
+                .append(getHeadersInfo(response.getAllHeaders()))
+                .append("]");
 
         if (response.getEntity() != null) {
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-            String payload = buffer.lines().collect(Collectors.joining("\n"));
-            response.setEntity(new StringEntity(payload));
-            message += "\nPayload: \n" + payload;
+            message.append("\nPayload: \n").append(getResponseEntityInfo(response));
         }
 
-        return message;
+        return message.toString();
+    }
+
+    private String getHeadersInfo(Header[] headers) {
+
+        return Arrays.stream(headers)
+                .map(header -> header.getName() + ": " + header.getValue())
+                .collect(Collectors.joining(", "));
+    }
+
+    private String getRequestEntityInfo(HttpRequest request) throws IOException {
+
+        HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        entity.writeTo(bs);
+        return bs.toString();
+    }
+
+    private String getResponseEntityInfo(HttpResponse response) throws IOException {
+
+        BufferedReader buffer = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        String payload = buffer.lines().collect(Collectors.joining("\n"));
+        response.setEntity(new StringEntity(payload));
+        return payload;
     }
 
     /**
@@ -1462,15 +1476,11 @@ public class ScimApiClient {
 
     private Map<String, List<String>> extractHeaders(HttpResponse response) {
 
-        Header[] headers = response.getAllHeaders();
-        Map<String, List<String>> extractedHeaders = new HashMap<>();
-
-        for (Header header : headers) {
-            String name = header.getName();
-            String value = header.getValue();
-            extractedHeaders.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
-        }
-
-        return extractedHeaders;
+        return Arrays.stream(response.getAllHeaders())
+                .collect(
+                Collectors.groupingBy(
+                        Header::getName,
+                        Collectors.mapping(Header::getValue, Collectors.toList())
+                                     ));
     }
 }
