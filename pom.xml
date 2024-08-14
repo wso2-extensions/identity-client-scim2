@@ -107,7 +107,13 @@
             <version>${junit-version}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+    
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.version}</version>
+        </dependency>
+</dependencies>
 
 
 
@@ -269,7 +275,27 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
             </plugin>
-        </plugins>
+        
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+</plugins>
     </build>
 
     <profiles>
@@ -280,7 +306,9 @@
             </activation>
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
-            </properties>
+            
+<jacoco.version>0.8.6</jacoco.version>
+</properties>
         </profile>
         <profile>
             <id>wso2-release</id>
@@ -294,7 +322,13 @@
                                 <artifactId>apache-source-release-assembly-descriptor</artifactId>
                                 <version>1.0.4</version>
                             </dependency>
-                        </dependencies>
+                        
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.version}</version>
+        </dependency>
+</dependencies>
                         <executions>
                             <execution>
                                 <id>source-release-assembly</id>
@@ -357,7 +391,27 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
+                
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+</plugins>
             </build>
         </profile>
     </profiles>
@@ -380,5 +434,7 @@
         <junit-version>4.12</junit-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sourceReleaseAssemblyDescriptor>source-release</sourceReleaseAssemblyDescriptor>
-    </properties>
+    
+<jacoco.version>0.8.6</jacoco.version>
+</properties>
 </project>
