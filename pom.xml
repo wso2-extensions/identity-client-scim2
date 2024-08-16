@@ -280,6 +280,8 @@
             </activation>
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
+            
+                <jacoco.version>0.8.12</jacoco.version>
             </properties>
         </profile>
         <profile>
@@ -380,5 +382,7 @@
         <junit-version>4.12</junit-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sourceReleaseAssemblyDescriptor>source-release</sourceReleaseAssemblyDescriptor>
-    </properties>
+    
+                <jacoco.version>0.8.12</jacoco.version>
+            </properties>
 </project>
