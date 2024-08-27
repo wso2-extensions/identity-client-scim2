@@ -150,7 +150,15 @@ public class GroupOperations extends AbstractOperations {
                 if (groupId == null) {
                     return;
                 }
-                String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+
+                // get corresponding userIds
+                Group updatedGroup = setUserIdForMembers();
+                String encodedGroup;
+                if (updatedGroup != null) {
+                    encodedGroup = scimClient.encodeSCIMObject(updatedGroup, SCIMConstants.JSON);
+                } else {
+                    encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                }
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
                 ScimApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
@@ -175,5 +183,28 @@ public class GroupOperations extends AbstractOperations {
         } catch (IOException e) {
             throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         }
+    }
+
+    private Group setUserIdForMembers() throws AbstractCharonException, ScimApiException, IOException {
+
+        List<String> users = ((Group) scimObject).getMembersWithDisplayName();
+        if (CollectionUtils.isEmpty(users)) {
+            return null;
+        }
+        //create a deep copy of the group since we are going to update the member ids
+        Group copiedGroup = (Group) CopyUtil.deepCopy(scimObject);
+        //delete existing members in the group since we are going to update it with
+        copiedGroup.deleteAttribute(SCIMConstants.GroupSchemaConstants.MEMBERS);
+
+        for (String user : users) {
+            List<SCIMObject> filteredUsers = listWithGet(null, null, USER_FILTER + user, 1, 1, null, null,
+                    SCIM2CommonConstants.USER);
+            String userId = null;
+            for (SCIMObject filteredUser : filteredUsers) {
+                userId = ((User) filteredUser).getId();
+            }
+            copiedGroup.setMember(userId, user);
+        }
+        return copiedGroup;
     }
 }
