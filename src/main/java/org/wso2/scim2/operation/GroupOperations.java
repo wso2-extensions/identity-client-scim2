@@ -154,13 +154,14 @@ public class GroupOperations extends AbstractOperations {
                     return;
                 }
 
-                // get corresponding userIds
-                Group updatedGroup = setUserIdForMembers();
                 String encodedGroup;
-                if (updatedGroup != null) {
-                    encodedGroup = scimClient.encodeSCIMObject(updatedGroup, SCIMConstants.JSON);
-                } else {
+                List<String> users = ((Group) scimObject).getMembersWithDisplayName();
+                if (CollectionUtils.isEmpty(users)) {
                     encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                } else {
+                    // Find corresponding userIds of group members and enrich the scimObject.
+                    Group updatedGroup = addUserIDForMembersOfGroup();
+                    encodedGroup = scimClient.encodeSCIMObject(updatedGroup, SCIMConstants.JSON);
                 }
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
@@ -188,12 +189,10 @@ public class GroupOperations extends AbstractOperations {
         }
     }
 
-    private Group setUserIdForMembers() throws AbstractCharonException, ScimApiException, IOException {
+    private Group addUserIDForMembersOfGroup() throws AbstractCharonException, ScimApiException, IOException {
 
         List<String> users = ((Group) scimObject).getMembersWithDisplayName();
-        if (CollectionUtils.isEmpty(users)) {
-            return null;
-        }
+
         //create a deep copy of the group since we are going to update the member ids
         Group copiedGroup = (Group) CopyUtil.deepCopy(scimObject);
         //delete existing members in the group since we are going to update it with
