@@ -65,6 +65,9 @@ public class GroupOperations extends AbstractOperations {
                     String filter = USER_FILTER + user;
                     List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null,
                             SCIM2CommonConstants.USER);
+                    if (CollectionUtils.isEmpty(filteredUsers)) {
+                        continue;
+                    }
                     String userId = null;
                     for (SCIMObject filteredUser : filteredUsers) {
                         userId = ((User) filteredUser).getId();
@@ -199,6 +202,9 @@ public class GroupOperations extends AbstractOperations {
         for (String user : users) {
             List<SCIMObject> filteredUsers = listWithGet(null, null, USER_FILTER + user, 1, 1, null, null,
                     SCIM2CommonConstants.USER);
+            if (CollectionUtils.isEmpty(filteredUsers)) {
+                continue;
+            }
             String userId = null;
             for (SCIMObject filteredUser : filteredUsers) {
                 userId = ((User) filteredUser).getId();
