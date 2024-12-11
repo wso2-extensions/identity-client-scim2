@@ -87,13 +87,18 @@
         <dependency>
             <groupId>org.wso2.charon</groupId>
             <artifactId>org.wso2.charon3.core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.okio</groupId>
+                    <artifactId>okio</artifactId>
+                </exclusion>
+            </exclusions>
             <version>${charon.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okio</groupId>
-            <artifactId>okio</artifactId>
-            <version>3.6.0</version>
-            <scope>provided</scope>
+            <artifactId>okio-jvm</artifactId>
+            <version>3.9.0</version>
         </dependency>
         <dependency>
             <groupId>commons-lang.wso2</groupId>
