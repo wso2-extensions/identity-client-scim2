@@ -145,6 +145,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>${maven.bundle.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -386,5 +387,6 @@
         <junit-version>4.12</junit-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sourceReleaseAssemblyDescriptor>source-release</sourceReleaseAssemblyDescriptor>
+        <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
     </properties>
 </project>
