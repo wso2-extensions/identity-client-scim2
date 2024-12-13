@@ -98,7 +98,7 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio-jvm</artifactId>
-            <version>3.9.0</version>
+            <version>${okio.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-lang.wso2</groupId>
@@ -145,6 +145,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>${maven.bundle.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -372,6 +373,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <swagger-core-version>1.5.15</swagger-core-version>
+        <okio.version>3.9.1</okio.version>
         <commons-lang.wso2.version>2.6.0.wso2v1</commons-lang.wso2.version>
         <httpclient.orbit.version>4.5.13.wso2v1</httpclient.orbit.version>
         <httpcore.orbit.version>4.4.16.wso2v1</httpcore.orbit.version>
@@ -385,5 +387,6 @@
         <junit-version>4.12</junit-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sourceReleaseAssemblyDescriptor>source-release</sourceReleaseAssemblyDescriptor>
+        <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
     </properties>
 </project>
