@@ -22,6 +22,7 @@ import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
+import org.wso2.charon3.core.exceptions.NotFoundException;
 import org.wso2.charon3.core.objects.AbstractSCIMObject;
 import org.wso2.charon3.core.objects.Group;
 import org.wso2.charon3.core.objects.SCIMObject;
@@ -63,16 +64,19 @@ public class GroupOperations extends AbstractOperations {
                 //get corresponding userIds
                 for (String user : users) {
                     String filter = USER_FILTER + user;
-                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null,
-                            SCIM2CommonConstants.USER);
-                    if (CollectionUtils.isEmpty(filteredUsers)) {
-                        continue;
+                    try {
+                        List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null,
+                                SCIM2CommonConstants.USER);
+                        String userId = null;
+                        for (SCIMObject filteredUser : filteredUsers) {
+                            userId = ((User) filteredUser).getId();
+                        }
+                        copiedGroup.setMember(userId, user);
+                    } catch (NotFoundException e) {
+                        // Skip the not existing users from the SCIM2/groups create request.
+                        logger.warn("User not found in the provisioned store. Hence, the user will not be " +
+                                "added to the group: " + copiedGroup.getDisplayName());
                     }
-                    String userId = null;
-                    for (SCIMObject filteredUser : filteredUsers) {
-                        userId = ((User) filteredUser).getId();
-                    }
-                    copiedGroup.setMember(userId, user);
                 }
             }
 
@@ -199,16 +203,19 @@ public class GroupOperations extends AbstractOperations {
         copiedGroup.deleteAttribute(SCIMConstants.GroupSchemaConstants.MEMBERS);
 
         for (String user : users) {
-            List<SCIMObject> filteredUsers = listWithGet(null, null, USER_FILTER + user, 1, 1, null, null,
-                    SCIM2CommonConstants.USER);
-            if (CollectionUtils.isEmpty(filteredUsers)) {
-                continue;
+            try {
+                List<SCIMObject> filteredUsers = listWithGet(null, null, USER_FILTER + user, 1, 1, null, null,
+                        SCIM2CommonConstants.USER);
+                String userId = null;
+                for (SCIMObject filteredUser : filteredUsers) {
+                    userId = ((User) filteredUser).getId();
+                }
+                copiedGroup.setMember(userId, user);
+            } catch (NotFoundException e) {
+                // Skip the not existing users from the SCIM2/groups update request.
+                logger.warn("User not found in the provisioned store. Hence, the user will not be " +
+                        "added to the group: " + copiedGroup.getDisplayName());
             }
-            String userId = null;
-            for (SCIMObject filteredUser : filteredUsers) {
-                userId = ((User) filteredUser).getId();
-            }
-            copiedGroup.setMember(userId, user);
         }
         return copiedGroup;
     }

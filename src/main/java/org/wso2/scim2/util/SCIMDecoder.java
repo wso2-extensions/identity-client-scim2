@@ -54,10 +54,7 @@ public class SCIMDecoder {
 
             //we expect this to be a non-empty JSONArray according to the format
             Object resources = decodedJsonObj.opt(SCIMConstants.ListedResourceSchemaConstants.RESOURCES);
-            scimObjects = new ArrayList<>();
-            if (resources == null) {
-                return scimObjects;
-            }
+            scimObjects = new ArrayList<SCIMObject>();
             decoder = new JSONDecoder();
             for (int i = 0; i < (((JSONArray) resources).length()); i++) {
                 Object object = ((JSONArray) resources).get(i);
