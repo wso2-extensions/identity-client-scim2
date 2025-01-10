@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2018-2025, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.scim2.operation;
@@ -22,6 +24,7 @@ import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
+import org.wso2.charon3.core.exceptions.NotFoundException;
 import org.wso2.charon3.core.objects.AbstractSCIMObject;
 import org.wso2.charon3.core.objects.Group;
 import org.wso2.charon3.core.objects.SCIMObject;
@@ -63,13 +66,19 @@ public class GroupOperations extends AbstractOperations {
                 //get corresponding userIds
                 for (String user : users) {
                     String filter = USER_FILTER + user;
-                    List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null,
-                            SCIM2CommonConstants.USER);
-                    String userId = null;
-                    for (SCIMObject filteredUser : filteredUsers) {
-                        userId = ((User) filteredUser).getId();
+                    try {
+                        List<SCIMObject> filteredUsers = listWithGet(null, null, filter, 1, 1, null, null,
+                                SCIM2CommonConstants.USER);
+                        String userId = null;
+                        for (SCIMObject filteredUser : filteredUsers) {
+                            userId = ((User) filteredUser).getId();
+                        }
+                        copiedGroup.setMember(userId, user);
+                    } catch (NotFoundException e) {
+                        // Skip the not existing users from the SCIM2/groups create request.
+                        logger.warn("User not found in the provisioned store. Hence, the user will not be " +
+                                "added to the group: " + copiedGroup.getDisplayName());
                     }
-                    copiedGroup.setMember(userId, user);
                 }
             }
 
@@ -150,7 +159,16 @@ public class GroupOperations extends AbstractOperations {
                 if (groupId == null) {
                     return;
                 }
-                String encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+
+                String encodedGroup;
+                List<String> users = ((Group) scimObject).getMembersWithDisplayName();
+                if (CollectionUtils.isEmpty(users)) {
+                    encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                } else {
+                    // Find corresponding userIds of group members and enrich the scimObject.
+                    Group updatedGroup = addUserIDForMembersOfGroup();
+                    encodedGroup = scimClient.encodeSCIMObject(updatedGroup, SCIMConstants.JSON);
+                }
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
                 ScimApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
@@ -175,5 +193,32 @@ public class GroupOperations extends AbstractOperations {
         } catch (IOException e) {
             throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         }
+    }
+
+    private Group addUserIDForMembersOfGroup() throws AbstractCharonException, ScimApiException, IOException {
+
+        List<String> users = ((Group) scimObject).getMembersWithDisplayName();
+
+        // create a deep copy of the group since we are going to update the member ids.
+        Group copiedGroup = (Group) CopyUtil.deepCopy(scimObject);
+        // delete existing members in the group since we are going to update it with.
+        copiedGroup.deleteAttribute(SCIMConstants.GroupSchemaConstants.MEMBERS);
+
+        for (String user : users) {
+            try {
+                List<SCIMObject> filteredUsers = listWithGet(null, null, USER_FILTER + user, 1, 1, null, null,
+                        SCIM2CommonConstants.USER);
+                String userId = null;
+                for (SCIMObject filteredUser : filteredUsers) {
+                    userId = ((User) filteredUser).getId();
+                }
+                copiedGroup.setMember(userId, user);
+            } catch (NotFoundException e) {
+                // Skip the not existing users from the SCIM2/groups update request.
+                logger.warn("User not found in the provisioned store. Hence, the user will not be " +
+                        "added to the group: " + copiedGroup.getDisplayName());
+            }
+        }
+        return copiedGroup;
     }
 }
