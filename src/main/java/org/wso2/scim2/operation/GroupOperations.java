@@ -199,9 +199,9 @@ public class GroupOperations extends AbstractOperations {
 
         List<String> users = ((Group) scimObject).getMembersWithDisplayName();
 
-        //create a deep copy of the group since we are going to update the member ids
+        // create a deep copy of the group since we are going to update the member ids.
         Group copiedGroup = (Group) CopyUtil.deepCopy(scimObject);
-        //delete existing members in the group since we are going to update it with
+        // delete existing members in the group since we are going to update it with.
         copiedGroup.deleteAttribute(SCIMConstants.GroupSchemaConstants.MEMBERS);
 
         for (String user : users) {
