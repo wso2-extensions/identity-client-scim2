@@ -30,7 +30,10 @@ import org.wso2.charon3.core.utils.codeutils.PatchOperation;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for PatchOperationEncoder class.
