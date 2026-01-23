@@ -42,6 +42,7 @@ import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -58,8 +59,10 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.wso2.scim2.util.SCIM2ClientConfig;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -77,6 +80,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.SocketTimeoutException;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -96,9 +100,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,6 +113,13 @@ import java.util.stream.Collectors;
 public class ScimApiClient {
 
     private static final Log logger = LogFactory.getLog(ScimApiClient.class);
+    private static final Set<Integer> RETRYABLE_STATUS_CODES =
+            new HashSet<>(Arrays.asList(500, 502, 503, 504, 408, 429));
+
+    // Exponential backoff configuration for 429 (Too Many Requests).
+    private static final int BACKOFF_INITIAL_DELAY_MS = 1000;  // 1 second initial delay
+    private static final int BACKOFF_MAX_DELAY_MS = 32000;     // 32 seconds max delay
+    private static final double BACKOFF_MULTIPLIER = 2.0;      // Double delay each retry
 
     public static final double JAVA_VERSION;
 
@@ -151,9 +164,29 @@ public class ScimApiClient {
      */
     public ScimApiClient() {
 
-        httpClientBuilder = HttpClientBuilder.create();
+        // Get configurations from SCIM2ClientConfig.
+        SCIM2ClientConfig config = SCIM2ClientConfig.getInstance();
+        int readTimeout = config.getHttpReadTimeoutInMillis();
+        int connectionTimeout = config.getHttpConnectionTimeoutInMillis();
+        int connectionRequestTimeout = config.getHttpConnectionRequestTimeoutInMillis();
+        int connectionPoolSize = config.getHttpConnectionPoolSize();
+
+        // Build request config with timeout settings.
+        requestConfig = RequestConfig.custom()
+                .setConnectTimeout(connectionTimeout)
+                .setConnectionRequestTimeout(connectionRequestTimeout)
+                .setSocketTimeout(readTimeout)
+                .build();
+
+        // Build connection pool manager.
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(connectionPoolSize);
+
+        // Build HTTP client with request config and connection manager.
+        httpClientBuilder = HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig)
+                .setConnectionManager(connectionManager);
         httpClient = httpClientBuilder.build();
-        requestConfig = RequestConfig.custom().build();
 
         verifyingSsl = true;
         json = new JSON(this);
@@ -1089,6 +1122,7 @@ public class ScimApiClient {
 
     /**
      * Execute HTTP call and deserialize the HTTP response body into the given return type.
+     * This method implements a retry mechanism for handling transient network failures.
      *
      * @param returnType The return type used to deserialize HTTP response body
      * @param <T>        The return type corresponding to (same with) returnType
@@ -1100,12 +1134,150 @@ public class ScimApiClient {
      */
     public <T> ScimApiResponse<T> execute(HttpUriRequest request, Type returnType) throws ScimApiException {
 
+        int retryCount = SCIM2ClientConfig.getInstance().getHttpRequestRetryCount();
+
+        // If retryCount is 0, execute without retry (only original request).
+        if (retryCount == 0) {
+            return executeWithoutRetry(request, returnType);
+        }
+
+        int attempts = 0;
+        ScimApiException lastException = null;
+        ScimApiResponse<T> lastResponse = null;
+
+        // Loop executes retryCount + 1 times (original request + retryCount retries).
+        while (attempts <= retryCount) {
+            try {
+                HttpResponse response = httpClient.execute(request);
+                T data = handleResponse(response, returnType);
+                lastResponse = new ScimApiResponse<>(response.getStatusLine().getStatusCode(),
+                        extractHeaders(response), data);
+
+                // Check if the response is retryable based on status code.
+                if (!isRetryableResponse(lastResponse.getStatusCode())) {
+                    return lastResponse;
+                }
+
+                // Server error occurred, log and retry if attempts remain.
+                logRetryAttempt(request, attempts + 1, retryCount,
+                        String.format("Server error with status code: %d", lastResponse.getStatusCode()));
+
+                // Apply exponential backoff for 429 before retrying.
+                if (attempts < retryCount) {
+                    applyBackoff(attempts, lastResponse.getStatusCode());
+                }
+            } catch (ConnectTimeoutException | SocketTimeoutException e) {
+                lastException = new ScimApiException("Request timeout: " + e.getMessage(), e);
+                logRetryAttempt(request, attempts + 1, retryCount, "Connection/Socket timeout.");
+            } catch (IOException e) {
+                lastException = new ScimApiException("I/O error: " + e.getMessage(), e);
+                logRetryAttempt(request, attempts + 1, retryCount, "I/O error.");
+            } catch (ScimApiException e) {
+                // If it's a 4xx client error (except 429), don't retry.
+                if (e.getCode() >= 400 && e.getCode() < 500 && e.getCode() != 429) {
+                    throw e;
+                }
+                lastException = e;
+                logRetryAttempt(request, attempts + 1, retryCount, "SCIM API error.");
+            }
+            attempts++;
+        }
+
+        // All retries exhausted.
+        if (lastResponse != null) {
+            return lastResponse;
+        }
+        if (lastException != null) {
+            logger.warn(String.format("Maximum retry attempts (%d) reached for request: %s",
+                    retryCount, request.getURI()), lastException);
+            throw lastException;
+        }
+        throw new ScimApiException(String.format("Failed to execute request after %d attempts", retryCount));
+    }
+
+    /**
+     * Execute request without retry mechanism.
+     */
+    private <T> ScimApiResponse<T> executeWithoutRetry(HttpUriRequest request, Type returnType)
+            throws ScimApiException {
+
         try {
             HttpResponse response = httpClient.execute(request);
             T data = handleResponse(response, returnType);
             return new ScimApiResponse<>(response.getStatusLine().getStatusCode(), extractHeaders(response), data);
         } catch (IOException e) {
             throw new ScimApiException(e);
+        }
+    }
+
+    /**
+     * Check if the HTTP status code indicates a retryable response.
+     */
+    private boolean isRetryableResponse(int statusCode) {
+
+        return RETRYABLE_STATUS_CODES.contains(statusCode);
+    }
+
+    /**
+     * Log retry attempt information.
+     */
+    private void logRetryAttempt(HttpUriRequest request, int currentAttempt, int retryCount, String reason) {
+
+        if (!logger.isDebugEnabled()) {
+            return;
+        }
+
+        if (currentAttempt < retryCount) {
+            logger.debug(String.format("Request for API: %s failed due to %s. Retrying attempt %d of %d.",
+                    request.getURI(), reason, currentAttempt, retryCount - 1));
+        } else {
+            logger.debug(String.format("Request for API: %s failed due to %s. Maximum retry attempts reached.",
+                    request.getURI(), reason));
+        }
+    }
+
+    /**
+     * Check if the HTTP status code requires exponential backoff.
+     * Currently only 429 (Too Many Requests) uses backoff.
+     */
+    private boolean requiresBackoff(int statusCode) {
+
+        return statusCode == 429;
+    }
+
+    /**
+     * Calculate exponential backoff delay in milliseconds.
+     * Uses formula: min(BACKOFF_INITIAL_DELAY_MS * (BACKOFF_MULTIPLIER ^ attempt), BACKOFF_MAX_DELAY_MS)
+     *
+     * @param attempt Current attempt number (0-based)
+     * @return Delay in milliseconds
+     */
+    private long calculateBackoffDelay(int attempt) {
+
+        long delay = (long) (BACKOFF_INITIAL_DELAY_MS * Math.pow(BACKOFF_MULTIPLIER, attempt));
+        return Math.min(delay, BACKOFF_MAX_DELAY_MS);
+    }
+
+    /**
+     * Apply backoff delay before retry.
+     */
+    private void applyBackoff(int attempt, int statusCode) {
+
+        if (!requiresBackoff(statusCode)) {
+            return;
+        }
+
+        long delay = calculateBackoffDelay(attempt);
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format("Rate limited (429). Waiting %d ms before retry attempt %d",
+                    delay, attempt + 1));
+        }
+
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("Backoff delay interrupted", e);
         }
     }
 
