@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2018-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -11,7 +11,7 @@
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
+ * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -24,45 +24,48 @@ import io.scim2.swagger.client.auth.HttpBasicAuth;
 import io.scim2.swagger.client.auth.OAuth;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpHead;
+import org.apache.hc.client5.http.classic.methods.HttpOptions;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.FileEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import okio.BufferedSink;
 import okio.Okio;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.StringBody;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.wso2.scim2.util.SCIM2ClientConfig;
 
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
-import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.nio.reactor.ConnectingIOReactor;
-import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.core5.util.Timeout;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 
+import java.net.ConnectException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
@@ -157,7 +160,7 @@ public class ScimApiClient implements AutoCloseable {
 
     private CloseableHttpAsyncClient asyncHttpClient;
     private RequestConfig requestConfig;
-    private PoolingNHttpClientConnectionManager asyncConnManager;
+    private PoolingAsyncClientConnectionManager asyncConnManager;
     private volatile long cachedMaxOperationTimeMs;
     private JSON json;
 
@@ -171,15 +174,12 @@ public class ScimApiClient implements AutoCloseable {
         // Get configurations from SCIM2ClientConfig.
         SCIM2ClientConfig config = SCIM2ClientConfig.getInstance();
         int readTimeout = config.getHttpReadTimeoutInMillis();
-        int connectionTimeout = config.getHttpConnectionTimeoutInMillis();
         int connectionRequestTimeout = config.getHttpConnectionRequestTimeoutInMillis();
-        int connectionPoolSize = config.getHttpConnectionPoolSize();
 
-        // Build request config with timeout settings.
+        // Build request config with request-level timeout settings.
         requestConfig = RequestConfig.custom()
-                .setConnectTimeout(connectionTimeout)
-                .setConnectionRequestTimeout(connectionRequestTimeout)
-                .setSocketTimeout(readTimeout)
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectionRequestTimeout))
+                .setResponseTimeout(Timeout.ofMilliseconds(readTimeout))
                 .build();
 
         // Initialize async HTTP client with NIO.
@@ -190,8 +190,8 @@ public class ScimApiClient implements AutoCloseable {
         this.cachedMaxOperationTimeMs = calculateMaxOperationTime();
 
         if (logger.isDebugEnabled()) {
-            logger.debug(String.format("SCIM2 client initialized with NIO: %d threads, %d max connections, timeout: %dms",
-                    config.getNioThreadCount(), config.getHttpConnectionPoolSize(), cachedMaxOperationTimeMs));
+            logger.debug(String.format("SCIM2 client initialized with NIO: %d max connections, timeout: %dms",
+                    config.getHttpConnectionPoolSize(), cachedMaxOperationTimeMs));
         }
 
         verifyingSsl = true;
@@ -222,38 +222,28 @@ public class ScimApiClient implements AutoCloseable {
 
     /**
      * Create and configure async HTTP client for NIO-based non-blocking I/O.
+     * HttpClient 5 manages the I/O reactor internally with sensible defaults.
      *
      * @param config SCIM2ClientConfig instance
      * @return Configured CloseableHttpAsyncClient
      */
     private CloseableHttpAsyncClient createAsyncHttpClient(SCIM2ClientConfig config) {
 
-        try {
-            // Configure I/O reactor with NIO threads.
-            IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-                    .setIoThreadCount(config.getNioThreadCount())
-                    .setConnectTimeout(config.getHttpConnectionTimeoutInMillis())
-                    .setSoTimeout(config.getHttpReadTimeoutInMillis())
-                    .build();
+        // Configure connection pool manager for async client.
+        this.asyncConnManager = PoolingAsyncClientConnectionManagerBuilder.create()
+                .setMaxConnTotal(config.getHttpConnectionPoolSize())
+                .setMaxConnPerRoute(config.getHttpConnectionPoolSize())
+                .setDefaultConnectionConfig(ConnectionConfig.custom()
+                        .setSocketTimeout(Timeout.ofMilliseconds(config.getHttpReadTimeoutInMillis()))
+                        .setConnectTimeout(Timeout.ofMilliseconds(config.getHttpConnectionTimeoutInMillis()))
+                        .build())
+                .build();
 
-            // Create I/O reactor for non-blocking I/O.
-            ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
-
-            // Configure connection pool manager for async client and store for later use.
-            this.asyncConnManager = new PoolingNHttpClientConnectionManager(ioReactor);
-            this.asyncConnManager.setMaxTotal(config.getHttpConnectionPoolSize());
-            this.asyncConnManager.setDefaultMaxPerRoute(config.getHttpConnectionPoolSize());
-
-            // Build async HTTP client (SSL settings will be applied separately if needed).
-            return HttpAsyncClients.custom()
-                    .setConnectionManager(this.asyncConnManager)
-                    .setDefaultRequestConfig(requestConfig)
-                    .build();
-
-        } catch (IOReactorException e) {
-            logger.error("Failed to create I/O reactor for async HTTP client", e);
-            throw new IllegalStateException("Async HTTP client initialization failed", e);
-        }
+        // Build async HTTP client (SSL settings will be applied separately if needed).
+        return HttpAsyncClients.custom()
+                .setConnectionManager(this.asyncConnManager)
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
     /**
@@ -715,12 +705,13 @@ public class ScimApiClient implements AutoCloseable {
 
     /**
      * Get connection timeout (in milliseconds).
+     * Note: In HttpClient 5, connect timeout is configured at connection level.
      *
      * @return Timeout in milliseconds
      */
     public int getConnectTimeout() {
 
-        return requestConfig.getConnectTimeout();
+        return SCIM2ClientConfig.getInstance().getHttpConnectionTimeoutInMillis();
     }
 
     /**
@@ -917,7 +908,7 @@ public class ScimApiClient implements AutoCloseable {
      *                          or the Content-Type of the response is not supported.
      */
     @SuppressWarnings("unchecked")
-    public <T> T deserialize(HttpResponse response, Type returnType) throws ScimApiException {
+    public <T> T deserialize(SimpleHttpResponse response, Type returnType) throws ScimApiException {
 
         if (response == null || returnType == null) {
             return null;
@@ -925,27 +916,14 @@ public class ScimApiClient implements AutoCloseable {
 
         if ("byte[]".equals(returnType.toString())) {
             // Handle binary response (byte array).
-            try {
-                HttpEntity entity = response.getEntity();
-                return (T) EntityUtils.toByteArray(entity);
-            } catch (IOException e) {
-                throw new ScimApiException(e);
-            }
+            byte[] bodyBytes = response.getBodyBytes();
+            return (T) bodyBytes;
         } else if (returnType.equals(File.class)) {
             // Handle file downloading.
             return (T) downloadFileFromResponse(response);
         }
 
-        String respBody;
-        try {
-            if (response.getEntity() != null) {
-                respBody = EntityUtils.toString(response.getEntity());
-            } else {
-                respBody = null;
-            }
-        } catch (IOException e) {
-            throw new ScimApiException(e);
-        }
+        String respBody = response.getBodyText();
 
         if (respBody == null || "".equals(respBody)) {
             return null;
@@ -964,7 +942,7 @@ public class ScimApiClient implements AutoCloseable {
         } else {
             throw new ScimApiException(
                     "Content type \"" + contentType + "\" is not supported for type: " + returnType,
-                    response.getStatusLine().getStatusCode(),
+                    response.getCode(),
                     extractHeaders(response),
                     respBody);
         }
@@ -1008,12 +986,15 @@ public class ScimApiClient implements AutoCloseable {
      * @return Downloaded file
      * @throws ScimApiException If fail to read file content from response and write to disk
      */
-    public File downloadFileFromResponse(HttpResponse response) throws ScimApiException {
+    public File downloadFileFromResponse(SimpleHttpResponse response) throws ScimApiException {
 
         try {
             File file = prepareDownloadFile(response);
             BufferedSink sink = Okio.buffer(Okio.sink(file));
-            sink.writeAll(Okio.source(response.getEntity().getContent()));
+            byte[] bodyBytes = response.getBodyBytes();
+            if (bodyBytes != null) {
+                sink.write(bodyBytes);
+            }
             sink.close();
             return file;
         } catch (IOException e) {
@@ -1028,10 +1009,11 @@ public class ScimApiClient implements AutoCloseable {
      * @return Prepared file for the download
      * @throws IOException If fail to prepare file for download
      */
-    public File prepareDownloadFile(HttpResponse response) throws IOException {
+    public File prepareDownloadFile(SimpleHttpResponse response) throws IOException {
 
         String filename = null;
-        String contentDisposition = response.getFirstHeader("Content-Disposition").getValue();
+        Header contentDispositionHeader = response.getFirstHeader("Content-Disposition");
+        String contentDisposition = contentDispositionHeader != null ? contentDispositionHeader.getValue() : null;
         if (contentDisposition != null && !"".equals(contentDisposition)) {
             // Get filename from the Content-Disposition header.
             Pattern pattern = Pattern.compile("filename=['\"]?([^'\"\\s]+)['\"]?");
@@ -1145,12 +1127,16 @@ public class ScimApiClient implements AutoCloseable {
      */
     private long calculateMaxOperationTime() {
 
-        int retryCount = SCIM2ClientConfig.getInstance().getHttpRequestRetryCount();
-        int readTimeout = requestConfig.getSocketTimeout();
-        int connectionTimeout = requestConfig.getConnectTimeout();
+        SCIM2ClientConfig config = SCIM2ClientConfig.getInstance();
+        int retryCount = config.getHttpRequestRetryCount();
+        Timeout responseTimeout = requestConfig.getResponseTimeout();
+
+        // Get connect timeout from config (it's set at connection level, not request level)
+        long readTimeout = responseTimeout != null ? responseTimeout.toMilliseconds() : 5000;
+        long connTimeout = config.getHttpConnectionTimeoutInMillis();
 
         // Time for all HTTP attempts (initial + retries).
-        long totalAttemptTime = (long) (readTimeout + connectionTimeout) * (retryCount + 1);
+        long totalAttemptTime = (readTimeout + connTimeout) * (retryCount + 1);
 
         // Sum of all backoff delays: 1s + 2s + 4s + 8s + 16s + 32s...
         long totalBackoffTime = 0;
@@ -1196,34 +1182,41 @@ public class ScimApiClient implements AutoCloseable {
 
         final CompletableFuture<ScimApiResponse<T>> future = new CompletableFuture<>();
 
-        asyncHttpClient.execute(request, new FutureCallback<HttpResponse>() {
+        try {
+            // Convert classic request to simple request for async execution
+            SimpleHttpRequest simpleRequest = convertToSimpleRequest(request);
 
-            @Override
-            public void completed(HttpResponse response) {
-                try {
-                    T data = handleResponse(response, returnType);
-                    ScimApiResponse<T> scimResponse = new ScimApiResponse<>(
-                            response.getStatusLine().getStatusCode(),
-                            extractHeaders(response),
-                            data
-                    );
-                    future.complete(scimResponse);
-                } catch (Exception e) {
-                    future.completeExceptionally(new ScimApiException("Response handling failed: " +
-                            e.getMessage(), e));
+            asyncHttpClient.execute(simpleRequest, new FutureCallback<SimpleHttpResponse>() {
+
+                @Override
+                public void completed(SimpleHttpResponse response) {
+                    try {
+                        T data = handleResponse(response, returnType);
+                        ScimApiResponse<T> scimResponse = new ScimApiResponse<>(
+                                response.getCode(),
+                                extractHeaders(response),
+                                data
+                        );
+                        future.complete(scimResponse);
+                    } catch (Exception e) {
+                        future.completeExceptionally(new ScimApiException("Response handling failed: " +
+                                e.getMessage(), e));
+                    }
                 }
-            }
 
-            @Override
-            public void failed(Exception ex) {
-                future.completeExceptionally(new ScimApiException("Request failed: " + ex.getMessage(), ex));
-            }
+                @Override
+                public void failed(Exception ex) {
+                    future.completeExceptionally(new ScimApiException("Request failed: " + ex.getMessage(), ex));
+                }
 
-            @Override
-            public void cancelled() {
-                future.completeExceptionally(new ScimApiException("Request cancelled"));
-            }
-        });
+                @Override
+                public void cancelled() {
+                    future.completeExceptionally(new ScimApiException("Request cancelled"));
+                }
+            });
+        } catch (IOException e) {
+            future.completeExceptionally(new ScimApiException("Failed to convert request: " + e.getMessage(), e));
+        }
 
         return future;
     }
@@ -1251,7 +1244,7 @@ public class ScimApiClient implements AutoCloseable {
                         if (!isRetryableException(cause) || attempt >= maxRetries) {
                             if (attempt >= maxRetries) {
                                 logger.warn(String.format("Max retries (%d) reached for %s due to exception",
-                                        maxRetries, request.getURI()), cause);
+                                        maxRetries, getRequestUri(request)), cause);
                             }
                             CompletableFuture<ScimApiResponse<T>> failed = new CompletableFuture<>();
                             failed.completeExceptionally(cause);
@@ -1274,7 +1267,7 @@ public class ScimApiClient implements AutoCloseable {
                     // Retryable error - check if retries remaining.
                     if (attempt >= maxRetries) {
                         logger.warn(String.format("Max retries (%d) reached for %s with status %d",
-                                maxRetries, request.getURI(), response.getStatusCode()));
+                                maxRetries, getRequestUri(request), response.getStatusCode()));
                         return CompletableFuture.completedFuture(response);
                     }
 
@@ -1317,7 +1310,7 @@ public class ScimApiClient implements AutoCloseable {
      */
     private boolean isRetryableException(Throwable throwable) {
 
-        return throwable instanceof ConnectTimeoutException ||
+        return throwable instanceof ConnectException ||
                 throwable instanceof SocketTimeoutException ||
                 throwable instanceof IOException;
     }
@@ -1341,10 +1334,10 @@ public class ScimApiClient implements AutoCloseable {
 
         if (currentAttempt < retryCount) {
             logger.debug(String.format("Request for API: %s failed due to %s. Retrying attempt %d of %d.",
-                    request.getURI(), reason, currentAttempt, retryCount - 1));
+                    getRequestUri(request), reason, currentAttempt, retryCount - 1));
         } else {
             logger.debug(String.format("Request for API: %s failed due to %s. Maximum retry attempts reached.",
-                    request.getURI(), reason));
+                    getRequestUri(request), reason));
         }
     }
 
@@ -1371,37 +1364,21 @@ public class ScimApiClient implements AutoCloseable {
      * @throws ScimApiException If the response has a unsuccessful status code or
      *                          fail to deserialize the response body
      */
-    public <T> T handleResponse(HttpResponse response, Type returnType) throws ScimApiException {
+    public <T> T handleResponse(SimpleHttpResponse response, Type returnType) throws ScimApiException {
 
-        int statusCode = response.getStatusLine().getStatusCode();
-        HttpEntity entity = response.getEntity();
+        int statusCode = response.getCode();
+        String bodyText = response.getBodyText();
         if (statusCode >= 200 && statusCode < 300) {
             if (returnType == null || statusCode == 204) {
                 // returning null if the returnType is not defined,
                 // or the status code is 204 (No Content)
-                if (entity != null) {
-                    try {
-                        EntityUtils.consume(entity);
-                    } catch (IOException e) {
-                        throw new ScimApiException(response.getStatusLine().getReasonPhrase(), e, statusCode,
-                                extractHeaders(response));
-                    }
-                }
                 return null;
             } else {
                 return deserialize(response, returnType);
             }
         } else {
-            String respBody = null;
-            if (entity != null) {
-                try {
-                    respBody = EntityUtils.toString(entity);
-                } catch (IOException e) {
-                    throw new ScimApiException(response.getStatusLine().getReasonPhrase(), e, statusCode,
-                            extractHeaders(response));
-                }
-            }
-            throw new ScimApiException(response.getStatusLine().getReasonPhrase(), statusCode, extractHeaders(response),
+            String respBody = bodyText != null ? bodyText : "";
+            throw new ScimApiException(response.getReasonPhrase(), statusCode, extractHeaders(response),
                     respBody);
         }
     }
@@ -1458,8 +1435,8 @@ public class ScimApiClient implements AutoCloseable {
         }
 
         HttpEntity reqBody;
-        if (request instanceof HttpEntityEnclosingRequestBase) {
-            HttpEntityEnclosingRequestBase entityRequest = (HttpEntityEnclosingRequestBase) request;
+        if (request instanceof HttpUriRequestBase) {
+            HttpUriRequestBase entityRequest = (HttpUriRequestBase) request;
             if (URL_ENCODED_CONTENT_TYPE.equals(contentType)) {
                 reqBody = buildRequestBodyFormEncoding(formParams);
             } else if (MULTIPART_FORM_DATA_CONTENT_TYPE.equals(contentType)) {
@@ -1496,6 +1473,39 @@ public class ScimApiClient implements AutoCloseable {
             default:
                 throw new IllegalArgumentException("Invalid HTTP method: " + method);
         }
+    }
+
+    /**
+     * Helper method to safely get URI from request.
+     */
+    private String getRequestUri(HttpUriRequest request) {
+        try {
+            return request.getUri().toString();
+        } catch (Exception e) {
+            return "unknown";
+        }
+    }
+
+    /**
+     * Convert classic HttpUriRequest to SimpleHttpRequest for async execution.
+     */
+    private SimpleHttpRequest convertToSimpleRequest(HttpUriRequest classicRequest) throws IOException {
+        SimpleRequestBuilder builder = SimpleRequestBuilder.copy(classicRequest);
+
+        // Copy entity if present
+        if (classicRequest instanceof HttpUriRequestBase) {
+            HttpUriRequestBase entityRequest = (HttpUriRequestBase) classicRequest;
+            HttpEntity entity = entityRequest.getEntity();
+            if (entity != null) {
+                byte[] content = EntityUtils.toByteArray(entity);
+                if (content != null && content.length > 0) {
+                    builder.setBody(content, entity.getContentType() != null ?
+                        ContentType.parse(entity.getContentType()) : null);
+                }
+            }
+        }
+
+        return builder.build();
     }
 
     /**
@@ -1707,12 +1717,33 @@ public class ScimApiClient implements AutoCloseable {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(keyManagers, trustManagers, new SecureRandom());
 
-                // Build new async client with SSL settings
+                // Create TLS strategy with SSL context and hostname verifier (for async client)
+                TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
+                        .setSslContext(sslContext)
+                        .setHostnameVerifier(hostnameVerifier)
+                        .buildAsync();
+
+                // Get configuration values from SCIM2ClientConfig
+                SCIM2ClientConfig config = SCIM2ClientConfig.getInstance();
+
+                // Recreate connection manager with TLS strategy
+                if (asyncConnManager != null) {
+                    asyncConnManager.close();
+                }
+                asyncConnManager = PoolingAsyncClientConnectionManagerBuilder.create()
+                        .setTlsStrategy(tlsStrategy)
+                        .setMaxConnTotal(config.getHttpConnectionPoolSize())
+                        .setMaxConnPerRoute(config.getHttpConnectionPoolSize())
+                        .setDefaultConnectionConfig(ConnectionConfig.custom()
+                                .setSocketTimeout(Timeout.ofMilliseconds(config.getHttpReadTimeoutInMillis()))
+                                .setConnectTimeout(Timeout.ofMilliseconds(config.getHttpConnectionTimeoutInMillis()))
+                                .build())
+                        .build();
+
+                // Build new async client with SSL-configured connection manager
                 asyncHttpClient = HttpAsyncClients.custom()
                         .setConnectionManager(asyncConnManager)
                         .setDefaultRequestConfig(requestConfig)
-                        .setSSLContext(sslContext)
-                        .setSSLHostnameVerifier(hostnameVerifier)
                         .build();
 
                 // Start the new async client
@@ -1738,9 +1769,9 @@ public class ScimApiClient implements AutoCloseable {
         }
     }
 
-    private Map<String, List<String>> extractHeaders(HttpResponse response) {
+    private Map<String, List<String>> extractHeaders(SimpleHttpResponse response) {
 
-        return Arrays.stream(response.getAllHeaders())
+        return Arrays.stream(response.getHeaders())
                 .collect(
                 Collectors.groupingBy(
                         Header::getName,
@@ -1775,18 +1806,15 @@ public class ScimApiClient implements AutoCloseable {
             }
         }
 
-        // Shutdown connection manager to release I/O reactor threads and connection pool resources.
+        // Close connection manager to release I/O reactor threads and connection pool resources.
         if (asyncConnManager != null) {
             try {
-                asyncConnManager.shutdown();
+                asyncConnManager.close();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Connection manager shut down successfully");
+                    logger.debug("Connection manager closed successfully");
                 }
-            } catch (IOException e) {
-                logger.warn("Error shutting down connection manager", e);
-                if (firstException == null) {
-                    firstException = e;
-                }
+            } catch (Exception e) {
+                logger.warn("Error closing connection manager", e);
             } finally {
                 asyncConnManager = null;
             }
