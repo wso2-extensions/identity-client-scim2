@@ -1721,7 +1721,7 @@ public class ScimApiClient implements AutoCloseable {
                 TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
                         .setSslContext(sslContext)
                         .setHostnameVerifier(hostnameVerifier)
-                        .buildAsync();
+                        .build();
 
                 // Get configuration values from SCIM2ClientConfig
                 SCIM2ClientConfig config = SCIM2ClientConfig.getInstance();
