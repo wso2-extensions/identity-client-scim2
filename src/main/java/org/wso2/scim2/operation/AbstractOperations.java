@@ -40,7 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractOperations {
+/**
+ * Abstract base class for SCIM operations.
+ * Implements AutoCloseable to ensure proper cleanup of HTTP client resources.
+ */
+public abstract class AbstractOperations implements AutoCloseable {
 
     public static final String USER_FILTER = "userName Eq ";
     public static final String GROUP_FILTER = "displayName Eq ";
@@ -66,9 +70,29 @@ public abstract class AbstractOperations {
         groupEPURL = provider.getProperty(SCIM2CommonConstants.ELEMENT_NAME_GROUP_ENDPOINT);
         userName = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
 
+        // Create new client for this operation
         client = new ScimApiClient();
         client.setUsername(userName);
         client.setPassword(provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD));
+    }
+
+    /**
+     * Close the HTTP client and release all associated resources.
+     * This method should be called when the operation is complete.
+     */
+    @Override
+    public void close() {
+
+        if (client != null) {
+            try {
+                client.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Successfully closed SCIM API client");
+                }
+            } catch (IOException e) {
+                logger.warn("Error closing SCIM API client", e);
+            }
+        }
     }
 
     public List<SCIMObject> listWithGet(List<String> attributes, List<String> excludedAttributes, String filter,
