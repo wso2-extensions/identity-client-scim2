@@ -25,12 +25,8 @@ import io.scim2.swagger.client.auth.OAuth;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
@@ -43,7 +39,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
@@ -52,32 +47,39 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import okio.BufferedSink;
 import okio.Okio;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.wso2.scim2.util.SCIM2ClientConfig;
 
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
+import org.apache.http.nio.reactor.ConnectingIOReactor;
+import org.apache.http.nio.reactor.IOReactorException;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
@@ -110,16 +112,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ScimApiClient {
+public class ScimApiClient implements AutoCloseable {
 
     private static final Log logger = LogFactory.getLog(ScimApiClient.class);
     private static final Set<Integer> RETRYABLE_STATUS_CODES =
             new HashSet<>(Arrays.asList(500, 502, 503, 504, 408, 429));
 
     // Exponential backoff configuration for 429 (Too Many Requests).
-    private static final int BACKOFF_INITIAL_DELAY_MS = 1000;  // 1 second initial delay
-    private static final int BACKOFF_MAX_DELAY_MS = 32000;     // 32 seconds max delay
-    private static final double BACKOFF_MULTIPLIER = 2.0;      // Double delay each retry
+    private static final int BACKOFF_INITIAL_DELAY_MS = 1000;  // 1 second initial delay.
+    private static final int BACKOFF_MAX_DELAY_MS = 32000;     // 32 seconds max delay.
+    private static final double BACKOFF_MULTIPLIER = 2.0;      // Double delay each retry.
 
     public static final double JAVA_VERSION;
 
@@ -151,10 +153,12 @@ public class ScimApiClient {
     private InputStream sslCaCert;
     private boolean verifyingSsl;
     private KeyManager[] keyManagers;
+    private TrustManager[] cachedTrustManagers;
 
-    private HttpClient httpClient;
-    private final HttpClientBuilder httpClientBuilder;
+    private CloseableHttpAsyncClient asyncHttpClient;
     private RequestConfig requestConfig;
+    private PoolingNHttpClientConnectionManager asyncConnManager;
+    private volatile long cachedMaxOperationTimeMs;
     private JSON json;
 
     private String url;
@@ -178,15 +182,17 @@ public class ScimApiClient {
                 .setSocketTimeout(readTimeout)
                 .build();
 
-        // Build connection pool manager.
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(connectionPoolSize);
+        // Initialize async HTTP client with NIO.
+        this.asyncHttpClient = createAsyncHttpClient(config);
+        this.asyncHttpClient.start();
 
-        // Build HTTP client with request config and connection manager.
-        httpClientBuilder = HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .setConnectionManager(connectionManager);
-        httpClient = httpClientBuilder.build();
+        // Calculate and cache max operation time based on configuration
+        this.cachedMaxOperationTimeMs = calculateMaxOperationTime();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format("SCIM2 client initialized with NIO: %d threads, %d max connections, timeout: %dms",
+                    config.getNioThreadCount(), config.getHttpConnectionPoolSize(), cachedMaxOperationTimeMs));
+        }
 
         verifyingSsl = true;
         json = new JSON(this);
@@ -215,25 +221,49 @@ public class ScimApiClient {
     }
 
     /**
-     * Get HTTP client
+     * Create and configure async HTTP client for NIO-based non-blocking I/O.
      *
-     * @return An instance of HttpClient
+     * @param config SCIM2ClientConfig instance
+     * @return Configured CloseableHttpAsyncClient
      */
-    public HttpClient getHttpClient() {
+    private CloseableHttpAsyncClient createAsyncHttpClient(SCIM2ClientConfig config) {
 
-        return httpClient;
+        try {
+            // Configure I/O reactor with NIO threads.
+            IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
+                    .setIoThreadCount(config.getNioThreadCount())
+                    .setConnectTimeout(config.getHttpConnectionTimeoutInMillis())
+                    .setSoTimeout(config.getHttpReadTimeoutInMillis())
+                    .build();
+
+            // Create I/O reactor for non-blocking I/O.
+            ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
+
+            // Configure connection pool manager for async client and store for later use.
+            this.asyncConnManager = new PoolingNHttpClientConnectionManager(ioReactor);
+            this.asyncConnManager.setMaxTotal(config.getHttpConnectionPoolSize());
+            this.asyncConnManager.setDefaultMaxPerRoute(config.getHttpConnectionPoolSize());
+
+            // Build async HTTP client (SSL settings will be applied separately if needed).
+            return HttpAsyncClients.custom()
+                    .setConnectionManager(this.asyncConnManager)
+                    .setDefaultRequestConfig(requestConfig)
+                    .build();
+
+        } catch (IOReactorException e) {
+            logger.error("Failed to create I/O reactor for async HTTP client", e);
+            throw new IllegalStateException("Async HTTP client initialization failed", e);
+        }
     }
 
     /**
-     * Set HTTP client
+     * Get async HTTP client
      *
-     * @param httpClient An instance of HttpClient
-     * @return ScimApiClient
+     * @return An instance of CloseableHttpAsyncClient
      */
-    public ScimApiClient setHttpClient(HttpClient httpClient) {
+    public CloseableHttpAsyncClient getAsyncHttpClient() {
 
-        this.httpClient = httpClient;
-        return this;
+        return asyncHttpClient;
     }
 
     /**
@@ -297,12 +327,16 @@ public class ScimApiClient {
      * Configure the CA certificate to be trusted when making https requests.
      * Use null to reset to default.
      *
+     * Note: This client takes ownership of the provided InputStream and will close it
+     * when close() is called. Do not close the stream externally after passing it to this method.
+     *
      * @param sslCaCert input stream for SSL CA cert
      * @return ScimApiClient
      */
     public ScimApiClient setSslCaCert(InputStream sslCaCert) throws ScimApiException {
 
         this.sslCaCert = sslCaCert;
+        this.cachedTrustManagers = null;
         applySslSettings();
         return this;
     }
@@ -631,6 +665,7 @@ public class ScimApiClient {
      *
      * @return True if debugging is enabled, false otherwise.
      */
+    @Deprecated
     public boolean isDebugging() {
 
         return debugging;
@@ -638,94 +673,19 @@ public class ScimApiClient {
 
     /**
      * Enable/disable debugging for this API client.
+     * Note: Debugging with request/response interceptors is not currently supported with async NIO client.
      *
      * @param debugging To enable (true) or disable (false) debugging
      * @return ScimApiClient
      */
+    @Deprecated
     public ScimApiClient setDebugging(boolean debugging) {
 
-        try {
-            if (debugging != this.debugging) {
-                if (debugging) {
-                    // Create the logging interceptors.
-                    HttpRequestInterceptor requestInterceptor =
-                            (request, context) -> logger.debug(getRequestInfo(request));
-                    HttpResponseInterceptor responseInterceptor =
-                            (response, context) -> logger.debug(getResponseInfo(response));
-
-                    httpClient = HttpClients.custom()
-                            .addInterceptorFirst(requestInterceptor)
-                            .addInterceptorFirst(responseInterceptor)
-                            .build();
-                } else {
-                    ((CloseableHttpClient) httpClient).close();
-                    httpClient = httpClientBuilder.build();
-                }
-            }
-        } catch (IOException e) {
-            logger.error("An IOException occurred: {}", e);
-        }
         this.debugging = debugging;
+        if (debugging) {
+            logger.warn("Debugging mode with request/response interceptors is not supported with NIO async client");
+        }
         return this;
-    }
-
-    private String getRequestInfo(HttpRequest request) throws IOException {
-
-        StringBuilder message = new StringBuilder();
-        message.append("\nRequest - ")
-                .append(request.getRequestLine().getMethod())
-                .append(" ")
-                .append(request.getRequestLine().getUri())
-                .append("\nHeaders: [")
-                .append(getHeadersInfo(request.getAllHeaders()))
-                .append("]");
-
-        if (request instanceof HttpEntityEnclosingRequest) {
-            message.append("\nPayload:\n").append(getRequestEntityInfo(request));
-        }
-
-        return message.toString();
-    }
-
-    private String getResponseInfo(HttpResponse response) throws IOException {
-
-        StringBuilder message = new StringBuilder();
-        message.append("\nResponse - ")
-                .append(response.getStatusLine().getStatusCode())
-                .append(" ")
-                .append(response.getStatusLine().getReasonPhrase())
-                .append("\nHeaders: [")
-                .append(getHeadersInfo(response.getAllHeaders()))
-                .append("]");
-
-        if (response.getEntity() != null) {
-            message.append("\nPayload: \n").append(getResponseEntityInfo(response));
-        }
-
-        return message.toString();
-    }
-
-    private String getHeadersInfo(Header[] headers) {
-
-        return Arrays.stream(headers)
-                .map(header -> header.getName() + ": " + header.getValue())
-                .collect(Collectors.joining(", "));
-    }
-
-    private String getRequestEntityInfo(HttpRequest request) throws IOException {
-
-        HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
-        ByteArrayOutputStream bs = new ByteArrayOutputStream();
-        entity.writeTo(bs);
-        return bs.toString();
-    }
-
-    private String getResponseEntityInfo(HttpResponse response) throws IOException {
-
-        BufferedReader buffer = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        String payload = buffer.lines().collect(Collectors.joining("\n"));
-        response.setEntity(new StringEntity(payload));
-        return payload;
     }
 
     /**
@@ -765,19 +725,17 @@ public class ScimApiClient {
 
     /**
      * Sets the connection timeout (in milliseconds).
-     * A value of 0 means no timeout, otherwise values must be between 1 and
+     * Note: Connection timeout should be set via SCIM2ClientConfig before creating the client.
+     * Dynamic timeout changes are not supported with NIO async client.
      *
      * @param connectionTimeout connection timeout in milliseconds
      * @return Api client
      */
+    @Deprecated
     public ScimApiClient setConnectTimeout(int connectionTimeout) {
 
-        requestConfig = RequestConfig.custom()
-                .setConnectTimeout(connectionTimeout)
-                .build();
-        httpClient = httpClientBuilder
-                .setDefaultRequestConfig(requestConfig)
-                .build();
+        logger.warn("Dynamic connection timeout changes are not supported with NIO async client. " +
+                "Use SCIM2ClientConfig.registerTimeoutConfig() before client initialization.");
         return this;
     }
 
@@ -1134,80 +1092,234 @@ public class ScimApiClient {
      */
     public <T> ScimApiResponse<T> execute(HttpUriRequest request, Type returnType) throws ScimApiException {
 
-        int retryCount = SCIM2ClientConfig.getInstance().getHttpRequestRetryCount();
-
-        // If retryCount is 0, execute without retry (only original request).
-        if (retryCount == 0) {
-            return executeWithoutRetry(request, returnType);
-        }
-
-        int attempts = 0;
-        ScimApiException lastException = null;
-        ScimApiResponse<T> lastResponse = null;
-
-        // Loop executes retryCount + 1 times (original request + retryCount retries).
-        while (attempts <= retryCount) {
-            try {
-                HttpResponse response = httpClient.execute(request);
-                T data = handleResponse(response, returnType);
-                lastResponse = new ScimApiResponse<>(response.getStatusLine().getStatusCode(),
-                        extractHeaders(response), data);
-
-                // Check if the response is retryable based on status code.
-                if (!isRetryableResponse(lastResponse.getStatusCode())) {
-                    return lastResponse;
-                }
-
-                // Server error occurred, log and retry if attempts remain.
-                logRetryAttempt(request, attempts + 1, retryCount,
-                        String.format("Server error with status code: %d", lastResponse.getStatusCode()));
-
-                // Apply exponential backoff for 429 before retrying.
-                if (attempts < retryCount) {
-                    applyBackoff(attempts, lastResponse.getStatusCode());
-                }
-            } catch (ConnectTimeoutException | SocketTimeoutException e) {
-                lastException = new ScimApiException("Request timeout: " + e.getMessage(), e);
-                logRetryAttempt(request, attempts + 1, retryCount, "Connection/Socket timeout.");
-            } catch (IOException e) {
-                lastException = new ScimApiException("I/O error: " + e.getMessage(), e);
-                logRetryAttempt(request, attempts + 1, retryCount, "I/O error.");
-            } catch (ScimApiException e) {
-                // If it's a 4xx client error (except 429), don't retry.
-                if (e.getCode() >= 400 && e.getCode() < 500 && e.getCode() != 429) {
-                    throw e;
-                }
-                lastException = e;
-                logRetryAttempt(request, attempts + 1, retryCount, "SCIM API error.");
-            }
-            attempts++;
-        }
-
-        // All retries exhausted.
-        if (lastResponse != null) {
-            return lastResponse;
-        }
-        if (lastException != null) {
-            logger.warn(String.format("Maximum retry attempts (%d) reached for request: %s",
-                    retryCount, request.getURI()), lastException);
-            throw lastException;
-        }
-        throw new ScimApiException(String.format("Failed to execute request after %d attempts", retryCount));
+        return executeAsyncBlocking(request, returnType);
     }
 
     /**
-     * Execute request without retry mechanism.
+     * Execute request asynchronously and block on result (backward compatible).
+     * Internally uses NIO but blocks the calling thread until completion.
+     *
+     * Timeout is calculated once based on configuration and cached:
+     * - (readTimeout + connectionTimeout) × (retryCount + 1) for all attempts
+     * - Plus sum of all backoff delays between retries
+     * - Plus 10% buffer for async overhead
+     *
+     * @param request    HttpUriRequest
+     * @param returnType The return type
+     * @param <T>        The return type
+     * @return ScimApiResponse
+     * @throws ScimApiException If execution fails
      */
-    private <T> ScimApiResponse<T> executeWithoutRetry(HttpUriRequest request, Type returnType)
+    @SuppressWarnings("unchecked")
+    private <T> ScimApiResponse<T> executeAsyncBlocking(HttpUriRequest request, Type returnType)
             throws ScimApiException {
 
         try {
-            HttpResponse response = httpClient.execute(request);
-            T data = handleResponse(response, returnType);
-            return new ScimApiResponse<>(response.getStatusLine().getStatusCode(), extractHeaders(response), data);
-        } catch (IOException e) {
-            throw new ScimApiException(e);
+            // Use cached timeout (calculated once, only recalculated when config changes)
+            CompletableFuture<ScimApiResponse<T>> future =
+                    (CompletableFuture<ScimApiResponse<T>>) (CompletableFuture<?>) executeAsync(request, returnType);
+            return future.get(cachedMaxOperationTimeMs, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            long timeoutSec = cachedMaxOperationTimeMs / 1000;
+            throw new ScimApiException("Request timed out after " + timeoutSec + " seconds", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ScimApiException("Request interrupted", e);
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof ScimApiException) {
+                throw (ScimApiException) cause;
+            }
+            throw new ScimApiException("Request failed: " + cause.getMessage(), cause);
         }
+    }
+
+    /**
+     * Calculate maximum operation time including all retries and backoff delays.
+     * Formula:
+     * - (readTimeout + connectionTimeout) × (retryCount + 1) for all HTTP attempts
+     * - Plus sum of exponential backoff delays: 1s + 2s + 4s + 8s + ... (up to max)
+     * - Plus 50% buffer for async overhead
+     *
+     * @return Maximum operation time in milliseconds
+     */
+    private long calculateMaxOperationTime() {
+
+        int retryCount = SCIM2ClientConfig.getInstance().getHttpRequestRetryCount();
+        int readTimeout = requestConfig.getSocketTimeout();
+        int connectionTimeout = requestConfig.getConnectTimeout();
+
+        // Time for all HTTP attempts (initial + retries).
+        long totalAttemptTime = (long) (readTimeout + connectionTimeout) * (retryCount + 1);
+
+        // Sum of all backoff delays: 1s + 2s + 4s + 8s + 16s + 32s...
+        long totalBackoffTime = 0;
+        for (int i = 0; i < retryCount; i++) {
+            totalBackoffTime += calculateBackoffDelay(i);
+        }
+
+        // Total time + 50% buffer for async overhead.
+        long totalTime = totalAttemptTime + totalBackoffTime;
+        return (long) (totalTime * 1.5);
+    }
+
+    /**
+     * Execute HTTP request asynchronously using NIO (non-blocking).
+     * Returns CompletableFuture immediately - does NOT block calling thread.
+     *
+     * @param request    HTTP request to execute
+     * @param returnType Expected response type
+     * @param <T>        The return type
+     * @return CompletableFuture that completes when response is received
+     */
+    public <T> CompletableFuture<ScimApiResponse<T>> executeAsync(HttpUriRequest request, Type returnType) {
+
+        int retryCount = SCIM2ClientConfig.getInstance().getHttpRequestRetryCount();
+
+        if (retryCount == 0) {
+            return executeSingleAsync(request, returnType);
+        }
+
+        return executeWithRetryAsync(request, returnType, 0, retryCount);
+    }
+
+    /**
+     * Single async execution without retry.
+     *
+     * @param request    HTTP request
+     * @param returnType Expected response type
+     * @param <T>        The return type
+     * @return CompletableFuture with response
+     */
+    private <T> CompletableFuture<ScimApiResponse<T>> executeSingleAsync(
+            final HttpUriRequest request, final Type returnType) {
+
+        final CompletableFuture<ScimApiResponse<T>> future = new CompletableFuture<>();
+
+        asyncHttpClient.execute(request, new FutureCallback<HttpResponse>() {
+
+            @Override
+            public void completed(HttpResponse response) {
+                try {
+                    T data = handleResponse(response, returnType);
+                    ScimApiResponse<T> scimResponse = new ScimApiResponse<>(
+                            response.getStatusLine().getStatusCode(),
+                            extractHeaders(response),
+                            data
+                    );
+                    future.complete(scimResponse);
+                } catch (Exception e) {
+                    future.completeExceptionally(new ScimApiException("Response handling failed: " +
+                            e.getMessage(), e));
+                }
+            }
+
+            @Override
+            public void failed(Exception ex) {
+                future.completeExceptionally(new ScimApiException("Request failed: " + ex.getMessage(), ex));
+            }
+
+            @Override
+            public void cancelled() {
+                future.completeExceptionally(new ScimApiException("Request cancelled"));
+            }
+        });
+
+        return future;
+    }
+
+    /**
+     * Recursive async retry logic with non-blocking backoff.
+     *
+     * @param request    HTTP request
+     * @param returnType Expected response type
+     * @param attempt    Current attempt number (0-based)
+     * @param maxRetries Maximum retry count
+     * @param <T>        The return type
+     * @return CompletableFuture with response
+     */
+    private <T> CompletableFuture<ScimApiResponse<T>> executeWithRetryAsync(
+            final HttpUriRequest request, final Type returnType, final int attempt, final int maxRetries) {
+
+        return executeSingleAsync(request, returnType)
+                .handle((response, exception) -> {
+                    if (exception != null) {
+                        // Exception during request - check if retryable.
+                        Throwable cause = exception instanceof CompletionException ?
+                                exception.getCause() : exception;
+
+                        if (!isRetryableException(cause) || attempt >= maxRetries) {
+                            if (attempt >= maxRetries) {
+                                logger.warn(String.format("Max retries (%d) reached for %s due to exception",
+                                        maxRetries, request.getURI()), cause);
+                            }
+                            CompletableFuture<ScimApiResponse<T>> failed = new CompletableFuture<>();
+                            failed.completeExceptionally(cause);
+                            return failed;
+                        }
+
+                        // Schedule retry - NON-BLOCKING!
+                        long delay = calculateBackoffDelay(attempt);
+                        logRetryAttempt(request, attempt + 1, maxRetries, cause.getMessage());
+
+                        return scheduleRetry(() ->
+                                executeWithRetryAsync(request, returnType, attempt + 1, maxRetries), delay);
+                    }
+
+                    // Success case - return response if not retryable.
+                    if (!isRetryableResponse(response.getStatusCode())) {
+                        return CompletableFuture.completedFuture(response);
+                    }
+
+                    // Retryable error - check if retries remaining.
+                    if (attempt >= maxRetries) {
+                        logger.warn(String.format("Max retries (%d) reached for %s with status %d",
+                                maxRetries, request.getURI(), response.getStatusCode()));
+                        return CompletableFuture.completedFuture(response);
+                    }
+
+                    // Schedule retry with backoff - NON-BLOCKING!
+                    long delay = calculateBackoffDelay(attempt);
+                    logRetryAttempt(request, attempt + 1, maxRetries,
+                            String.format("Server error %d", response.getStatusCode()));
+
+                    return scheduleRetry(() ->
+                            executeWithRetryAsync(request, returnType, attempt + 1, maxRetries), delay);
+                })
+                .thenCompose(result -> {
+                    @SuppressWarnings("unchecked")
+                    CompletableFuture<ScimApiResponse<T>> typedResult =
+                            (CompletableFuture<ScimApiResponse<T>>) (CompletableFuture<?>) result;
+                    return typedResult;
+                });
+    }
+
+    /**
+     * Schedule a retry after delay using CompletableFuture's built-in delay executor (non-blocking).
+     *
+     * @param retryAction Action to execute after delay
+     * @param delayMs     Delay in milliseconds
+     * @param <T>         Return type
+     * @return CompletableFuture that completes after delay
+     */
+    private <T> CompletableFuture<T> scheduleRetry(Supplier<CompletableFuture<T>> retryAction, long delayMs) {
+
+        return CompletableFuture.supplyAsync(() -> null,
+                CompletableFuture.delayedExecutor(delayMs, TimeUnit.MILLISECONDS))
+                .thenCompose(ignored -> retryAction.get());
+    }
+
+    /**
+     * Check if exception is retryable.
+     *
+     * @param throwable Exception to check
+     * @return true if retryable, false otherwise
+     */
+    private boolean isRetryableException(Throwable throwable) {
+
+        return throwable instanceof ConnectTimeoutException ||
+                throwable instanceof SocketTimeoutException ||
+                throwable instanceof IOException;
     }
 
     /**
@@ -1237,15 +1349,6 @@ public class ScimApiClient {
     }
 
     /**
-     * Check if the HTTP status code requires exponential backoff.
-     * Currently only 429 (Too Many Requests) uses backoff.
-     */
-    private boolean requiresBackoff(int statusCode) {
-
-        return statusCode == 429;
-    }
-
-    /**
      * Calculate exponential backoff delay in milliseconds.
      * Uses formula: min(BACKOFF_INITIAL_DELAY_MS * (BACKOFF_MULTIPLIER ^ attempt), BACKOFF_MAX_DELAY_MS)
      *
@@ -1256,29 +1359,6 @@ public class ScimApiClient {
 
         long delay = (long) (BACKOFF_INITIAL_DELAY_MS * Math.pow(BACKOFF_MULTIPLIER, attempt));
         return Math.min(delay, BACKOFF_MAX_DELAY_MS);
-    }
-
-    /**
-     * Apply backoff delay before retry.
-     */
-    private void applyBackoff(int attempt, int statusCode) {
-
-        if (!requiresBackoff(statusCode)) {
-            return;
-        }
-
-        long delay = calculateBackoffDelay(attempt);
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Rate limited (429). Waiting %d ms before retry attempt %d",
-                    delay, attempt + 1));
-        }
-
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.warn("Backoff delay interrupted", e);
-        }
     }
 
     /**
@@ -1564,8 +1644,8 @@ public class ScimApiClient {
     }
 
     /**
-     * Apply SSL related settings to httpClient according to the current values of
-     * verifyingSsl and sslCaCert.
+     * Apply SSL related settings to async HTTP client.
+     * Recreates the async client with SSL configuration when SSL settings change.
      */
     private void applySslSettings() throws ScimApiException {
 
@@ -1592,46 +1672,58 @@ public class ScimApiClient {
                         return null;
                     }
                 };
-                SSLContext sslContext = SSLContext.getInstance("TLS");
                 trustManagers = new TrustManager[]{trustAll};
-                hostnameVerifier = new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String hostname, SSLSession session) {
-
-                        return true;
-                    }
-                };
+                hostnameVerifier = (hostname, session) -> true;
             } else if (sslCaCert != null) {
-                char[] password = null; // Any password will work.
-                CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                Collection<? extends Certificate> certificates = certificateFactory.generateCertificates(sslCaCert);
-                if (certificates.isEmpty()) {
-                    throw new IllegalArgumentException("expected non-empty set of trusted certificates");
+                // Use custom CA certificate (cache to avoid reading InputStream multiple times)
+                if (cachedTrustManagers == null) {
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    Collection<? extends Certificate> certs = cf.generateCertificates(sslCaCert);
+                    KeyStore caKeyStore = newEmptyKeyStore(null);
+                    int index = 0;
+                    for (Certificate cert : certs) {
+                        caKeyStore.setCertificateEntry("ca" + index++, cert);
+                    }
+                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                            TrustManagerFactory.getDefaultAlgorithm());
+                    tmf.init(caKeyStore);
+                    cachedTrustManagers = tmf.getTrustManagers();
                 }
-                KeyStore caKeyStore = newEmptyKeyStore(password);
-                int index = 0;
-                for (Certificate certificate : certificates) {
-                    String certificateAlias = "ca" + Integer.toString(index++);
-                    caKeyStore.setCertificateEntry(certificateAlias, certificate);
-                }
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.
-                        getDefaultAlgorithm());
-                trustManagerFactory.init(caKeyStore);
-                trustManagers = trustManagerFactory.getTrustManagers();
+                trustManagers = cachedTrustManagers;
             }
 
-            if (keyManagers != null || trustManagers != null) {
+            // Only recreate client if we have custom SSL settings
+            if (keyManagers != null || trustManagers != null || hostnameVerifier != null) {
+                // Close existing async client
+                if (asyncHttpClient != null) {
+                    try {
+                        asyncHttpClient.close();
+                    } catch (IOException e) {
+                        logger.warn("Error closing async HTTP client during SSL reconfiguration", e);
+                    }
+                }
+
+                // Create SSL context
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 sslContext.init(keyManagers, trustManagers, new SecureRandom());
-                SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext);
-                httpClientBuilder.setSSLSocketFactory(sslSocketFactory);
-            } else {
-                httpClientBuilder.setSSLSocketFactory(null);
+
+                // Build new async client with SSL settings
+                asyncHttpClient = HttpAsyncClients.custom()
+                        .setConnectionManager(asyncConnManager)
+                        .setDefaultRequestConfig(requestConfig)
+                        .setSSLContext(sslContext)
+                        .setSSLHostnameVerifier(hostnameVerifier)
+                        .build();
+
+                // Start the new async client
+                asyncHttpClient.start();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Async HTTP client recreated with custom SSL settings");
+                }
             }
-            httpClientBuilder.setSSLHostnameVerifier(hostnameVerifier);
-            httpClient = httpClientBuilder.build();
         } catch (GeneralSecurityException e) {
-            throw new ScimApiException(e);
+            throw new ScimApiException("Failed to apply SSL settings to async client", e);
         }
     }
 
@@ -1654,5 +1746,72 @@ public class ScimApiClient {
                         Header::getName,
                         Collectors.mapping(Header::getValue, Collectors.toList())
                                      ));
+    }
+
+    /**
+     * Close all resources properly.
+     * MUST be called when client is no longer needed to prevent resource leaks.
+     * This method is idempotent and can be safely called multiple times.
+     *
+     * @throws IOException If an error occurs during shutdown
+     */
+    @Override
+    public void close() throws IOException {
+
+        IOException firstException = null;
+
+        // Close async HTTP client.
+        if (asyncHttpClient != null) {
+            try {
+                asyncHttpClient.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Async HTTP client closed successfully");
+                }
+            } catch (IOException e) {
+                logger.warn("Error closing async HTTP client", e);
+                firstException = e;
+            } finally {
+                asyncHttpClient = null;
+            }
+        }
+
+        // Shutdown connection manager to release I/O reactor threads and connection pool resources.
+        if (asyncConnManager != null) {
+            try {
+                asyncConnManager.shutdown();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Connection manager shut down successfully");
+                }
+            } catch (IOException e) {
+                logger.warn("Error shutting down connection manager", e);
+                if (firstException == null) {
+                    firstException = e;
+                }
+            } finally {
+                asyncConnManager = null;
+            }
+        }
+
+        // Close SSL CA certificate input stream if present.
+        if (sslCaCert != null) {
+            try {
+                sslCaCert.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("SSL CA certificate input stream closed successfully");
+                }
+            } catch (IOException e) {
+                logger.warn("Error closing SSL CA certificate input stream", e);
+                if (firstException == null) {
+                    firstException = e;
+                }
+            } finally {
+                sslCaCert = null;
+            }
+        }
+
+        // Throw the first exception if any occurred.
+        if (firstException != null) {
+            throw firstException;
+        }
     }
 }

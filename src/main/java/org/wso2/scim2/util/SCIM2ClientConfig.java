@@ -35,12 +35,14 @@ public class SCIM2ClientConfig {
     private static final int DEFAULT_HTTP_CONNECTION_TIMEOUT_IN_MILLIS = 2000;
     private static final int DEFAULT_HTTP_CONNECTION_REQUEST_TIMEOUT_IN_MILLIS = 2000;
     private static final int DEFAULT_HTTP_CONNECTION_POOL_SIZE = 20;
+    private static final int DEFAULT_NIO_THREAD_COUNT = 4;
 
     private Integer registeredRetryCount;
     private Integer registeredReadTimeout;
     private Integer registeredConnectionTimeout;
     private Integer registeredConnectionRequestTimeout;
     private Integer registeredConnectionPoolSize;
+    private Integer registeredNioThreadCount;
 
     private SCIM2ClientConfig() {
     }
@@ -170,6 +172,34 @@ public class SCIM2ClientConfig {
     }
 
     /**
+     * Returns the NIO thread count for the I/O reactor.
+     * Priority: Registered config > Default value.
+     *
+     * @return The NIO thread count.
+     */
+    public int getNioThreadCount() {
+
+        if (registeredNioThreadCount != null) {
+            return registeredNioThreadCount;
+        }
+        return DEFAULT_NIO_THREAD_COUNT;
+    }
+
+    /**
+     * Registers NIO thread count configuration.
+     * This method allows external configuration providers to set the number of I/O reactor threads.
+     *
+     * @param nioThreadCount Number of NIO threads for the I/O reactor.
+     */
+    public void registerNioThreadCountConfig(int nioThreadCount) {
+
+        this.registeredNioThreadCount = nioThreadCount;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Registered SCIM2 client NIO thread count: %d", nioThreadCount));
+        }
+    }
+
+    /**
      * Clears all registered configurations.
      * Useful for testing or resetting to default behavior.
      */
@@ -180,6 +210,7 @@ public class SCIM2ClientConfig {
         this.registeredConnectionTimeout = null;
         this.registeredConnectionRequestTimeout = null;
         this.registeredConnectionPoolSize = null;
+        this.registeredNioThreadCount = null;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Cleared all registered SCIM2 client configs");
         }
