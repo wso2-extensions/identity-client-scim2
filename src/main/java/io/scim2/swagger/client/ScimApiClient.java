@@ -1180,8 +1180,6 @@ public class ScimApiClient implements AutoCloseable {
             return lastResponse;
         }
         if (lastException != null) {
-            logger.warn(String.format("Maximum retry attempts (%d) reached for request: %s",
-                    retryCount, request.getURI()), lastException);
             throw lastException;
         }
         throw new ScimApiException(String.format("Failed to execute request after %d attempts", retryCount));
