@@ -34,13 +34,11 @@ public class SCIM2ClientConfig {
     private static final int DEFAULT_HTTP_READ_TIMEOUT_IN_MILLIS = 5000;
     private static final int DEFAULT_HTTP_CONNECTION_TIMEOUT_IN_MILLIS = 2000;
     private static final int DEFAULT_HTTP_CONNECTION_REQUEST_TIMEOUT_IN_MILLIS = 2000;
-    private static final int DEFAULT_HTTP_CONNECTION_POOL_SIZE = 20;
 
     private Integer registeredRetryCount;
     private Integer registeredReadTimeout;
     private Integer registeredConnectionTimeout;
     private Integer registeredConnectionRequestTimeout;
-    private Integer registeredConnectionPoolSize;
 
     private SCIM2ClientConfig() {
     }
@@ -107,20 +105,6 @@ public class SCIM2ClientConfig {
     }
 
     /**
-     * Returns the HTTP connection pool size.
-     * Priority: Registered config > Default value.
-     *
-     * @return The HTTP connection pool size, or the default if not registered.
-     */
-    public int getHttpConnectionPoolSize() {
-
-        if (registeredConnectionPoolSize != null) {
-            return registeredConnectionPoolSize;
-        }
-        return DEFAULT_HTTP_CONNECTION_POOL_SIZE;
-    }
-
-    /**
      * Registers HTTP retry count configuration.
      * This method allows external configuration providers (like IdentityUtil) to set retry count.
      * Retry is disabled when count is 0 (only original request is sent).
@@ -156,20 +140,6 @@ public class SCIM2ClientConfig {
     }
 
     /**
-     * Registers HTTP connection pool size configuration.
-     * This method allows external configuration providers (like IdentityUtil) to set pool size config.
-     *
-     * @param poolSize HTTP connection pool size.
-     */
-    public void registerConnectionPoolConfig(int poolSize) {
-
-        this.registeredConnectionPoolSize = poolSize;
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Registered SCIM2 client connection pool size: %d", poolSize));
-        }
-    }
-
-    /**
      * Clears all registered configurations.
      * Useful for testing or resetting to default behavior.
      */
@@ -179,7 +149,6 @@ public class SCIM2ClientConfig {
         this.registeredReadTimeout = null;
         this.registeredConnectionTimeout = null;
         this.registeredConnectionRequestTimeout = null;
-        this.registeredConnectionPoolSize = null;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Cleared all registered SCIM2 client configs");
         }

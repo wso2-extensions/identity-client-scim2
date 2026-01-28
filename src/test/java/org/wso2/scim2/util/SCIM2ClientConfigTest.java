@@ -100,19 +100,6 @@ public class SCIM2ClientConfigTest {
     }
 
     @Test
-    public void testDefaultConnectionPoolSize() {
-
-        assertEquals(20, config.getHttpConnectionPoolSize());
-    }
-
-    @Test
-    public void testRegisteredConnectionPoolSize() {
-
-        config.registerConnectionPoolConfig(50);
-        assertEquals(50, config.getHttpConnectionPoolSize());
-    }
-
-    @Test
     public void testRetryCountZeroMeansNoRetries() {
 
         config.registerRetryConfig(0);
@@ -125,14 +112,12 @@ public class SCIM2ClientConfigTest {
         // Register some configs.
         config.registerRetryConfig(10);
         config.registerTimeoutConfig(15000, 8000, 6000);
-        config.registerConnectionPoolConfig(100);
 
         // Verify registered values are used.
         assertEquals(10, config.getHttpRequestRetryCount());
         assertEquals(15000, config.getHttpReadTimeoutInMillis());
         assertEquals(8000, config.getHttpConnectionTimeoutInMillis());
         assertEquals(6000, config.getHttpConnectionRequestTimeoutInMillis());
-        assertEquals(100, config.getHttpConnectionPoolSize());
 
         // Clear configs.
         config.clearRegisteredConfigs();
@@ -142,7 +127,6 @@ public class SCIM2ClientConfigTest {
         assertEquals(5000, config.getHttpReadTimeoutInMillis());
         assertEquals(2000, config.getHttpConnectionTimeoutInMillis());
         assertEquals(2000, config.getHttpConnectionRequestTimeoutInMillis());
-        assertEquals(20, config.getHttpConnectionPoolSize());
     }
 
     @Test

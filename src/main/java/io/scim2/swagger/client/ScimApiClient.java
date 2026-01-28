@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2018-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -11,7 +11,7 @@
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
+ * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
  */
@@ -59,7 +59,6 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.wso2.scim2.util.SCIM2ClientConfig;
@@ -116,7 +115,6 @@ public class ScimApiClient {
     private static final Set<Integer> RETRYABLE_STATUS_CODES =
             new HashSet<>(Arrays.asList(500, 502, 503, 504, 408, 429));
 
-    // Exponential backoff configuration for 429 (Too Many Requests).
     private static final int BACKOFF_INITIAL_DELAY_MS = 1000;  // 1 second initial delay
     private static final int BACKOFF_MAX_DELAY_MS = 32000;     // 32 seconds max delay
     private static final double BACKOFF_MULTIPLIER = 2.0;      // Double delay each retry
@@ -169,7 +167,6 @@ public class ScimApiClient {
         int readTimeout = config.getHttpReadTimeoutInMillis();
         int connectionTimeout = config.getHttpConnectionTimeoutInMillis();
         int connectionRequestTimeout = config.getHttpConnectionRequestTimeoutInMillis();
-        int connectionPoolSize = config.getHttpConnectionPoolSize();
 
         // Build request config with timeout settings.
         requestConfig = RequestConfig.custom()
@@ -178,14 +175,9 @@ public class ScimApiClient {
                 .setSocketTimeout(readTimeout)
                 .build();
 
-        // Build connection pool manager.
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(connectionPoolSize);
-
-        // Build HTTP client with request config and connection manager.
+        // Build HTTP client with request config.
         httpClientBuilder = HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .setConnectionManager(connectionManager);
+                .setDefaultRequestConfig(requestConfig);
         httpClient = httpClientBuilder.build();
 
         verifyingSsl = true;
