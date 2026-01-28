@@ -109,7 +109,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class ScimApiClient {
+public class ScimApiClient implements AutoCloseable {
 
     private static final Log logger = LogFactory.getLog(ScimApiClient.class);
     private static final Set<Integer> RETRYABLE_STATUS_CODES =
@@ -1646,5 +1646,26 @@ public class ScimApiClient {
                         Header::getName,
                         Collectors.mapping(Header::getValue, Collectors.toList())
                                      ));
+    }
+
+    /**
+     * Closes the underlying HTTP client and releases associated resources.
+     *
+     * @throws IOException if an I/O error occurs while closing the client
+     */
+    @Override
+    public void close() throws IOException {
+
+        if (httpClient instanceof CloseableHttpClient) {
+            try {
+                ((CloseableHttpClient) httpClient).close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Successfully closed ScimApiClient and its underlying HTTP client");
+                }
+            } catch (IOException e) {
+                logger.error("Error closing HTTP client", e);
+                throw e;
+            }
+        }
     }
 }

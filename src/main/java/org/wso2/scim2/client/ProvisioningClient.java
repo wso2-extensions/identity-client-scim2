@@ -60,9 +60,7 @@ public class ProvisioningClient {
      */
     public void provisionCreateUser() throws IdentitySCIMException {
 
-        UserOperations operation;
-        try {
-            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+        try (UserOperations operation = new UserOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.createUser();
         } catch (ScimApiException e) {
             throw new IdentitySCIMException("Unable to create the User.", e);
@@ -73,9 +71,7 @@ public class ProvisioningClient {
 
     public void provisionDeleteUser() throws IdentitySCIMException {
 
-        UserOperations operation;
-        try {
-            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+        try (UserOperations operation = new UserOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.deleteUser();
         } catch (ScimApiException e) {
             throw new IdentitySCIMException("Unable to delete the User.", e);
@@ -86,9 +82,7 @@ public class ProvisioningClient {
 
     public void provisionUpdateUser() throws IdentitySCIMException {
 
-        UserOperations operation;
-        try {
-            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+        try (UserOperations operation = new UserOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.updateUser();
         } catch (ScimApiException e) {
             throw new IdentitySCIMException("Unable to update the User.", e);
@@ -103,9 +97,7 @@ public class ProvisioningClient {
      */
     public void provisionPatchUser() throws IdentitySCIMException {
 
-        UserOperations operation;
-        try {
-            operation = new UserOperations(provider, scimObject, additionalProvisioningInformation);
+        try (UserOperations operation = new UserOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.patchUser();
         } catch (ScimApiException | IdentitySCIMException e) {
             throw new IdentitySCIMException("Unable to patch the User.", e);
@@ -114,9 +106,7 @@ public class ProvisioningClient {
 
     public void provisionCreateGroup() throws IdentitySCIMException {
 
-        GroupOperations operation;
-        try {
-            operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation);
+        try (GroupOperations operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.createGroup();
         } catch (ScimApiException e) {
             throw new IdentitySCIMException("Unable to create the Group.", e);
@@ -127,9 +117,7 @@ public class ProvisioningClient {
 
     public void provisionDeleteGroup() throws IdentitySCIMException {
 
-        GroupOperations operation;
-        try {
-            operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation);
+        try (GroupOperations operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.deleteGroup();
         } catch (ScimApiException e) {
             throw new IdentitySCIMException("Unable to delete the Group.", e);
@@ -140,9 +128,7 @@ public class ProvisioningClient {
 
     public void provisionUpdateGroup() throws IdentitySCIMException {
 
-        GroupOperations operation;
-        try {
-            operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation);
+        try (GroupOperations operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation)) {
             operation.updateGroup();
         } catch (ScimApiException e) {
             throw new IdentitySCIMException("Unable to update the Group.", e);
