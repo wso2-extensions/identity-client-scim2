@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractOperations {
+public abstract class AbstractOperations implements AutoCloseable {
 
     public static final String USER_FILTER = "userName Eq ";
     public static final String GROUP_FILTER = "displayName Eq ";
@@ -133,6 +133,25 @@ public abstract class AbstractOperations {
             AbstractCharonException exception =
                     scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
             logger.error(exception.getMessage());
+        }
+    }
+
+    /**
+     * Close the HTTP client and release all associated resources.
+     * This method should be called when the operation is complete.
+     */
+    @Override
+    public void close() {
+
+        if (client != null) {
+            try {
+                client.close();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Successfully closed SCIM API client");
+                }
+            } catch (IOException e) {
+                logger.warn("Error closing SCIM API client", e);
+            }
         }
     }
 }
