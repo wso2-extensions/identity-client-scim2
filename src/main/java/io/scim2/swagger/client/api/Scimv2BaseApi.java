@@ -22,6 +22,7 @@ import io.scim2.swagger.client.ScimApiClient;
 import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.ArrayList;
@@ -171,12 +172,14 @@ public class Scimv2BaseApi {
      * @param attributes         SCIM defined attributes parameter. (optional)
      * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
      * @param body               (optional)
+     * @param httpMethod         HTTP Method for update operation. (e.g., PUT, PATCH)
      * @return Call to execute.
      * @throws ScimApiException If fail to serialize the request body object.
      */
-    public HttpUriRequest updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body)
-            throws ScimApiException {
+    public HttpUriRequest updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body,
+                                             String httpMethod) throws ScimApiException {
 
+        String method = StringUtils.isNotBlank(httpMethod) ? httpMethod.trim().toUpperCase() : "PUT";
         Object localVarPostBody = body;
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
         if (attributes != null)
@@ -195,8 +198,23 @@ public class Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
         String[] localVarAuthNames = new String[]{"basicAuth"};
-        return scimApiClient.buildCall("PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams,
+        return scimApiClient.buildCall(method, localVarQueryParams, localVarPostBody, localVarHeaderParams,
                 localVarFormParams, localVarAuthNames);
+    }
+
+    /**
+     * Build call for update.
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
+     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
+     * @param body               (optional)
+     * @return Call to execute.
+     * @throws ScimApiException If fail to serialize the request body object.
+     */
+    public HttpUriRequest updateResourceCall(List<String> attributes, List<String> excludedAttributes, String body)
+            throws ScimApiException {
+
+        return updateResourceCall(attributes, excludedAttributes, body, "PUT");
     }
 
     /**

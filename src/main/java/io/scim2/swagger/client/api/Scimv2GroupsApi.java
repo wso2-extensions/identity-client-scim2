@@ -320,10 +320,16 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
         return scimApiClient.execute(call, localVarReturnType);
     }
 
-    private HttpUriRequest updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
-            throws ScimApiException {
+    private HttpUriRequest updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes,
+                                                         String body) throws ScimApiException {
 
         return updateResourceCall(attributes, excludedAttributes, body);
+    }
+
+    private HttpUriRequest updateGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes,
+                                                         String body, String httpMethod) throws ScimApiException {
+
+        return updateResourceCall(attributes, excludedAttributes, body, httpMethod);
     }
 
     /**
@@ -343,6 +349,23 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
     }
 
     /**
+     * Return the updated group with httpMethod support
+     * Returns HTTP 404 if the group is not found.
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
+     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
+     * @param body               (optional)
+     * @param httpMethod         HTTP method to use (PUT or PATCH)
+     * @return String
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ScimApiResponse<String> updateGroup(List<String> attributes, List<String> excludedAttributes, String body,
+                                              String httpMethod) throws ScimApiException {
+
+        return updateGroupWithHttpInfo(attributes, excludedAttributes, body, httpMethod);
+    }
+
+    /**
      * Return the updated group
      * Returns HTTP 404 if the group is not found.
      *
@@ -355,6 +378,25 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
     public ScimApiResponse<String> updateGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
                                                            String body) throws ScimApiException {
         HttpUriRequest call = updateGroupValidateBeforeCall(attributes, excludedAttributes, body);
+        Type localVarReturnType = new TypeToken<String>() {}.getType();
+        return scimApiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Return the updated group with httpMethod support
+     * Returns HTTP 404 if the group is not found.
+     *
+     * @param attributes         SCIM defined attributes parameter. (optional)
+     * @param excludedAttributes SCIM defined excludedAttribute parameter. (optional)
+     * @param body               (optional)
+     * @param httpMethod         HTTP method to use (PUT or PATCH)
+     * @return ScimApiResponse&lt;String&gt;
+     * @throws ScimApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ScimApiResponse<String> updateGroupWithHttpInfo(List<String> attributes, List<String> excludedAttributes,
+                                                          String body, String httpMethod) throws ScimApiException {
+
+        HttpUriRequest call = updateGroupValidateBeforeCall(attributes, excludedAttributes, body, httpMethod);
         Type localVarReturnType = new TypeToken<String>() {}.getType();
         return scimApiClient.execute(call, localVarReturnType);
     }

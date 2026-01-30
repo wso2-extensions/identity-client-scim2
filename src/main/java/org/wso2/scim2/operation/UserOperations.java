@@ -170,7 +170,8 @@ public class UserOperations extends AbstractOperations {
                 }
                 client.setURL(userEPURL + "/" + userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
-                ScimApiResponse<String> response = api.updateUser(null, null, encodedObject, httpMethod);
+                ScimApiResponse<String> response =
+                        api.updateUser(null, null, encodedObject, httpMethod);
 
                 if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                     scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.USER);

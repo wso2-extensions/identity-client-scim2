@@ -136,4 +136,17 @@ public class ProvisioningClient {
             throw new IdentitySCIMException("Unable to update the Group.", e);
         }
     }
+
+    /**
+     * Provision the patch group.
+     * @throws IdentitySCIMException if an error occurs while patching the group.
+     */
+    public void provisionPatchGroup() throws IdentitySCIMException {
+
+        try (GroupOperations operation = new GroupOperations(provider, scimObject, additionalProvisioningInformation)) {
+            operation.patchGroup();
+        } catch (ScimApiException | IdentitySCIMException e) {
+            throw new IdentitySCIMException("Unable to patch the Group.", e);
+        }
+    }
 }
