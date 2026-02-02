@@ -23,7 +23,10 @@ import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
 import org.wso2.charon3.core.exceptions.AbstractCharonException;
+import org.wso2.charon3.core.exceptions.BadRequestException;
+import org.wso2.charon3.core.exceptions.CharonException;
 import org.wso2.charon3.core.exceptions.NotFoundException;
 import org.wso2.charon3.core.objects.AbstractSCIMObject;
 import org.wso2.charon3.core.objects.Group;
@@ -31,9 +34,11 @@ import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.objects.User;
 import org.wso2.charon3.core.schema.SCIMConstants;
 import org.wso2.charon3.core.utils.CopyUtil;
+import org.wso2.charon3.core.utils.codeutils.PatchOperation;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.util.CollectionUtils;
+import org.wso2.scim2.util.PatchOperationEncoder;
 import org.wso2.scim2.util.SCIM2CommonConstants;
 import org.wso2.scim2.util.SCIMClient;
 
@@ -140,14 +145,18 @@ public class GroupOperations extends AbstractOperations {
         }
     }
 
-    public void updateGroup() throws IdentitySCIMException {
+    public void updateGroup(String httpMethod) throws IdentitySCIMException {
 
         String filter;
         try {
             //check if role name is updated
-            if (additionalInformation != null && (Boolean) additionalInformation.get(
-                    SCIM2CommonConstants.IS_ROLE_NAME_CHANGED_ON_UPDATE)) {
-                filter = GROUP_FILTER + additionalInformation.get(SCIM2CommonConstants.OLD_GROUP_NAME);
+            if (additionalInformation != null) {
+                Object flag = additionalInformation.get(SCIM2CommonConstants.IS_ROLE_NAME_CHANGED_ON_UPDATE);
+                boolean changed = flag != null && Boolean.parseBoolean(flag.toString());
+
+                filter = GROUP_FILTER + (changed
+                        ? additionalInformation.get(SCIM2CommonConstants.OLD_GROUP_NAME)
+                        : ((Group) scimObject).getDisplayName());
             } else {
                 filter = GROUP_FILTER + ((Group) scimObject).getDisplayName();
             }
@@ -161,17 +170,45 @@ public class GroupOperations extends AbstractOperations {
                 }
 
                 String encodedGroup;
-                List<String> users = ((Group) scimObject).getMembersWithDisplayName();
-                if (CollectionUtils.isEmpty(users)) {
-                    encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                if (httpMethod.equals("PUT")) {
+                    List<String> users = ((Group) scimObject).getMembersWithDisplayName();
+                    if (CollectionUtils.isEmpty(users)) {
+                        encodedGroup = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject, SCIMConstants.JSON);
+                    } else {
+                        // Find corresponding userIds of group members and enrich the scimObject.
+                        Group updatedGroup = addUserIDForMembersOfGroup();
+                        encodedGroup = scimClient.encodeSCIMObject(updatedGroup, SCIMConstants.JSON);
+                    }
+                } else if (httpMethod.equals("PATCH")) {
+                    // Get patch operations from additionalInformation, or fall back to provider.
+                    List<PatchOperation> patchOperations = null;
+                    if (additionalInformation != null &&
+                            additionalInformation.containsKey(SCIM2CommonConstants.PATCH_OPERATIONS)) {
+                        patchOperations =
+                                (List<PatchOperation>) additionalInformation.get(SCIM2CommonConstants.PATCH_OPERATIONS);
+                    }
+
+                    // Fall back to provider's patch operations list if not in additionalInformation.
+                    if (patchOperations == null || patchOperations.isEmpty()) {
+                        patchOperations = provider.getPatchOperationList();
+                    }
+
+                    if (patchOperations == null || patchOperations.isEmpty()) {
+                        logger.error("No patch operations provided for PATCH request");
+                        throw new IdentitySCIMException("No patch operations provided for PATCH request");
+                    }
+
+                    PatchOperationEncoder patchOperationEncoder = new PatchOperationEncoder();
+                    encodedGroup = patchOperationEncoder.encodeRequest(patchOperations);
                 } else {
-                    // Find corresponding userIds of group members and enrich the scimObject.
-                    Group updatedGroup = addUserIDForMembersOfGroup();
-                    encodedGroup = scimClient.encodeSCIMObject(updatedGroup, SCIMConstants.JSON);
+                    logger.error("Not supported update operation type: " + httpMethod);
+                    return;
                 }
+
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
-                ScimApiResponse<String> response = api.updateGroup(null, null, encodedGroup);
+                ScimApiResponse<String> response =
+                        api.updateGroup(null, null, encodedGroup, httpMethod);
                 logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Update Group Response: " + response.getData());
@@ -186,6 +223,17 @@ public class GroupOperations extends AbstractOperations {
                     logger.error(exception.getMessage());
                 }
             }
+        } catch (CharonException e) {
+            throw new IdentitySCIMException(
+                    "Error in encoding the object to be provisioned for group : " +
+                            ((Group) scimObject).getDisplayName(), e);
+        } catch (BadRequestException e) {
+            throw new IdentitySCIMException(
+                    "Error in encoding patch operations for group : " + ((Group) scimObject).getDisplayName(), e);
+        } catch (JSONException e) {
+            throw new IdentitySCIMException(
+                    "Error in building JSON for patch operations for group : " + ((Group) scimObject).getDisplayName(),
+                    e);
         } catch (AbstractCharonException e) {
             throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         } catch (ScimApiException e) {
@@ -193,6 +241,20 @@ public class GroupOperations extends AbstractOperations {
         } catch (IOException e) {
             throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
         }
+    }
+
+    public void updateGroup() throws IdentitySCIMException {
+
+        this.updateGroup("PUT");
+    }
+
+    /**
+     * Update group with PATCH method.
+     * @throws IdentitySCIMException if an error occurs while patching the group.
+     */
+    public void patchGroup() throws IdentitySCIMException {
+
+        this.updateGroup("PATCH");
     }
 
     private Group addUserIDForMembersOfGroup() throws AbstractCharonException, ScimApiException, IOException {
