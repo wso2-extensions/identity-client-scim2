@@ -25,6 +25,8 @@ public class SCIM2CommonConstants {
     public static final String ELEMENT_NAME_USER_ENDPOINT = "userEndpoint";
     public static final String ELEMENT_NAME_GROUP_ENDPOINT = "groupEndpoint";
     public static final String PATCH_OPERATIONS = "PatchOperations";
+    public static final String NEW_MEMBERS = "NewMembers";
+    public static final String DELETED_MEMBERS = "DeletedMembers";
     public static final int USER = 1;
     public static final int GROUP = 2;
 }
