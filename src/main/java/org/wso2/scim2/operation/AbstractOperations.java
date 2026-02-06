@@ -21,6 +21,10 @@ import io.scim2.swagger.client.ScimApiException;
 import io.scim2.swagger.client.ScimApiResponse;
 import io.scim2.swagger.client.api.Scimv2GroupsApi;
 import io.scim2.swagger.client.api.Scimv2UsersApi;
+import io.scim2.swagger.client.auth.ApiKeyAuth;
+import io.scim2.swagger.client.auth.HttpBasicAuth;
+import io.scim2.swagger.client.auth.OAuth;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.charon3.core.config.CharonConfiguration;
@@ -32,6 +36,7 @@ import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.protocol.ResponseCodeConstants;
 import org.wso2.charon3.core.schema.SCIMConstants;
 import org.wso2.scim2.client.SCIMProvider;
+import org.wso2.scim2.util.AuthenticationType;
 import org.wso2.scim2.util.SCIM2CommonConstants;
 import org.wso2.scim2.util.SCIMClient;
 
@@ -54,6 +59,7 @@ public abstract class AbstractOperations implements AutoCloseable {
     protected String userName;
     protected Map<String, Object> additionalInformation;
     protected ScimApiClient client;
+    protected String[] authNames;
 
     public AbstractOperations(SCIMProvider scimProvider, SCIMObject object,
                               Map<String, Object> additionalInformation) throws ScimApiException {
@@ -67,8 +73,100 @@ public abstract class AbstractOperations implements AutoCloseable {
         userName = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
 
         client = new ScimApiClient();
-        client.setUsername(userName);
-        client.setPassword(provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD));
+        configureAuthentication(client);
+    }
+
+    /**
+     * Configure authentication on the SCIM API client based on authentication type.
+     *
+     * @param client ScimApiClient to configure.
+     * @throws ScimApiException If authentication configuration fails.
+     */
+    private void configureAuthentication(ScimApiClient client) throws ScimApiException {
+
+        String authTypeValue = provider.getProperty(SCIM2CommonConstants.AUTHENTICATION_TYPE);
+
+        // Parse authentication type from string value, default to BASIC if not specified.
+        AuthenticationType authType = AuthenticationType.fromValue(authTypeValue);
+
+        switch (authType) {
+            case BASIC:
+                // Configure BASIC authentication.
+                HttpBasicAuth basicAuth = (HttpBasicAuth) client.getAuthentication(
+                        SCIM2CommonConstants.AUTH_SCHEME_BASIC);
+                if (basicAuth != null) {
+                    String username = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
+                    String password = provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD);
+                    if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+                        basicAuth.setUsername(username);
+                        basicAuth.setPassword(password);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Configured BASIC authentication for SCIM client");
+                        }
+                    }
+                }
+                authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_BASIC};
+                break;
+            case BEARER:
+                // Configure BEARER authentication.
+                OAuth bearerAuth = (OAuth) client.getAuthentication(SCIM2CommonConstants.AUTH_SCHEME_BEARER);
+                if (bearerAuth != null) {
+                    String accessToken = provider.getProperty(SCIM2CommonConstants.ACCESS_TOKEN);
+                    if (StringUtils.isNotBlank(accessToken)) {
+                        bearerAuth.setAccessToken(accessToken);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Configured BEARER authentication for SCIM client");
+                        }
+                    }
+                }
+                authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_BEARER};
+                break;
+            case API_KEY:
+                // Configure API_KEY authentication.
+                String apiKeyHeader = provider.getProperty(SCIM2CommonConstants.API_KEY_HEADER);
+                String apiKeyValue = provider.getProperty(SCIM2CommonConstants.API_KEY_VALUE);
+
+                if (StringUtils.isNotBlank(apiKeyHeader) && StringUtils.isNotBlank(apiKeyValue)) {
+                    ApiKeyAuth apiKeyAuth = (ApiKeyAuth) client.getAuthentication(
+                            SCIM2CommonConstants.AUTH_SCHEME_API_KEY);
+                    if (apiKeyAuth != null) {
+                        apiKeyAuth.setApiKey(apiKeyValue);
+                        apiKeyAuth.setApiKeyPrefix(null); // No prefix, just the key.
+                        // Update the header name.
+                        apiKeyAuth = new ApiKeyAuth("header", apiKeyHeader);
+                        apiKeyAuth.setApiKey(apiKeyValue);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Configured API_KEY authentication for SCIM client with header: " +
+                                    apiKeyHeader);
+                        }
+                    }
+                }
+                authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_API_KEY};
+                break;
+            case NONE:
+                // No authentication.
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No authentication configured for SCIM client");
+                }
+                authNames = new String[]{};
+                break;
+            default:
+                logger.warn("Unsupported authentication type: " + authTypeValue +
+                        ". Defaulting to BASIC authentication.");
+                // Fallback to BASIC authentication.
+                HttpBasicAuth defaultBasicAuth = (HttpBasicAuth) client.getAuthentication(
+                        SCIM2CommonConstants.AUTH_SCHEME_BASIC);
+                if (defaultBasicAuth != null) {
+                    String username = provider.getProperty(SCIMConstants.UserSchemaConstants.USER_NAME);
+                    String password = provider.getProperty(SCIMConstants.UserSchemaConstants.PASSWORD);
+                    if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+                        defaultBasicAuth.setUsername(username);
+                        defaultBasicAuth.setPassword(password);
+                    }
+                }
+                authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_BASIC};
+                break;
+        }
     }
 
     public List<SCIMObject> listWithGet(List<String> attributes, List<String> excludedAttributes, String filter,
@@ -97,11 +195,15 @@ public abstract class AbstractOperations implements AutoCloseable {
         ScimApiResponse<String> response;
         if (resourceType == SCIM2CommonConstants.USER) {
             client.setURL(userEPURL);
-            response = new Scimv2UsersApi(client).getUser(attributes, excludedAttributes, filter, startIndex, count,
+            Scimv2UsersApi usersApi = new Scimv2UsersApi(client);
+            usersApi.setAuthNames(authNames);
+            response = usersApi.getUser(attributes, excludedAttributes, filter, startIndex, count,
                     sortBy, sortOrder);
         } else {
             client.setURL(groupEPURL);
-            response = new Scimv2GroupsApi(client).getGroup(attributes, excludedAttributes, filter, startIndex, count,
+            Scimv2GroupsApi groupsApi = new Scimv2GroupsApi(client);
+            groupsApi.setAuthNames(authNames);
+            response = groupsApi.getGroup(attributes, excludedAttributes, filter, startIndex, count,
                     sortBy, sortOrder);
         }
         if (logger.isDebugEnabled()) {

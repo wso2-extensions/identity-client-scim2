@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2025, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2018-2026, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -98,6 +98,7 @@ public class GroupOperations extends AbstractOperations {
             }
             client.setURL(groupEPURL);
             Scimv2GroupsApi api = new Scimv2GroupsApi(client);
+            api.setAuthNames(authNames);
             ScimApiResponse<String> response = api.createGroup(null, null, encodedGroup);
             logger.info("SCIM - create group operation returned with response code: " + response.getStatusCode());
             if (logger.isDebugEnabled()) {
@@ -134,6 +135,7 @@ public class GroupOperations extends AbstractOperations {
                 }
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
+                api.setAuthNames(authNames);
                 ScimApiResponse<String> response = api.deleteGroup();
                 logger.info("SCIM - delete group operation returned with response code: " + response.getStatusCode());
                 handleSCIMErrorResponse(response);
@@ -198,7 +200,7 @@ public class GroupOperations extends AbstractOperations {
 
                     // Initialize patchOperations if still null.
                     if (patchOperations == null) {
-                        patchOperations = new java.util.ArrayList<>();
+                        patchOperations = new ArrayList<>();
                     }
 
                     // Handle member updates via PATCH.
@@ -236,6 +238,7 @@ public class GroupOperations extends AbstractOperations {
 
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
+                api.setAuthNames(authNames);
                 ScimApiResponse<String> response =
                         api.updateGroup(null, null, encodedGroup, httpMethod);
                 logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());

@@ -24,6 +24,7 @@ import io.scim2.swagger.client.Configuration;
 import io.scim2.swagger.client.Pair;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.wso2.scim2.util.SCIM2CommonConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.Map;
 public class Scimv2BaseApi {
 
     protected ScimApiClient scimApiClient;
+    protected String[] authNames;
 
     public Scimv2BaseApi() {
         this(Configuration.getDefaultScimApiClient());
@@ -40,6 +42,7 @@ public class Scimv2BaseApi {
 
     public Scimv2BaseApi(ScimApiClient scimApiClient) {
         this.scimApiClient = scimApiClient;
+        this.authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_BASIC};
     }
 
     public ScimApiClient getScimApiClient() {
@@ -48,6 +51,24 @@ public class Scimv2BaseApi {
 
     public void setScimApiClient(ScimApiClient scimApiClient) {
         this.scimApiClient = scimApiClient;
+    }
+
+    /**
+     * Set the authentication names to use for API calls.
+     *
+     * @param authNames Array of authentication names (e.g., AUTH_SCHEME_BASIC, AUTH_SCHEME_BEARER, AUTH_SCHEME_API_KEY)
+     */
+    public void setAuthNames(String[] authNames) {
+        this.authNames = authNames;
+    }
+
+    /**
+     * Get the authentication names used for API calls.
+     *
+     * @return Array of authentication names
+     */
+    public String[] getAuthNames() {
+        return authNames;
     }
 
     /**
@@ -79,9 +100,8 @@ public class Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     /**
@@ -104,9 +124,8 @@ public class Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("DELETE", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     /**
@@ -136,9 +155,8 @@ public class Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     /**
@@ -161,9 +179,8 @@ public class Scimv2BaseApi {
         final String[] localVarContentTypes = {"application/scim+json"};
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     /**
@@ -197,9 +214,8 @@ public class Scimv2BaseApi {
         final String[] localVarContentTypes = {"application/scim+json"};
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall(method, localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     /**
@@ -237,8 +253,7 @@ public class Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 }

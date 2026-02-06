@@ -62,6 +62,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.wso2.scim2.util.SCIM2ClientConfig;
+import org.wso2.scim2.util.SCIM2CommonConstants;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
@@ -201,7 +202,9 @@ public class ScimApiClient implements AutoCloseable {
 
         // Setup authentications (key: authentication name, value: authentication).
         authentications = new HashMap<>();
-        authentications.put("basicAuth", new HttpBasicAuth());
+        authentications.put(SCIM2CommonConstants.AUTH_SCHEME_BASIC, new HttpBasicAuth());
+        authentications.put(SCIM2CommonConstants.AUTH_SCHEME_BEARER, new OAuth());
+        authentications.put(SCIM2CommonConstants.AUTH_SCHEME_API_KEY, new ApiKeyAuth("header", "Authorization"));
         // Prevent the authentications from being modified.
         authentications = Collections.unmodifiableMap(authentications);
     }

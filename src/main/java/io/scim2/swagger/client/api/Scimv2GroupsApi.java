@@ -74,9 +74,8 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("POST", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     private HttpUriRequest createGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String body)
@@ -195,9 +194,8 @@ public class Scimv2GroupsApi extends Scimv2BaseApi {
         final String localVarContentType = scimApiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
 
-        String[] localVarAuthNames = new String[]{"basicAuth"};
         return scimApiClient.buildCall("GET", localVarQueryParams, localVarPostBody, localVarHeaderParams,
-                localVarFormParams, localVarAuthNames);
+                localVarFormParams, authNames);
     }
 
     private HttpUriRequest getGroupValidateBeforeCall(List<String> attributes, List<String> excludedAttributes, String filter,
