@@ -62,6 +62,7 @@ public class UserOperations extends AbstractOperations {
             }
             client.setURL(userEPURL);
             Scimv2UsersApi api = new Scimv2UsersApi(client);
+            api.setAuthNames(authNames);
             ScimApiResponse<String> response = api.createUser(null, null,
                     encodedUser);
             logger.info("SCIM - create user operation returned with response code: " + response.getStatusCode());
@@ -107,6 +108,7 @@ public class UserOperations extends AbstractOperations {
                 }
                 client.setURL(userEPURL + "/" + userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
+                api.setAuthNames(authNames);
                 ScimApiResponse response = api.deleteUser();
                 handleSCIMErrorResponse(response);
             } else {
@@ -170,6 +172,7 @@ public class UserOperations extends AbstractOperations {
                 }
                 client.setURL(userEPURL + "/" + userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
+                api.setAuthNames(authNames);
                 ScimApiResponse<String> response =
                         api.updateUser(null, null, encodedObject, httpMethod);
 
