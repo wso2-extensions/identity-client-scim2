@@ -29,4 +29,22 @@ public class SCIM2CommonConstants {
     public static final String DELETED_MEMBERS = "DeletedMembers";
     public static final int USER = 1;
     public static final int GROUP = 2;
+
+    // Authentication constants.
+    public static final String AUTHENTICATION_TYPE = "authenticationType";
+    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String API_KEY_HEADER = "apiKeyHeader";
+    public static final String API_KEY_VALUE = "apiKeyValue";
+
+    // Authentication scheme names.
+    public static final String AUTH_SCHEME_BASIC = "basicAuth";
+    public static final String AUTH_SCHEME_BEARER = "bearerAuth";
+    public static final String AUTH_SCHEME_API_KEY = "apiKeyAuth";
+
+    // OAuth Client Credentials authentication constants.
+    public static final String OAUTH_TOKEN_ENDPOINT = "oauthTokenEndpoint";
+    public static final String OAUTH_CLIENT_ID = "oauthClientId";
+    public static final String OAUTH_CLIENT_SECRET = "oauthClientSecret";
+    public static final String OAUTH_SCOPE = "oauthScope";
+    public static final String TOKEN_MANAGER = "tokenManager";
 }
