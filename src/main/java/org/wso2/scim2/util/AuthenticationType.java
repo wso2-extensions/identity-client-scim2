@@ -53,7 +53,7 @@ public enum AuthenticationType {
     public static AuthenticationType fromValue(String value) {
 
         if (value == null) {
-            return BASIC; // Default
+            return BASIC;
         }
         for (AuthenticationType type : AuthenticationType.values()) {
             if (type.value.equalsIgnoreCase(value)) {
