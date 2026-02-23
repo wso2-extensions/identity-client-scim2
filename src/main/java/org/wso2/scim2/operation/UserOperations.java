@@ -35,6 +35,7 @@ import org.wso2.charon3.core.utils.codeutils.PatchOperation;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.exception.IdentitySCIMException;
 import org.wso2.scim2.util.PatchOperationEncoder;
+import org.wso2.scim2.util.SCIM2ClientConfig;
 import org.wso2.scim2.util.SCIM2CommonConstants;
 import org.wso2.scim2.util.SCIMClient;
 
@@ -58,7 +59,8 @@ public class UserOperations extends AbstractOperations {
             String encodedUser = scimClient.encodeSCIMObject((AbstractSCIMObject) scimObject,
                     SCIMConstants.JSON);
             if (logger.isDebugEnabled()) {
-                logger.debug("User to provision : useName" + userName);
+                logger.debug("User to provision : userName: " +
+                        SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()));
             }
             client.setURL(userEPURL);
             Scimv2UsersApi api = new Scimv2UsersApi(client);
@@ -79,13 +81,13 @@ public class UserOperations extends AbstractOperations {
                 logger.error(exception.getMessage());
             }
         } catch (CharonException e) {
-            throw new IdentitySCIMException(
-                    "Error in encoding the object to be provisioned for user with userName: " + userName, e);
+            throw new IdentitySCIMException("Error in encoding the object to be provisioned for user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (AbstractCharonException e) {
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with userName: " + userName, e);
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         }
     }
 
@@ -112,16 +114,17 @@ public class UserOperations extends AbstractOperations {
                 ScimApiResponse response = api.deleteUser();
                 handleSCIMErrorResponse(response);
             } else {
-                logger.error("No Users found with userName: " + ((User) scimObject).getUserName());
+                logger.error("No Users found with userName: " +
+                        SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()));
             }
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: " + userName, e);
-        } catch ( AbstractCharonException e){
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: " + userName, e);
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
+        } catch (AbstractCharonException e) {
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         }
     }
 
@@ -184,25 +187,26 @@ public class UserOperations extends AbstractOperations {
                     logger.error(exception.getMessage());
                 }
             } else {
-                logger.error("No Users found with userName: " + ((User) scimObject).getUserName());
+                logger.error("No Users found with userName: " +
+                        SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()));
             }
         } catch (CharonException e) {
-            throw new IdentitySCIMException(
-                    "Error in encoding the object to be provisioned for user : " + userName, e);
+            throw new IdentitySCIMException("Error in encoding the object to be provisioned for user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         } catch (BadRequestException e) {
-            throw new IdentitySCIMException(
-                    "Error in encoding patch operations for user : " + userName, e);
+            throw new IdentitySCIMException("Error in encoding patch operations for user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         } catch (JSONException e) {
-            throw new IdentitySCIMException(
-                    "Error in building JSON for patch operations for user : " + userName, e);
+            throw new IdentitySCIMException("Error in building JSON for patch operations for user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: " + userName, e);
-        } catch ( AbstractCharonException e){
-            throw new IdentitySCIMException(
-                    "Error in invoking provisioning operation for the user with id: " + userName, e);
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
+        } catch (AbstractCharonException e) {
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         }
     }
 
@@ -217,5 +221,22 @@ public class UserOperations extends AbstractOperations {
     public void patchUser() throws IdentitySCIMException {
 
         this.updateUser("PATCH");
+    }
+
+    /**
+     * Returns the username of the user being provisioned from the SCIM object.
+     *
+     * @return The provisioning user's username, or null if not available.
+     */
+    private String getProvisioningUserName() {
+
+        if (scimObject instanceof User) {
+            try {
+                return ((User) scimObject).getUserName();
+            } catch (CharonException e) {
+                logger.debug("Could not retrieve provisioning username from SCIM object.", e);
+            }
+        }
+        return null;
     }
 }
