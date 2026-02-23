@@ -18,8 +18,11 @@
 
 package org.wso2.scim2.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.regex.Pattern;
 
 /**
  * Configuration class for SCIM2 Client HTTP settings including retry mechanism.
@@ -35,10 +38,14 @@ public class SCIM2ClientConfig {
     private static final int DEFAULT_HTTP_CONNECTION_TIMEOUT_IN_MILLIS = 2000;
     private static final int DEFAULT_HTTP_CONNECTION_REQUEST_TIMEOUT_IN_MILLIS = 2000;
 
+    private static final Pattern LOG_MASKING_PATTERN = Pattern.compile("(?<=.).(?=.)");
+    private static final String MASKING_CHARACTER = "*";
+
     private Integer registeredRetryCount;
     private Integer registeredReadTimeout;
     private Integer registeredConnectionTimeout;
     private Integer registeredConnectionRequestTimeout;
+    private Boolean registeredMaskingEnabled;
 
     private SCIM2ClientConfig() {
     }
@@ -50,7 +57,6 @@ public class SCIM2ClientConfig {
 
     /**
      * Returns the HTTP request retry count.
-     * Priority: Registered config > Default value.
      *
      * @return The HTTP request retry count, or the default if not registered.
      */
@@ -64,7 +70,6 @@ public class SCIM2ClientConfig {
 
     /**
      * Returns the HTTP read timeout in milliseconds.
-     * Priority: Registered config > Default value.
      *
      * @return The HTTP read timeout, or the default if not registered.
      */
@@ -78,7 +83,6 @@ public class SCIM2ClientConfig {
 
     /**
      * Returns the HTTP connection timeout in milliseconds.
-     * Priority: Registered config > Default value.
      *
      * @return The HTTP connection timeout, or the default if not registered.
      */
@@ -92,7 +96,6 @@ public class SCIM2ClientConfig {
 
     /**
      * Returns the HTTP connection request timeout in milliseconds.
-     * Priority: Registered config > Default value.
      *
      * @return The HTTP connection request timeout, or the default if not registered.
      */
@@ -122,7 +125,6 @@ public class SCIM2ClientConfig {
 
     /**
      * Registers HTTP timeout configurations.
-     * This method allows external configuration providers (like IdentityUtil) to set timeout configs.
      *
      * @param readTimeout Read timeout in milliseconds.
      * @param connectionTimeout Connection timeout in milliseconds.
@@ -140,8 +142,44 @@ public class SCIM2ClientConfig {
     }
 
     /**
+     * Registers the log masking configuration.
+     *
+     * @param maskingEnabled true if PII masking should be applied, false otherwise.
+     */
+    public void registerMaskingConfig(boolean maskingEnabled) {
+
+        this.registeredMaskingEnabled = maskingEnabled;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Registered SCIM2 client log masking enabled: %b", maskingEnabled));
+        }
+    }
+
+    /**
+     * Returns whether log masking is enabled.
+     *
+     * @return true if masking is enabled, false otherwise.
+     */
+    public boolean isMaskingEnabled() {
+
+        return registeredMaskingEnabled != null && registeredMaskingEnabled;
+    }
+
+    /**
+     * Masks the given value if log masking is enabled, otherwise returns the value as-is.
+     *
+     * @param value The value to potentially mask.
+     * @return The masked value if masking is enabled, or the original value.
+     */
+    public String maskIfRequired(String value) {
+
+        if (isMaskingEnabled() && StringUtils.isNotEmpty(value)) {
+            return LOG_MASKING_PATTERN.matcher(value).replaceAll(MASKING_CHARACTER);
+        }
+        return value;
+    }
+
+    /**
      * Clears all registered configurations.
-     * Useful for testing or resetting to default behavior.
      */
     public void clearRegisteredConfigs() {
 
@@ -149,6 +187,7 @@ public class SCIM2ClientConfig {
         this.registeredReadTimeout = null;
         this.registeredConnectionTimeout = null;
         this.registeredConnectionRequestTimeout = null;
+        this.registeredMaskingEnabled = null;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Cleared all registered SCIM2 client configs");
         }
