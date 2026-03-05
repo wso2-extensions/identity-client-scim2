@@ -189,7 +189,7 @@
                         </Export-Package>
                         <Import-Package>
                             io.swagger.*;version=${swagger-core-version},
-                            org.wso2.charon3.core.*; version="[3.0.0,4.1.0)",
+                            org.wso2.charon3.core.*; version="[3.0.0,6.0.0)",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
@@ -452,7 +452,7 @@
         <gson-version>2.9.0</gson-version>
         <jodatime-version>2.9.9</jodatime-version>
         <commons.logging.version>1.2</commons.logging.version>
-        <charon.version>5.0.3</charon.version>
+        <charon.version>5.1.1</charon.version>
         <commons.logging.version>1.1</commons.logging.version>
         <maven-plugin-version>1.0.0</maven-plugin-version>
         <junit-version>4.12</junit-version>
