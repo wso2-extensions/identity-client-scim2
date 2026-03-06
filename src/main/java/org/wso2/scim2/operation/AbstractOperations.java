@@ -35,6 +35,7 @@ import org.wso2.charon3.core.exceptions.NotFoundException;
 import org.wso2.charon3.core.objects.SCIMObject;
 import org.wso2.charon3.core.protocol.ResponseCodeConstants;
 import org.wso2.charon3.core.schema.SCIMConstants;
+import org.wso2.scim2.auth.TokenManager;
 import org.wso2.scim2.client.SCIMProvider;
 import org.wso2.scim2.util.AuthenticationType;
 import org.wso2.scim2.util.SCIM2CommonConstants;
@@ -44,6 +45,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 public abstract class AbstractOperations implements AutoCloseable {
 
@@ -60,6 +62,7 @@ public abstract class AbstractOperations implements AutoCloseable {
     protected Map<String, Object> additionalInformation;
     protected ScimApiClient client;
     protected String[] authNames;
+    protected TokenManager tokenManager;
 
     public AbstractOperations(SCIMProvider scimProvider, SCIMObject object,
                               Map<String, Object> additionalInformation) throws ScimApiException {
@@ -142,6 +145,28 @@ public abstract class AbstractOperations implements AutoCloseable {
                     }
                 }
                 authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_API_KEY};
+                break;
+            case CLIENT_CREDENTIALS:
+                // Configure CLIENT_CREDENTIALS authentication using TokenManager.
+                tokenManager = provider.getTokenManager();
+                if (tokenManager != null) {
+                    try {
+                        String token = tokenManager.getAccessToken();
+                        OAuth clientCredsBearerAuth = (OAuth) client.getAuthentication(
+                                SCIM2CommonConstants.AUTH_SCHEME_BEARER);
+                        if (clientCredsBearerAuth != null) {
+                            clientCredsBearerAuth.setAccessToken(token);
+                        }
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Configured CLIENT_CREDENTIALS authentication for SCIM client");
+                        }
+                    } catch (Exception e) {
+                        throw new ScimApiException("Failed to obtain access token for CLIENT_CREDENTIALS auth", e);
+                    }
+                } else {
+                    throw new ScimApiException("TokenManager is not configured for CLIENT_CREDENTIALS authentication");
+                }
+                authNames = new String[]{SCIM2CommonConstants.AUTH_SCHEME_BEARER};
                 break;
             case NONE:
                 // No authentication.
@@ -235,6 +260,36 @@ public abstract class AbstractOperations implements AutoCloseable {
             AbstractCharonException exception =
                     scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
             logger.error(exception.getMessage());
+        }
+    }
+
+    /**
+     * Execute an operation with automatic token retry on 401 responses.
+     * If the operation fails with a 401 status and a TokenManager is available,
+     * the token is refreshed and the operation is retried once.
+     *
+     * @param operation The operation to execute.
+     * @param <T> The return type of the operation.
+     * @return The result of the operation.
+     * @throws Exception If the operation fails after retry.
+     */
+    protected <T> T executeWithTokenRetry(Callable<T> operation) throws Exception {
+
+        try {
+            return operation.call();
+        } catch (ScimApiException e) {
+            if (e.getCode() == 401 && tokenManager != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Received 401 response, attempting token refresh and retry");
+                }
+                OAuth bearerAuth = (OAuth) client.getAuthentication(SCIM2CommonConstants.AUTH_SCHEME_BEARER);
+                String newToken = tokenManager.refreshToken(null);
+                if (bearerAuth != null) {
+                    bearerAuth.setAccessToken(newToken);
+                }
+                return operation.call();
+            }
+            throw e;
         }
     }
 

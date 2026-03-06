@@ -26,6 +26,7 @@ public enum AuthenticationType {
     BASIC("basic"),
     BEARER("bearer"),
     API_KEY("apiKey"),
+    CLIENT_CREDENTIALS("clientCredentials"),
     NONE("none");
 
     private final String value;

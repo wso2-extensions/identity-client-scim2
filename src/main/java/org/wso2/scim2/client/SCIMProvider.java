@@ -17,6 +17,7 @@
 package org.wso2.scim2.client;
 
 import org.wso2.charon3.core.utils.codeutils.PatchOperation;
+import org.wso2.scim2.auth.TokenManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class SCIMProvider {
     private String id;
     private Map<String, String> properties = new HashMap<String, String>();
     private List<PatchOperation> patchOperationList = new ArrayList<PatchOperation>();
+    private TokenManager tokenManager;
 
     public SCIMProvider() {
     }
@@ -69,5 +71,15 @@ public class SCIMProvider {
 
     public List<PatchOperation> getPatchOperationList() {
         return patchOperationList;
+    }
+
+    public TokenManager getTokenManager() {
+
+        return tokenManager;
+    }
+
+    public void setTokenManager(TokenManager tokenManager) {
+
+        this.tokenManager = tokenManager;
     }
 }

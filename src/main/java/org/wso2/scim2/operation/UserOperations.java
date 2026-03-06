@@ -65,8 +65,8 @@ public class UserOperations extends AbstractOperations {
             client.setURL(userEPURL);
             Scimv2UsersApi api = new Scimv2UsersApi(client);
             api.setAuthNames(authNames);
-            ScimApiResponse<String> response = api.createUser(null, null,
-                    encodedUser);
+            ScimApiResponse<String> response = executeWithTokenRetry(
+                    () -> api.createUser(null, null, encodedUser));
             logger.info("SCIM - create user operation returned with response code: " + response.getStatusCode());
             if (logger.isDebugEnabled()) {
                 logger.debug("Create User Response: " + response.getData());
@@ -87,6 +87,9 @@ public class UserOperations extends AbstractOperations {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (AbstractCharonException e) {
             throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
+        } catch (Exception e) {
+            throw new IdentitySCIMException("Error in provisioning 'create user' operation for the user: " +
                     SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         }
     }
@@ -111,7 +114,7 @@ public class UserOperations extends AbstractOperations {
                 client.setURL(userEPURL + "/" + userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
                 api.setAuthNames(authNames);
-                ScimApiResponse response = api.deleteUser();
+                ScimApiResponse response = executeWithTokenRetry(() -> api.deleteUser());
                 handleSCIMErrorResponse(response);
             } else {
                 logger.error("No Users found with userName: " +
@@ -124,6 +127,9 @@ public class UserOperations extends AbstractOperations {
                     SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         } catch (AbstractCharonException e) {
             throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
+        } catch (Exception e) {
+            throw new IdentitySCIMException("Error in provisioning 'delete user' operation for the user: " +
                     SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         }
     }
@@ -176,8 +182,8 @@ public class UserOperations extends AbstractOperations {
                 client.setURL(userEPURL + "/" + userId);
                 Scimv2UsersApi api = new Scimv2UsersApi(client);
                 api.setAuthNames(authNames);
-                ScimApiResponse<String> response =
-                        api.updateUser(null, null, encodedObject, httpMethod);
+                ScimApiResponse<String> response = executeWithTokenRetry(
+                        () -> api.updateUser(null, null, encodedObject, httpMethod));
 
                 if (scimClient.evaluateResponseStatus(response.getStatusCode())) {
                     scimClient.decodeSCIMResponse(response.getData(), SCIMConstants.JSON, SCIM2CommonConstants.USER);
@@ -206,6 +212,9 @@ public class UserOperations extends AbstractOperations {
                     SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         } catch (AbstractCharonException e) {
             throw new IdentitySCIMException("Error in invoking provisioning operation for the user: " +
+                    SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
+        } catch (Exception e) {
+            throw new IdentitySCIMException("Error in provisioning 'update user' operation for the user: " +
                     SCIM2ClientConfig.getInstance().maskIfRequired(getProvisioningUserName()), e);
         }
     }
