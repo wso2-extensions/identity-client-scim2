@@ -51,7 +51,7 @@ import java.util.Optional;
 
 public class GroupOperations extends AbstractOperations {
 
-    private static final Log logger = LogFactory.getLog(UserOperations.class.getName());
+    private static final Log logger = LogFactory.getLog(GroupOperations.class.getName());
 
     public GroupOperations(SCIMProvider scimProvider, SCIMObject object,
                            Map<String, Object> additionalInformation) throws ScimApiException {
@@ -99,7 +99,8 @@ public class GroupOperations extends AbstractOperations {
             client.setURL(groupEPURL);
             Scimv2GroupsApi api = new Scimv2GroupsApi(client);
             api.setAuthNames(authNames);
-            ScimApiResponse<String> response = api.createGroup(null, null, encodedGroup);
+            ScimApiResponse<String> response = executeWithTokenRetry(
+                    () -> api.createGroup(null, null, encodedGroup));
             logger.info("SCIM - create group operation returned with response code: " + response.getStatusCode());
             if (logger.isDebugEnabled()) {
                 logger.debug("Create Group Response: " + response.getData());
@@ -113,12 +114,17 @@ public class GroupOperations extends AbstractOperations {
                         scimClient.decodeSCIMException(response.getData(), SCIMConstants.JSON);
                 logger.error(exception.getMessage());
             }
-        } catch (IOException e) {
-            throw new IdentitySCIMException("Error in provisioning 'create group' operation for user : " + userName, e);
+        } catch (CharonException e) {
+            throw new IdentitySCIMException("Error in encoding the object to be provisioned for group: " +
+                    getProvisioningGroupName(), e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
-        } catch ( AbstractCharonException e){
-            throw new IdentitySCIMException("Error in provisioning 'create group' operation for user : " + userName, e);
+        } catch (AbstractCharonException e) {
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the group: " +
+                    getProvisioningGroupName(), e);
+        } catch (Exception e) {
+            throw new IdentitySCIMException("Error in provisioning 'create group' operation for the group: " +
+                    getProvisioningGroupName(), e);
         }
     }
 
@@ -136,16 +142,21 @@ public class GroupOperations extends AbstractOperations {
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
                 api.setAuthNames(authNames);
-                ScimApiResponse<String> response = api.deleteGroup();
+                ScimApiResponse<String> response = executeWithTokenRetry(() -> api.deleteGroup());
                 logger.info("SCIM - delete group operation returned with response code: " + response.getStatusCode());
                 handleSCIMErrorResponse(response);
             }
-        } catch (AbstractCharonException e) {
-            throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user : " + userName, e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
+        } catch (AbstractCharonException e) {
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the group: " +
+                    getProvisioningGroupName(), e);
         } catch (IOException e) {
-            throw new IdentitySCIMException("Error in provisioning 'delete group' operation for user : " + userName, e);
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the group: " +
+                    getProvisioningGroupName(), e);
+        } catch (Exception e) {
+            throw new IdentitySCIMException("Error in provisioning 'delete group' operation for the group: " +
+                    getProvisioningGroupName(), e);
         }
     }
 
@@ -239,8 +250,8 @@ public class GroupOperations extends AbstractOperations {
                 client.setURL(groupEPURL + "/" + groupId);
                 Scimv2GroupsApi api = new Scimv2GroupsApi(client);
                 api.setAuthNames(authNames);
-                ScimApiResponse<String> response =
-                        api.updateGroup(null, null, encodedGroup, httpMethod);
+                ScimApiResponse<String> response = executeWithTokenRetry(
+                        () -> api.updateGroup(null, null, encodedGroup, httpMethod));
                 logger.info("SCIM - update group operation returned with response code: " + response.getStatusCode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("Update Group Response: " + response.getData());
@@ -257,21 +268,24 @@ public class GroupOperations extends AbstractOperations {
             }
         } catch (CharonException e) {
             throw new IdentitySCIMException(
-                    "Error in encoding the object to be provisioned for group : " +
-                            ((Group) scimObject).getDisplayName(), e);
+                    "Error in encoding the object to be provisioned for group: " + getProvisioningGroupName(), e);
         } catch (BadRequestException e) {
             throw new IdentitySCIMException(
-                    "Error in encoding patch operations for group : " + ((Group) scimObject).getDisplayName(), e);
+                    "Error in encoding patch operations for group: " + getProvisioningGroupName(), e);
         } catch (JSONException e) {
             throw new IdentitySCIMException(
-                    "Error in building JSON for patch operations for group : " + ((Group) scimObject).getDisplayName(),
-                    e);
+                    "Error in building JSON for patch operations for group: " + getProvisioningGroupName(), e);
         } catch (AbstractCharonException e) {
-            throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the group: " +
+                    getProvisioningGroupName(), e);
         } catch (ScimApiException e) {
             throw new IdentitySCIMException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new IdentitySCIMException("Error in provisioning 'update group' operation for user : " + userName, e);
+            throw new IdentitySCIMException("Error in invoking provisioning operation for the group: " +
+                    getProvisioningGroupName(), e);
+        } catch (Exception e) {
+            throw new IdentitySCIMException("Error in provisioning 'update group' operation for the group: " +
+                    getProvisioningGroupName(), e);
         }
     }
 
@@ -287,6 +301,19 @@ public class GroupOperations extends AbstractOperations {
     public void patchGroup() throws IdentitySCIMException {
 
         this.updateGroup("PATCH");
+    }
+
+    /**
+     * Returns the display name of the group being provisioned from the SCIM object.
+     *
+     * @return The provisioning group's display name, or null if not available.
+     */
+    private String getProvisioningGroupName() {
+
+        if (scimObject instanceof Group) {
+            return ((Group) scimObject).getDisplayName();
+        }
+        return null;
     }
 
     private Group addUserIDForMembersOfGroup() throws AbstractCharonException, ScimApiException, IOException {
